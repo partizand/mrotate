@@ -1,4 +1,6 @@
 /ipch
+/Debug
+/mrotate/Debug
 mrotate.opensdf
 mrotate.sdf
 mrotate.vcxproj.user
