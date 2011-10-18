@@ -39,7 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Documents\Visual Studio 2010\Projects\poco\Foundation\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\poco\Util\include;..\..\poco\Foundation\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Documents\Visual Studio 2010\Projects\poco\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
