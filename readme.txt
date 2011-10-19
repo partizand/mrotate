@@ -1,4 +1,6 @@
-logrotate для Windows
+Log rotation for Windows
+
+Ротация логов для Windows
 
 Задумка
 

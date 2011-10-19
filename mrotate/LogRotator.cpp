@@ -8,8 +8,12 @@
 #include <Poco\Path.h>
 #include <Poco\String.h>
 #include <Poco\File.h>
-#include <Poco/NumberParser.h>
+#include <Poco\NumberParser.h>
+#include <Poco\Glob.h>
+#include <Poco\Timestamp.h>
+#include <Poco\DateTime.h>
 
+using namespace std;
 using namespace Poco;
 using namespace Util;
 
@@ -21,6 +25,92 @@ LogRotator::LogRotator(void)
 LogRotator::~LogRotator(void)
 {
 }
+//------------------------------------------------------------------------
+//! Ротировать файлы (основная функция)
+void LogRotator::rotate()
+{
+	int i;
+	vector<string> fileList;
+	// Перебираем все записи
+	for (i=0;i<items.size();++i)
+	{
+		currIndex=i;
+		// Получить список файлов для обработки
+		getFileList(fileList);
+
+	}
+}
+//------------------------------------------------------------------------
+//! Получить список файлов для обработки
+void LogRotator::getFileList(std::vector<std::string> &fileList)
+{
+	set<string> files;
+	fileList.clear();
+	Glob::glob(items.at(currIndex).source,files); // Волшебная функция получения списка файлов по маске
+	// Перебираем все файлы
+	set<string>::iterator it=files.begin();
+	for (;it!=files.end();++it)
+	{
+		// *it - имя файла
+		if (isRotateFile(*it)) // Добавляем файл если подходит
+		{
+			fileList.push_back(*it);
+		}
+	}
+
+}
+//! Ротировать заданный файл
+//------------------------------------------------------------------------
+void rotateFile(const std::string &fileName)
+{
+
+}
+
+//! Проверить нужно ли ротировать данный файл
+//------------------------------------------------------------------------
+bool LogRotator::isRotateFile(const std::string &fileName)
+{
+Poco::File pFile(fileName);
+
+	if (!pFile.exists()) return false; // Файла нет
+	if (!pFile.isFile()) return false; // Это не файл
+	if (!pFile.canRead()) return false; // Файл не может быть прочитан
+
+	if (items.at(currIndex).period!=0) //задан период обрабтки
+	{
+		//Timestamp periodTime;  //Текущее время
+		DateTime pTime; //Время для сравнения
+		//DateTime fTime; // Время файла
+		Timespan diffTime(items.at(currIndex).period-1,23,0,0,0);  //Сколько нужно отнять
+		pTime-=diffTime; 
+		//periodTime=periodTime-diffTime; // 
+
+		// дата создание файла должена быть старше period - 1 час
+		DateTime fTime(pFile.created());
+		if (fTime<=pTime)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	if (items.at(currIndex).limitSize!=0)
+	{
+		File::FileSize fsize;
+		fsize=pFile.getSize();
+		if (fsize > items.at(currIndex).limitSize)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+//------------------------------------------------------------------------
 //! Загрузка параметров ротации из файла
 void LogRotator::load(const std::string &fileName)
 {
@@ -49,7 +139,7 @@ void LogRotator::load(const std::string &fileName)
 	
 	load(pConf);
 }
-
+//------------------------------------------------------------------------
 //! Загрузка настроек ротации
 void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
 {
@@ -75,27 +165,33 @@ if (!RootKeys.empty())
 				}
 				//Период и тип
 				KeyName=RootKeys.at(i)+".period";
-				KeyValue=pConf->getString(KeyName,"0");
-				tmpItem.period=convertPeriod(KeyValue,tmpItem.type);
+				tmpItem.period=pConf->getInt(KeyName,0);
+				
 				// Размер
 
-				KeyName=RootKeys.at(i)+".nametask";
-				tmpTask.NameTask=pConf->getString(KeyName,"");
-				if (tmpTask.NameTask=="") 
-				{
-					tmpTask.NameTask=RootKeys.at(i);
-				}
+				items.push_back(tmpItem);
 				//cout<< *it<<endl;
-			addTask(tmpTask);
+			 
 			}
  }
 }
 //! Преобразование размера в int64
-Int64 LogRotator::convertSize(std::string &strSize)
+long int LogRotator::convertSize(std::string &strSize)
 {
-	strSize
+	Int64 iSize;
+	// Преобразуем строку в число
+	
+	if (NumberParser::tryParse64(strSize,iSize))
+	{
+		return iSize;
+	}
+	else
+	{
+		return 0;
+	}
 }
 //! Преобразование строкового периода в int и определение типа ротации
+/*
 int LogRotator::convertPeriod(std::string &strPeriod,Rotate::RotateType &rType)
 {
 	int iPeriod;
@@ -130,4 +226,5 @@ int LogRotator::convertPeriod(std::string &strPeriod,Rotate::RotateType &rType)
 	}
 
 }
+*/
 

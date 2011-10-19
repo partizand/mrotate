@@ -30,6 +30,12 @@
     <ClInclude Include="RotateEntry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Archiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchiverParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RotateEntry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Archiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArchiverParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
