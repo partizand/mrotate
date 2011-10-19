@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "Archiver.h"
 
+#include "ReplVar.h"
+
 using namespace std;
 
 Archiver::Archiver(void)
@@ -9,7 +11,7 @@ Archiver::Archiver(void)
 	
 {
 	// Добавляем 7z
-	ArchiverParam SevenZipArh("7z","7z.exe"," options");
+	ArchiverParam SevenZipArh("7z","7z.exe"," a %ArhFileName %FileName");
 	Archivers["7z"]=SevenZipArh; 
 	setOptions("7z","","");
 }

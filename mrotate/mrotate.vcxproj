@@ -82,6 +82,7 @@
     <ClInclude Include="Archiver.h" />
     <ClInclude Include="ArchiverParam.h" />
     <ClInclude Include="LogRotator.h" />
+    <ClInclude Include="ReplVar.h" />
     <ClInclude Include="RotateEntry.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -91,6 +92,7 @@
     <ClCompile Include="ArchiverParam.cpp" />
     <ClCompile Include="LogRotator.cpp" />
     <ClCompile Include="mrotate.cpp" />
+    <ClCompile Include="ReplVar.cpp" />
     <ClCompile Include="RotateEntry.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
