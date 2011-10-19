@@ -10,14 +10,16 @@ public:
 	Archiver(void);
 	~Archiver(void);
 	//! Установить настройки (действуют на одну ротацию)
-	void setOptions(std::string ArchiveName,std::string TargetPath,std::string TargetMask);
+	void setOptions(std::string ArchiveName,std::string TargetPath);
 	
 	//! Заархивировать файл архиватором с текущими настройками
-	bool archiveFile(std::string ArchiverName,std::string FileName);
+	bool archiveFile(std::string FileName);
 private:
 	//! Архиваторы
 	//std::vector<ArchiverParam> Archivers;
 	std::map<std::string,ArchiverParam> Archivers;
+	//! Запустить внешнюю прогу и ждать завершения, возвращает успех
+	bool startProg(std::string exeName,std::string args);
 
 	//! Имя архиватора
 	std::string archiveName;
