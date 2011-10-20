@@ -23,7 +23,7 @@ public:
 	//! Сколько дней хранить архивы
 	int keepPeriod;
 	//! Имя архиватора, или none
-	std::string archiver;
+	std::string archiverName;
 	//! Каталог назначения
 	std::string target;
 	//! Ограничение размера

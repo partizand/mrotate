@@ -5,7 +5,7 @@ class ArchiverParam
 {
 public:
 	ArchiverParam(void);
-	ArchiverParam(std::string ArchiverName,std::string ExeName,std::string Arguments);
+	ArchiverParam(std::string ArchiverName,std::string Extention,std::string ExeName,std::string Arguments);
 	~ArchiverParam(void);
 	//! Имя архиватора
 	std::string archiverName;

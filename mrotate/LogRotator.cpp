@@ -17,8 +17,10 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-LogRotator::LogRotator(void)
+LogRotator::LogRotator(Poco::Logger *logger)
+
 {
+	log=logger;
 }
 
 
@@ -30,13 +32,19 @@ LogRotator::~LogRotator(void)
 void LogRotator::rotate()
 {
 	int i;
+	bool suc;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
 		currIndex=i;
+		suc=archiver.setOptions(items[i].archiverName,items[i].target);
+		if (!suc) continue; // Ошибка в архиваторе
 		// Получить список файлов для обработки
 		getFileList(fileList);
+		// Ротируем файлы
+		rotateFile(fileList);
+
 
 	}
 }
@@ -59,15 +67,32 @@ void LogRotator::getFileList(std::vector<std::string> &fileList)
 	}
 
 }
-//! Ротировать заданный файл
 //------------------------------------------------------------------------
-void rotateFile(const std::string &fileName)
+//! Ротировать список файлов
+void LogRotator::rotateFile(const std::vector<std::string> &listFiles)
 {
-
+	int i;
+	for (i=0;i<listFiles.size();++i)
+	{
+		rotateFile(listFiles[i]);
+	}
+	
+}
+//------------------------------------------------------------------------
+//! Ротировать заданный файл
+void LogRotator::rotateFile(const std::string &fileName)
+{
+	// Архивируем файл
+	bool suc=archiver.archiveFile(fileName);
+	if (suc) // Успешно заархивировался
+	{
+		Poco::File pFile(fileName);
+		pFile.remove(); // Удаляем его
+	}
 }
 
-//! Проверить нужно ли ротировать данный файл
 //------------------------------------------------------------------------
+//! Проверить нужно ли ротировать данный файл
 bool LogRotator::isRotateFile(const std::string &fileName)
 {
 Poco::File pFile(fileName);
