@@ -16,6 +16,25 @@ ReplVar::~ReplVar(void)
 {
 }
 //------------------------------------------------------------------------
+//! Заменить имя файла и дату в векторе
+void ReplVar::replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0)
+{
+	vector<string>::iterator it=strVect.begin();
+	
+	for (;it!=strVect.end();++it)
+	{
+		replaceFile(*it,FileName,ArhFileName);
+		replaceDate(*it,dateTime);
+	}
+}
+//! Заменить имя файла и дату в строке
+std::string ReplVar::replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0)
+{
+string ret(str);
+ret=replaceFile(ret,FileName,ArhFileName);
+ret=
+}
+//------------------------------------------------------------------------
 //! Заменить имя файла и имя архива в строке
 std::string ReplVar::replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="")
 {

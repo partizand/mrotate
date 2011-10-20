@@ -2,6 +2,7 @@
 #include "Archiver.h"
 
 #include "ReplVar.h"
+#include "Executer.h"
 //#include <Poco\DateTime.h>
 #include <Poco\Path.h>
 #include <Poco\Environment.h>
@@ -31,6 +32,9 @@ bool Archiver::archiveFile(std::string FileName)
 	// Нужно построить опции, найти архиватор и запустить
 	// Нужно заменить:
 	
+	Process::Args vectArgs;
+
+	Executer::splitArgs(Archivers[archiveName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
 	
 	string ArhFileName(targetPath); // Полное имя архива
 	string sFileName; // Имя файла (короткое) и имя архива (короткое)

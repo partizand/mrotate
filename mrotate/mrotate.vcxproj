@@ -52,7 +52,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -66,7 +66,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="Archiver.h" />
     <ClInclude Include="ArchiverParam.h" />
+    <ClInclude Include="Executer.h" />
     <ClInclude Include="LogRotator.h" />
     <ClInclude Include="ReplVar.h" />
     <ClInclude Include="RotateEntry.h" />
@@ -90,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="Archiver.cpp" />
     <ClCompile Include="ArchiverParam.cpp" />
+    <ClCompile Include="Executer.cpp" />
     <ClCompile Include="LogRotator.cpp" />
     <ClCompile Include="mrotate.cpp" />
     <ClCompile Include="ReplVar.cpp" />

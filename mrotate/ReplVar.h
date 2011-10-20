@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <Poco\DateTime.h>
 
 //! Замена параметров в строке
@@ -32,6 +34,10 @@
 %z - time zone differential in ISO 8601 format (Z or +NN.NN) 
 %Z - time zone differential in RFC format (GMT or +NNNN) 
 %% - percent sign
+
+%FileName Только имя файла
+%FileBaseName Имя файла без расширения
+%FileExt Расширение файла
 */
 class ReplVar
 {
@@ -42,5 +48,10 @@ public:
 	static std::string replaceDate(const std::string &str,Poco::DateTime dateTime=0);
 	//! Заменить имя файла в строке
 	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="");
+	//! Заменить имя файла и дату в строке
+	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0);
+	//! Заменить имя файла и дату в векторе
+	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0);
+
 };
 
