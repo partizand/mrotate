@@ -24,8 +24,10 @@ public:
 	int keepPeriod;
 	//! Имя архиватора, или none
 	std::string archiverName;
+	//! Каталог назначения и маска
+	std::string targetPath;
 	//! Каталог назначения
-	std::string target;
+	std::string targetDir;
 	//! Ограничение размера
 	long int limitSize;
 

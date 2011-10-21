@@ -14,7 +14,7 @@
 class LogRotator
 {
 public:
-	LogRotator(Poco::Logger *logger);
+	LogRotator(Poco::Logger &logger);
 	~LogRotator(void);
 	//! Загрузка настроек ротации из файла
 	void load(const std::string &fileName);
@@ -32,13 +32,19 @@ private:
 	//! Загрузка настроек ротации
 	void load(const Poco::Util::AbstractConfiguration *pConf);
 	//! Получить список файлов для обработки
-	void getFileList(std::vector<std::string> &fileList);
-	//! Проверить нужно ли ротировать данный файл
-	bool isRotateFile(const std::string &fileName);
+	//void getFileList(std::vector<std::string> &fileList);
+	//! Получить список файлов по маске, отобранных по периоду или размеру, если period и lSize не заданы, берутся из настройки текущей ротации
+	void getFileList(std::vector<std::string> &fileList, const std::string &pathMask,int Period=0,unsigned long int lSize=0);
+	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, берутся из настройки текущей ротации
+	bool isRotateFile(const std::string &fileName,int Period=0,unsigned long int lSize=0);
 	//! Ротировать заданный файл
 	void rotateFile(const std::string &fileName);
 	//! Ротировать список файлов
 	void rotateFile(const std::vector<std::string> &listFiles);
+	//! Ротировать архивные файлы
+	void rotateArhFile(const std::string &fileName);
+	//! Ротировать список архивных файлов
+	void rotateArhFile(const std::vector<std::string> &listFiles);
 
 	//! Преобразование строкового периода в int и определение типа ротации
 	//int convertPeriod(std::string &strPeriod,Rotate::RotateType &rType);

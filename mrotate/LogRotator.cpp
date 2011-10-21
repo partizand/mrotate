@@ -17,10 +17,10 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-LogRotator::LogRotator(Poco::Logger *logger)
+LogRotator::LogRotator(Poco::Logger &logger)
 
 {
-	log=logger;
+	log=&logger;
 }
 
 
@@ -33,23 +33,54 @@ void LogRotator::rotate()
 {
 	int i;
 	bool suc;
+	string arhMask;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
 		currIndex=i;
-		suc=archiver.setOptions(items[i].archiverName,items[i].target);
+		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
 		if (!suc) continue; // Ошибка в архиваторе
 		// Получить список файлов для обработки
-		getFileList(fileList);
+		getFileList(fileList,items.at(currIndex).source);
 		// Ротируем файлы
 		rotateFile(fileList);
-
+		// Удаляем старые архивы
+		if (items[i].keepPeriod>0)
+		{
+			arhMask=items.at(currIndex).source
+			getFileList(fileList,items[i].keepPeriod
+		}
 
 	}
 }
 //------------------------------------------------------------------------
+//! Получить список файлов по маске, отобранных по периоду или размеру, если period и lSize не заданы, берутся из настройки текущей ротации
+void LogRotator::getFileList(std::vector<std::string> &fileList, const std::string &pathMask,int Period,unsigned long int lSize)
+{
+set<string> files;
+fileList.clear();
+Glob::glob(pathMask,files); // Волшебная функция получения списка файлов по маске
+/*
+if (Period==0 && lSize==0) 
+{
+	fileList.assign(files.begin(),files.end());
+	return;
+}
+*/
+// Перебираем все файлы
+	set<string>::iterator it=files.begin();
+	for (;it!=files.end();++it)
+	{
+		if (isRotateFile(*it,Period,lSize)) // Добавляем файл если подходит
+		{
+			fileList.push_back(*it);
+		}
+	}
+}
+//------------------------------------------------------------------------
 //! Получить список файлов для обработки
+/*
 void LogRotator::getFileList(std::vector<std::string> &fileList)
 {
 	set<string> files;
@@ -67,6 +98,7 @@ void LogRotator::getFileList(std::vector<std::string> &fileList)
 	}
 
 }
+*/
 //------------------------------------------------------------------------
 //! Ротировать список файлов
 void LogRotator::rotateFile(const std::vector<std::string> &listFiles)
@@ -90,10 +122,27 @@ void LogRotator::rotateFile(const std::string &fileName)
 		pFile.remove(); // Удаляем его
 	}
 }
+//------------------------------------------------------------------------
+//! Ротировать архивный файл (т.е. удалить его)
+void LogRotator::rotateArhFile(const std::string &fileName)
+{
+Poco::File pFile(fileName);
+pFile.remove(); // Удаляем его
+}
 
 //------------------------------------------------------------------------
-//! Проверить нужно ли ротировать данный файл
-bool LogRotator::isRotateFile(const std::string &fileName)
+//! Ротировать список архивных файлов
+void LogRotator::rotateArhFile(const std::vector<std::string> &listFiles)
+{
+	int i;
+	for (i=0;i<listFiles.size();++i)
+	{
+		rotateArhFile(listFiles[i]);
+	}
+}
+//------------------------------------------------------------------------
+//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, берутся из настройки текущей ротации
+bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,unsigned long int lSize/*=0*/)
 {
 Poco::File pFile(fileName);
 
@@ -101,12 +150,20 @@ Poco::File pFile(fileName);
 	if (!pFile.isFile()) return false; // Это не файл
 	if (!pFile.canRead()) return false; // Файл не может быть прочитан
 
-	if (items.at(currIndex).period!=0) //задан период обрабтки
+	int iPeriod(Period);
+	unsigned long int iSize(lSize);
+	if (Period==0 && lSize==0) // Параметры не заданы, берем из текущей настройки ротации
+	{
+		iPeriod=items.at(currIndex).period;
+		iSize=items.at(currIndex).limitSize;
+	}
+
+	if (iPeriod>0) //задан период обрабтки
 	{
 		//Timestamp periodTime;  //Текущее время
 		DateTime pTime; //Время для сравнения
 		//DateTime fTime; // Время файла
-		Timespan diffTime(items.at(currIndex).period-1,23,0,0,0);  //Сколько нужно отнять
+		Timespan diffTime(iPeriod-1,23,0,0,0);  //Сколько нужно отнять
 		pTime-=diffTime; 
 		//periodTime=periodTime-diffTime; // 
 
@@ -121,11 +178,11 @@ Poco::File pFile(fileName);
 			return false;
 		}
 	}
-	if (items.at(currIndex).limitSize!=0)
+	if (iSize>0)
 	{
 		File::FileSize fsize;
 		fsize=pFile.getSize();
-		if (fsize > items.at(currIndex).limitSize)
+		if (fsize > iSize)
 		{
 			return true;
 		}

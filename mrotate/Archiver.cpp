@@ -39,7 +39,7 @@ bool Archiver::archiveFile(std::string FileName)
 	//ћен€ем в targetPath - %FileName и %yydd - на тек дату
 	string ArhFileName(targetPath); // ѕолное им€ архива
 	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName);
-	ArhFileName+="."+Archivers[archiveName].extention;
+	ArhFileName+=Archivers[archiveName].extention;
 
 	//мен€ем в аргументах архиватора %ArhFileName на полный путь и им€ архива, %FileName - полный путь и им€ архивируемого файла
 	vector<std::string> vectArgs;
