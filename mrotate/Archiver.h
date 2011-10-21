@@ -15,6 +15,8 @@ public:
 	
 	//! Заархивировать файл архиватором с текущими настройками
 	bool archiveFile(std::string FileName);
+	//! Возвращает расширение файла, для текущего установленного архиватора
+	std::string getArhExtention(std::string ArchiveName="");
 private:
 	//! Архиваторы
 	//std::vector<ArchiverParam> Archivers;

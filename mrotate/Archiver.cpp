@@ -81,3 +81,14 @@ bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)
 
 }
 //------------------------------------------------------------------------
+//! Возвращает расширение файла, для текущего установленного архиватора
+std::string Archiver::getArhExtention(std::string ArchiveName/*=""*/)
+{
+	if (ArchiveName.empty())
+	{
+		return Archivers[archiveName].extention;
+	}
+	else
+		return Archivers[ArchiveName].extention;
+}
+//------------------------------------------------------------------------

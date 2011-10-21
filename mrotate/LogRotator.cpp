@@ -33,7 +33,7 @@ void LogRotator::rotate()
 {
 	int i;
 	bool suc;
-	string arhMask;
+	string oldArhMask;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
@@ -48,8 +48,11 @@ void LogRotator::rotate()
 		// Удаляем старые архивы
 		if (items[i].keepPeriod>0)
 		{
-			arhMask=items.at(currIndex).source
-			getFileList(fileList,items[i].keepPeriod
+			Path pPath(items.at(currIndex).targetDir);
+			pPath.setFileName("*"+archiver.getArhExtention()); // только по расширению архива
+			oldArhMask=pPath.toString();
+			getFileList(fileList,oldArhMask,items[i].keepPeriod); // Список файлов для удаления
+			removeFile(fileList); 
 		}
 
 	}
@@ -118,27 +121,32 @@ void LogRotator::rotateFile(const std::string &fileName)
 	bool suc=archiver.archiveFile(fileName);
 	if (suc) // Успешно заархивировался
 	{
-		Poco::File pFile(fileName);
-		pFile.remove(); // Удаляем его
+		removeFile(fileName);
 	}
 }
 //------------------------------------------------------------------------
-//! Ротировать архивный файл (т.е. удалить его)
-void LogRotator::rotateArhFile(const std::string &fileName)
+//! Удалить список файлов
+void LogRotator::removeFile(const std::vector<std::string> &listFiles)
 {
-Poco::File pFile(fileName);
-pFile.remove(); // Удаляем его
-}
-
-//------------------------------------------------------------------------
-//! Ротировать список архивных файлов
-void LogRotator::rotateArhFile(const std::vector<std::string> &listFiles)
-{
-	int i;
+int i;
 	for (i=0;i<listFiles.size();++i)
 	{
-		rotateArhFile(listFiles[i]);
+		removeFile(listFiles[i]);
 	}
+}
+//------------------------------------------------------------------------
+//! Удалить файл
+void LogRotator::removeFile(const std::string &fileName)
+{
+Poco::File pFile(fileName);
+try
+{
+pFile.remove(); // Удаляем его
+}
+catch(...) 
+{
+	log->error("Ошибка удаления файла");
+}
 }
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, берутся из настройки текущей ротации
@@ -242,14 +250,39 @@ if (!RootKeys.empty())
 				tmpItem.source=pConf->getString(KeyName,"");
 				if (tmpItem.source=="") 
 				{
-					//poco_error_f1(*AppLogger,"Source missing in config %s",RootKeys.at(i));
+					poco_error_f1(*log,"Skip entry %s. Source missing",RootKeys.at(i));
 					continue;
 				}
-				//Период и тип
+				//Период
 				KeyName=RootKeys.at(i)+".period";
 				tmpItem.period=pConf->getInt(KeyName,0);
 				
 				// Размер
+				KeyName=RootKeys.at(i)+".size";
+				KeyValue=pConf->getString(KeyName,"");
+				tmpItem.limitSize=convertSize(KeyValue);
+				if (tmpItem.limitSize==0 && tmpItem.period==0) 
+				{
+					poco_error_f1(*log,"Skip entry %s. Period and size is null",RootKeys.at(i));
+					continue;
+				}
+				// Keep Период
+				KeyName=RootKeys.at(i)+".keepPeriod";
+				tmpItem.keepPeriod=pConf->getInt(KeyName,0);
+				// Архиватор
+				KeyName=RootKeys.at(i)+".compress";
+				tmpItem.archiverName=pConf->getString(KeyName,"");
+				if (tmpItem.archiverName.empty()) 
+				{
+					poco_error_f1(*log,"Skip entry %s. Archiver is empty",RootKeys.at(i));
+					continue;
+				}
+				// Target
+				KeyName=RootKeys.at(i)+".target";
+				KeyValue=pConf->getString(KeyName,"");
+
+				
+
 
 				items.push_back(tmpItem);
 				//cout<< *it<<endl;
@@ -257,18 +290,53 @@ if (!RootKeys.empty())
 			}
  }
 }
-//! Преобразование размера в int64
-long int LogRotator::convertSize(std::string &strSize)
+//------------------------------------------------------------------------
+//! Преобразовать target к полному пути
+std::string LogRotator::getFullTarget(const std::string &targetPath,const std::string &Source)
 {
-	Int64 iSize;
-	// Преобразуем строку в число
+	string shortFileName; // Короткое имя файла target
+	Path sPath(Source);
+	sPath.makeFile();
 	
+	sPath.setFileName("");
+	Path tPath(targetPath);
+	shortFileName=tPath.getFileName();
+	if (shortFileName.empty()) shortFileName="%FileName";
+	Path rPath; // Результирующий 
+	if (tPath.depth()==0) 
+	{tPath.assign(
+
+	}
+
+}
+//------------------------------------------------------------------------
+//! Преобразование размера в int64 (Т.е. строка может содержать K и M)
+unsigned long int LogRotator::convertSize(std::string &strSize)
+{
+	if (strSize.empty()) return 0;
+	Int64 iSize;
+	Int64 multipl=1;
+	// Преобразуем строку в число
+	toUpperInPlace(strSize);
+	string::size_type iK=strSize.find("K");
+	string::size_type iM=strSize.find("M");
+	if (iK!=string::npos) // Найден K
+	{
+		multipl=1024;
+		strSize.erase(iK,1);
+	}
+	if (iM!=string::npos) // Найден M
+	{
+		multipl=1024*1024;
+		strSize.erase(iM,1);
+	}
 	if (NumberParser::tryParse64(strSize,iSize))
 	{
-		return iSize;
+		return iSize*multipl;
 	}
 	else
 	{
+		log->error("Error parsing size in entry");
 		return 0;
 	}
 }

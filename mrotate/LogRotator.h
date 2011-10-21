@@ -42,14 +42,20 @@ private:
 	//! Ротировать список файлов
 	void rotateFile(const std::vector<std::string> &listFiles);
 	//! Ротировать архивные файлы
-	void rotateArhFile(const std::string &fileName);
+	//void rotateArhFile(const std::string &fileName);
 	//! Ротировать список архивных файлов
-	void rotateArhFile(const std::vector<std::string> &listFiles);
-
+	//void rotateArhFile(const std::vector<std::string> &listFiles);
+	//! Удалить файл
+	void removeFile(const std::string &fileName);
+	//! Удалить список файлов
+	void removeFile(const std::vector<std::string> &listFiles);
 	//! Преобразование строкового периода в int и определение типа ротации
 	//int convertPeriod(std::string &strPeriod,Rotate::RotateType &rType);
 	//! Преобразование размера в int64
-	long int convertSize(std::string &strSize);
+	unsigned long int convertSize(std::string &strSize);
+	//! Преобразовать target к полному пути
+	std::string getFullTarget(const std::string &targetPath,const std::string &Source);
+
 	Poco::Logger *log;
 };
 

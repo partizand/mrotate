@@ -12,6 +12,11 @@ public:
 	static int execute(const std::string &exePath,const std::vector<std::string> &vectArgs,bool wait=true);
 	//! Получить полное имя файла (ищет в %path% каталогах), если путь уже полный, то просто вернет его же
 	static std::string getFullPath(std::string aPath);
+	//! Возвращает имя каталога из пути
+	static std::string getDir(std::string aPath);
+	//! Возвращает имя файла из пути
+	static std::string getFileName(std::string aPath);
+	
 	//! Разбить строку аргументов на вектор по разделителю "пробел"
 	static void splitArgs(const std::string &strArgs,std::vector<std::string> &vectArgs);
 };
