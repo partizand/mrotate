@@ -17,8 +17,8 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-LogRotator::LogRotator(Poco::Logger &logger)
-
+LogRotator::LogRotator(Poco::Logger &logger):
+	archiver(logger)
 {
 	log=&logger;
 }
@@ -41,6 +41,7 @@ void LogRotator::rotate()
 		currIndex=i;
 		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
 		if (!suc) continue; // Ошибка в архиваторе
+		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
 		// Получить список файлов для обработки
 		getFileList(fileList,items.at(currIndex).source);
 		// Ротируем файлы
@@ -165,7 +166,7 @@ Poco::File pFile(fileName);
 		iPeriod=items.at(currIndex).period;
 		iSize=items.at(currIndex).limitSize;
 	}
-
+	if (iPeriod==0 && iSize==0) return false; // Все равно не заданы
 	if (iPeriod>0) //задан период обрабтки
 	{
 		//Timestamp periodTime;  //Текущее время
@@ -174,9 +175,20 @@ Poco::File pFile(fileName);
 		Timespan diffTime(iPeriod-1,23,0,0,0);  //Сколько нужно отнять
 		pTime-=diffTime; 
 		//periodTime=periodTime-diffTime; // 
-
-		// дата создание файла должена быть старше period - 1 час
-		DateTime fTime(pFile.created());
+		Timestamp fileTime;
+		switch (items.at(currIndex).dateMode)
+		{
+		case Rotate::Created: 
+			fileTime=pFile.created();
+			break;
+		case Rotate::Modified: 
+			fileTime=pFile.getLastModified();
+			break;
+		}
+		// дата файла должена быть старше period - 1 час
+		//DateTime fTime(pFile.created());
+		// Дата модификации
+		DateTime fTime(fileTime);
 		if (fTime<=pTime)
 		{
 			return true;
@@ -199,6 +211,7 @@ Poco::File pFile(fileName);
 			return false;
 		}
 	}
+	return false;
 }
 //------------------------------------------------------------------------
 //! Загрузка параметров ротации из файла
@@ -233,7 +246,11 @@ void LogRotator::load(const std::string &fileName)
 //! Загрузка настроек ротации
 void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
 {
-RotateEntry tmpItem;
+//RotateEntry tmpItem;
+string Source,ArchiverName,TargetDir,TargetMask,FDateMode;
+int Period,KeepPeriod;
+unsigned long int LimitSize;
+
 AbstractConfiguration::Keys RootKeys;
 pConf-> keys("",RootKeys); // Список корневых ключей
 if (!RootKeys.empty())
@@ -244,47 +261,62 @@ if (!RootKeys.empty())
 	
 	 //for (AbstractConfiguration::Keys::const_iterator it = RootKeys.begin(); it != RootKeys.end(); ++it)
 			{
+				// Базовые ключи
+				//KeyName=RootKeys.at(i);
+				if (icompare(RootKeys.at(i),"application")==0) continue;
+				if (icompare(RootKeys.at(i),"system")==0) continue;
+				if (icompare(RootKeys.at(i),"logging")==0) continue;
+				
+				poco_debug_f1(*log,"Loading entry %s.",RootKeys.at(i));
+
 				//KeyName=*it+".source";
 				// Источник
 				KeyName=RootKeys.at(i)+".source";
-				tmpItem.source=pConf->getString(KeyName,"");
-				if (tmpItem.source=="") 
+				Source=pConf->getString(KeyName,"");
+				if (Source.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Source missing",RootKeys.at(i));
 					continue;
 				}
 				//Период
 				KeyName=RootKeys.at(i)+".period";
-				tmpItem.period=pConf->getInt(KeyName,0);
+				Period=pConf->getInt(KeyName,0);
 				
 				// Размер
 				KeyName=RootKeys.at(i)+".size";
 				KeyValue=pConf->getString(KeyName,"");
-				tmpItem.limitSize=convertSize(KeyValue);
-				if (tmpItem.limitSize==0 && tmpItem.period==0) 
+				LimitSize=convertSize(KeyValue);
+				if (LimitSize==0 && Period==0) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Period and size is null",RootKeys.at(i));
 					continue;
 				}
 				// Keep Период
 				KeyName=RootKeys.at(i)+".keepPeriod";
-				tmpItem.keepPeriod=pConf->getInt(KeyName,0);
+				KeepPeriod=pConf->getInt(KeyName,0);
 				// Архиватор
 				KeyName=RootKeys.at(i)+".compress";
-				tmpItem.archiverName=pConf->getString(KeyName,"");
-				if (tmpItem.archiverName.empty()) 
+				ArchiverName=pConf->getString(KeyName,"");
+				if (ArchiverName.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Archiver is empty",RootKeys.at(i));
 					continue;
 				}
-				// Target
-				KeyName=RootKeys.at(i)+".target";
-				KeyValue=pConf->getString(KeyName,"");
+				// Target Dir
+				KeyName=RootKeys.at(i)+".targetDir";
+				TargetDir=pConf->getString(KeyName,"");
+				// Target Mask
+				KeyName=RootKeys.at(i)+".targetMask";
+				TargetMask=pConf->getString(KeyName,"");
+				// Date mode
+				KeyName=RootKeys.at(i)+".dateMode";
+				FDateMode=pConf->getString(KeyName,"");
 
-				
+				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
 
 
-				items.push_back(tmpItem);
+				//items.push_back(tmpItem);
+				items.push_back(RotateEntry(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
 				//cout<< *it<<endl;
 			 
 			}
@@ -292,6 +324,7 @@ if (!RootKeys.empty())
 }
 //------------------------------------------------------------------------
 //! Преобразовать target к полному пути
+/*
 std::string LogRotator::getFullTarget(const std::string &targetPath,const std::string &Source)
 {
 	string shortFileName; // Короткое имя файла target
@@ -309,6 +342,7 @@ std::string LogRotator::getFullTarget(const std::string &targetPath,const std::s
 	}
 
 }
+*/
 //------------------------------------------------------------------------
 //! Преобразование размера в int64 (Т.е. строка может содержать K и M)
 unsigned long int LogRotator::convertSize(std::string &strSize)

@@ -3,12 +3,14 @@
 #include <vector>
 #include <map>
 
+#include <Poco\Logger.h>
+
 #include "ArchiverParam.h"
 //! Реализация архивации файлов внешним архиватором
 class Archiver
 {
 public:
-	Archiver(void);
+	Archiver(Poco::Logger &logger);
 	~Archiver(void);
 	//! Установить настройки (действуют на одну ротацию)
 	bool setOptions(std::string ArchiveName,std::string TargetPath);
@@ -27,7 +29,8 @@ private:
 	std::string archiveName;
 	//! Каталог назначения
 	std::string targetPath;
-	
+	//! Логгер
+	Poco::Logger *log;
 	
 };
 

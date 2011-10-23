@@ -16,13 +16,21 @@ Log rotation for Windows
 
 Пример настроек
 
-[Entry]
-Source=d:\temp\*.log
-Period=90; Период хранения оригиналов
-Size=100K ; Обрабатывать все файлы больше указанного размера (или этот параметр или period)
-compress=none|7z|имя архиватора
-Target=d:\oldlog\%filename%%yymmdd% или %filename%%yymmdd% ; Если каталога нет то он Source
-KeepPeriod=180 (пять последних файлов) ; Сколько дней хранить старые файлы, аналог Period, если не указан, то вечно
+[Entry1]
+Source=d:\temp\rotate\*.log
+; Период хранения оригиналов в днях
+Period=90
+; Обрабатывать все файлы больше указанного размера (или этот параметр или period)
+;Size=100K 
+compress=7z
+; Каталог старых файлов, если не указан то он Source
+TargetDir=d:\temp\rotateold
+; Маска наименования архивов, по умолчанию %fileName, к ней всегда добавляется расширение архиватора
+;TargetMask=%FileName
+; Сколько дней хранить старые файлы, аналог Period, если не указан, то вечно
+KeepPeriod=180 
+; Какую дату брать у файлов (по умолчанию Created)
+DateMode=Modified
 
 
 На будущее

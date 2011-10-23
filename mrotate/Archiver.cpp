@@ -11,13 +11,14 @@
 using namespace std;
 using namespace Poco;
 
-Archiver::Archiver(void)
+Archiver::Archiver(Poco::Logger &logger)
 	
 	
 	
 {
+	log=&logger;
 	// Добавляем 7z
-	ArchiverParam SevenZipArh("7z",".7z","7z.exe"," a %ArhFileName %FileName");
+	ArchiverParam SevenZipArh("7z",".7z","7z.exe"," a %ArhFileName %FullFileName -m0=PPMd");
 	Archivers["7z"]=SevenZipArh; 
 	//setOptions("7z","");
 }
@@ -34,17 +35,18 @@ bool Archiver::archiveFile(std::string FileName)
 	string exeName(Archivers[archiveName].exeName); // Exe файл
 
 	Path pPathSource(FileName);
+	pPathSource.makeFile();
 
 	string sFileName(pPathSource.getFileName()); // Короткое имя файла источника
 	//Меняем в targetPath - %FileName и %yydd - на тек дату
 	string ArhFileName(targetPath); // Полное имя архива
-	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName);
+	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName); // Полный путь пропадает!
 	ArhFileName+=Archivers[archiveName].extention;
 
 	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
 	vector<std::string> vectArgs;
 	Executer::splitArgs(Archivers[archiveName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
-	ReplVar::replaceFileAndDate(vectArgs,FileName,ArhFileName);
+	ReplVar::replaceFileAndDate(vectArgs,FileName,ArhFileName); // Все аргументы становятя полный путь к файлу
 	
 	
 	// Осталось это все запустить
@@ -72,6 +74,7 @@ bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)
 	std::map<std::string,ArchiverParam>::iterator it=Archivers.find(ArchiveName);
 	if (it==Archivers.end()) // Такого архиватора нет
 	{
+		poco_error_f1(*log,"ArchiveName %s not found",ArchiveName);
 		return false;
 	}
 	archiveName=ArchiveName;

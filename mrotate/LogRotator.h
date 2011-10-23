@@ -18,6 +18,8 @@ public:
 	~LogRotator(void);
 	//! Загрузка настроек ротации из файла
 	void load(const std::string &fileName);
+	//! Загрузка настроек ротации
+	void load(const Poco::Util::AbstractConfiguration *pConf);
 	//! Ротировать файлы (основная функция)
 	void rotate();
 
@@ -29,8 +31,7 @@ private:
 	int currIndex;
 	//! Архиватор
 	Archiver archiver;
-	//! Загрузка настроек ротации
-	void load(const Poco::Util::AbstractConfiguration *pConf);
+	
 	//! Получить список файлов для обработки
 	//void getFileList(std::vector<std::string> &fileList);
 	//! Получить список файлов по маске, отобранных по периоду или размеру, если period и lSize не заданы, берутся из настройки текущей ротации
@@ -54,7 +55,7 @@ private:
 	//! Преобразование размера в int64
 	unsigned long int convertSize(std::string &strSize);
 	//! Преобразовать target к полному пути
-	std::string getFullTarget(const std::string &targetPath,const std::string &Source);
+	//std::string getFullTarget(const std::string &targetPath,const std::string &Source);
 
 	Poco::Logger *log;
 };

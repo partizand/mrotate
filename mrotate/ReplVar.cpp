@@ -39,8 +39,13 @@ return ret;
 std::string ReplVar::replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName)
 {
 	string From,To;
-	string tmpStr(FileName);
+	string tmpStr(str);
 	Path pPath(FileName);
+	pPath.makeFile();
+	//Замена полного имени файла
+	From="%FullFileName"; // Только имя файла
+	To=pPath.toString();
+	tmpStr=replace (tmpStr,From,To);
 	//Замена имени файла
 	From="%FileName"; // Только имя файла
 	To=pPath.getFileName();

@@ -28,10 +28,11 @@ class RotateApp: public Application
 	/// more information.
 {
 public:
-	RotateApp(): _helpRequested(false),_runRequested(false),rotator(logger())
+	RotateApp(): _helpRequested(false),_runRequested(false),_loadRequested(false),rotator(logger())
 	{
 		//bak=new Backup(logger());
-		
+		logger().information("mrotate v.0.1. Rotate logs utility for Windows");
+		//logger().debug("debug mes");
 	}
 
 protected:	
@@ -39,6 +40,7 @@ protected:
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
+		
 		// add your own initialization code here
 		//bak=new Backup(logger());
 		
@@ -67,37 +69,27 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleHelp)));
 
-		options.addOption(
-			Option("define", "D", "define a configuration property")
-				.required(false)
-				.repeatable(true)
-				.argument("name=value")
-				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleDefine)));
-				
+		
+			/*	
 		options.addOption(
 			Option("config-file", "f", "load configuration data from a file")
 				.required(false)
 				.repeatable(true)
-				.argument("file")
+				.argument("config-file")
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleConfig)));
 
+		*/
 		options.addOption(
-			Option("bind", "b", "bind option value to test.property")
-				.required(false)
-				.repeatable(false)
-				.argument("value")
-				.binding("test.property"));
-		options.addOption(
-			Option("run", "r", "Run tasks")
+			Option("run", "r", "Run rotate")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleRun)));
 		options.addOption(
-			Option("task-file", "t", "load tasks from a file")
+			Option("config-file", "c", "load rotate entries from a file")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
-				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadTasks)));
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadEntries)));
 	}
 	
 	void handleHelp(const std::string& name, const std::string& value)
@@ -113,93 +105,47 @@ protected:
 		
 	}
 
-	void handleDefine(const std::string& name, const std::string& value)
-	{
-		defineProperty(value);
-	}
 	
+	// Загрузка параметров настройки
+	/*
 	void handleConfig(const std::string& name, const std::string& value)
 	{
 		loadConfiguration(value);
-//		bak->taskList.loadFromFile(value); // Грузим файл конфигурации
 	}
-	void handleLoadTasks(const std::string& name, const std::string& value)
+	*/
+	void handleLoadEntries(const std::string& name, const std::string& value)
 	{
-		bak.taskList.loadFromFile(value); // Грузим файл конфигурации
+		rotator.load(value); // Грузим файл конфигурации
+		_loadRequested=true;
 	}	
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Backup utility.");
+		helpFormatter.setHeader("Rotate utility.");
 		helpFormatter.format(std::cout);
 	}
 	
-	void defineProperty(const std::string& def)
-	{
-		std::string name;
-		std::string value;
-		std::string::size_type pos = def.find('=');
-		if (pos != std::string::npos)
-		{
-			name.assign(def, 0, pos);
-			value.assign(def, pos + 1, def.length() - pos);
-		}
-		else name = def;
-		config().setString(name, value);
-	}
+	
 
 	int main(const std::vector<std::string>& args)
 	{
 		if (!_helpRequested)
 		{
 			
+			if (!_loadRequested) rotator.load(&config());
 			if (_runRequested)	rotator.rotate();
-			//Backup bak(&logger());
-			/*
-			logger().information("Arguments to main():");
-			for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
-			{
-				logger().information(*it);
-			}
-			logger().information("Application properties:");
-			printProperties("");
-			*/
+			//rotator.rotate();
 		}
 		return Application::EXIT_OK;
 	}
 	
-	void printProperties(const std::string& base)
-	{
-		AbstractConfiguration::Keys keys;
-		config().keys(base, keys);
-		if (keys.empty())
-		{
-			if (config().hasProperty(base))
-			{
-				std::string msg;
-				msg.append(base);
-				msg.append(" = ");
-				msg.append(config().getString(base));
-				logger().information(msg);
-			}
-		}
-		else
-		{
-			for (AbstractConfiguration::Keys::const_iterator it = keys.begin(); it != keys.end(); ++it)
-			{
-				std::string fullKey = base;
-				if (!fullKey.empty()) fullKey += '.';
-				fullKey.append(*it);
-				printProperties(fullKey);
-			}
-		}
-	}
 	
 private:
 	bool _helpRequested;
 	bool _runRequested;
+	bool _loadRequested; // Указан параметр загрузки конфигурации из файла
 	LogRotator rotator;
 };
 
