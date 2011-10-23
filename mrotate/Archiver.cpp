@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "Archiver.h"
+
 
 #include "ReplVar.h"
 #include "Executer.h"
@@ -7,9 +7,18 @@
 #include <Poco\Path.h>
 #include <Poco\Environment.h>
 #include <Poco\Process.h>
+#include <Poco\Path.h>
+#include <Poco\String.h>
+#include <Poco\File.h>
+#include <Poco\Util\IniFileConfiguration.h>
+#include <Poco\Util\PropertyFileConfiguration.h>
+#include <Poco\AutoPtr.h>
+
+#include "Archiver.h"
 
 using namespace std;
 using namespace Poco;
+using namespace Util;
 
 Archiver::Archiver(Poco::Logger &logger)
 	
@@ -17,9 +26,11 @@ Archiver::Archiver(Poco::Logger &logger)
 	
 {
 	log=&logger;
-	// Добавляем 7z
-	ArchiverParam SevenZipArh("7z",".7z","7z.exe"," a %ArhFileName %FullFileName -m0=PPMd");
-	Archivers["7z"]=SevenZipArh; 
+	// 7z
+	Archivers["7z"]=ArchiverParam("7z",".7z","7z.exe"," a %ArhFileName %FullFileName -m0=PPMd");
+	// rar
+	Archivers["rar"]=ArchiverParam("rar",".rar","rar.exe"," a %ArhFileName %FullFileName");
+	
 	//setOptions("7z","");
 }
 //------------------------------------------------------------------------
@@ -65,7 +76,89 @@ bool Archiver::archiveFile(std::string FileName)
 	
 
 }
+//------------------------------------------------------------------------
+//! Загрузка параметров из файла
+void Archiver::load(const std::string &fileName)
+{
+// Определение типа файла по расширению
+	Poco::Path pPath(fileName);
+	Poco::File pFile(pPath);
 
+	if (!pFile.exists()) return; // Файла нет
+	if (!pFile.canRead()) return; // Файл не может быть прочитан
+
+	string Ext=pPath.getExtension();
+	//toLowerInPlace(Ext); // Расширение маленькими буквами
+
+	AutoPtr<AbstractConfiguration> pConf;
+
+	
+	if (icompare(Ext,"ini")==0) // Конфигурация ini
+	{
+		pConf=new IniFileConfiguration(fileName);
+	}
+	if (icompare(Ext,"properties")==0) // Конфигурация prop
+	{
+		pConf=new PropertyFileConfiguration(fileName);
+	}
+	if (pConf.isNull()) return; // Нет нужного расширения
+	
+	load(pConf);
+}
+//------------------------------------------------------------------------
+//! Загрузка настроек 
+void Archiver::load(const Poco::Util::AbstractConfiguration *pConf)
+{
+//RotateEntry tmpItem;
+string ArchiverName,ExeName,Extension,Args;
+
+AbstractConfiguration::Keys RootKeys;
+pConf-> keys("",RootKeys); // Список корневых ключей
+if (!RootKeys.empty())
+ {
+	string KeyName,KeyValue;
+	int i;
+	for (i=0;i<RootKeys.size();++i)
+	
+	 //for (AbstractConfiguration::Keys::const_iterator it = RootKeys.begin(); it != RootKeys.end(); ++it)
+			{
+				// Базовые ключи
+				//KeyName=RootKeys.at(i);
+				if (icompare(RootKeys.at(i),"application")==0) continue;
+				if (icompare(RootKeys.at(i),"system")==0) continue;
+				if (icompare(RootKeys.at(i),"logging")==0) continue;
+				
+				poco_debug_f1(*log,"Loading arh entry %s.",RootKeys.at(i));
+
+				//KeyName=*it+".source";
+				
+				// Имя
+				ArchiverName=RootKeys.at(i);
+				// Exe
+				KeyName=RootKeys.at(i)+".exeName";
+				ExeName=pConf->getString(KeyName,"");
+				if (ExeName.empty())
+				{
+					continue;
+				}
+
+				// Расширение
+				KeyName=RootKeys.at(i)+".Extension";
+				Extension=pConf->getString(KeyName,"");
+
+				// Аргументы
+				KeyName=RootKeys.at(i)+".Args";
+				Args=pConf->getString(KeyName,"");
+
+				
+
+				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
+
+				Archivers[ArchiverName]=ArchiverParam(ArchiverName,Extension,ExeName,Args);
+			 
+			}
+ }
+}
 //------------------------------------------------------------------------
 //! Установить настройки (действуют на одну ротацию)
 bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)

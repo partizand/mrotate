@@ -4,6 +4,7 @@
 #include <map>
 
 #include <Poco\Logger.h>
+#include <Poco\Util\AbstractConfiguration.h>
 
 #include "ArchiverParam.h"
 //! Реализация архивации файлов внешним архиватором
@@ -17,6 +18,12 @@ public:
 	
 	//! Заархивировать файл архиватором с текущими настройками
 	bool archiveFile(std::string FileName);
+
+	//! Загрузка настроек из файла
+	void load(const std::string &fileName);
+	//! Загрузка настроек 
+	void load(const Poco::Util::AbstractConfiguration *pConf);
+
 	//! Возвращает расширение файла, для текущего установленного архиватора
 	std::string getArhExtention(std::string ArchiveName="");
 private:

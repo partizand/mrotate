@@ -17,6 +17,8 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
+const string ver="0.1"; // Версия ротатора
+
 LogRotator::LogRotator(Poco::Logger &logger):
 	archiver(logger)
 {
@@ -373,6 +375,11 @@ unsigned long int LogRotator::convertSize(std::string &strSize)
 		log->error("Error parsing size in entry");
 		return 0;
 	}
+}
+//! Возвращает версию
+std::string LogRotator::getVersion()
+{
+return ver;
 }
 //! Преобразование строкового периода в int и определение типа ротации
 /*

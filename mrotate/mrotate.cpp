@@ -7,6 +7,7 @@
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/AutoPtr.h"
+//#include <Poco\Logger.h>
 //#include <iostream>
 
 #include "LogRotator.h"
@@ -31,7 +32,8 @@ public:
 	RotateApp(): _helpRequested(false),_runRequested(false),_loadRequested(false),rotator(logger())
 	{
 		//bak=new Backup(logger());
-		logger().information("mrotate v.0.1. Rotate logs utility for Windows");
+		poco_information_f1(logger(),"mrotate v.%s. Rotate logs utility for Windows.",rotator.getVersion());
+		//logger().information("mrotate v.0.1. Rotate logs utility for Windows");
 		//logger().debug("debug mes");
 	}
 
@@ -85,7 +87,13 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleRun)));
 		options.addOption(
-			Option("config-file", "c", "load rotate entries from a file")
+			Option("conf", "c", "load rotate entries from a file")
+				.required(false)
+				.repeatable(true)
+				.argument("file")
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadEntries)));
+		options.addOption(
+			Option("arh", "a", "load archivers settings from a file")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
@@ -113,6 +121,10 @@ protected:
 		loadConfiguration(value);
 	}
 	*/
+	void handleLoadArh(const std::string& name, const std::string& value)
+	{
+		rotator.archiver.load(value); // Грузим файл архиватора
+	}
 	void handleLoadEntries(const std::string& name, const std::string& value)
 	{
 		rotator.load(value); // Грузим файл конфигурации
@@ -133,7 +145,8 @@ protected:
 	{
 		if (!_helpRequested)
 		{
-			
+			std::string arhFile=config().getString("application.dir","")+"archivers.ini";
+			rotator.archiver.load(arhFile); // Грузим пользовательские архиваторы
 			if (!_loadRequested) rotator.load(&config());
 			if (_runRequested)	rotator.rotate();
 			//rotator.rotate();
@@ -146,6 +159,7 @@ private:
 	bool _helpRequested;
 	bool _runRequested;
 	bool _loadRequested; // Указан параметр загрузки конфигурации из файла
+	
 	LogRotator rotator;
 };
 

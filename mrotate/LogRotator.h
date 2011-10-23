@@ -22,6 +22,10 @@ public:
 	void load(const Poco::Util::AbstractConfiguration *pConf);
 	//! Ротировать файлы (основная функция)
 	void rotate();
+	//! Возвращает версию
+	std::string getVersion();
+	//! Архиватор
+	Archiver archiver;
 
 private:
 	
@@ -29,8 +33,7 @@ private:
 	std::vector <RotateEntry> items;
 	//! индекс текущей обрабатываемой записи ротации items
 	int currIndex;
-	//! Архиватор
-	Archiver archiver;
+	
 	
 	//! Получить список файлов для обработки
 	//void getFileList(std::vector<std::string> &fileList);
