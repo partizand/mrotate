@@ -29,7 +29,9 @@ class RotateApp: public Application
 	/// more information.
 {
 public:
-	RotateApp(): _helpRequested(false),_runRequested(false),_loadRequested(false),rotator(logger())
+	RotateApp(): _helpRequested(false),_runRequested(false),_loadRequested(false),
+		_checkRequested(false),_debugReq(false),
+		rotator(logger())
 	{
 		//bak=new Backup(logger());
 		poco_information_f1(logger(),"mrotate v.%s. Rotate logs utility for Windows.",rotator.getVersion());
@@ -87,6 +89,16 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleRun)));
 		options.addOption(
+			Option("check", "", "Check rotate entries")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleCheck)));
+		options.addOption(
+			Option("debug", "d", "Set debug mode")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleDebug)));
+		options.addOption(
 			Option("conf", "c", "load rotate entries from a file")
 				.required(false)
 				.repeatable(true)
@@ -112,6 +124,18 @@ protected:
 		_runRequested = true;
 		
 	}
+	void handleDebug(const std::string& name, const std::string& value)
+	{
+		rotator.setDebugMode();
+		_debugReq = true;
+		
+	}
+
+	void handleCheck(const std::string& name, const std::string& value)
+	{
+		_checkRequested = true;
+		
+	}
 
 	
 	// Загрузка параметров настройки
@@ -135,7 +159,7 @@ protected:
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Rotate utility.");
+		helpFormatter.setHeader("Rotate logs utility.");
 		helpFormatter.format(std::cout);
 	}
 	
@@ -147,8 +171,26 @@ protected:
 		{
 			std::string arhFile=config().getString("application.dir","")+"archivers.ini";
 			rotator.archiver.load(arhFile); // Грузим пользовательские архиваторы
-			if (!_loadRequested) rotator.load(&config());
-			if (_runRequested)	rotator.rotate();
+			if (!_loadRequested) 
+			{
+				logger().information("Loading standart config file.");
+				rotator.load(&config());
+			}
+			if (_checkRequested)
+			{
+				logger().information("Start checking");
+				rotator.check();
+			}
+			if (_debugReq)	
+			{
+				logger().information("Start debugging");
+				rotator.rotate();
+			}
+			if (_runRequested)	
+			{
+				logger().information("Start rotation");
+				rotator.rotate();
+			}
 			//rotator.rotate();
 		}
 		return Application::EXIT_OK;
@@ -159,7 +201,8 @@ private:
 	bool _helpRequested;
 	bool _runRequested;
 	bool _loadRequested; // Указан параметр загрузки конфигурации из файла
-	
+	bool _checkRequested; // Проверка конфигурации
+	bool _debugReq; // Режим эмуляции
 	LogRotator rotator;
 };
 

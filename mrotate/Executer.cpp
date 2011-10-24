@@ -22,7 +22,8 @@ Executer::~Executer(void)
 int Executer::execute(const std::string &exePath,const std::vector<std::string> &vectArgs,bool wait)
 {
 	// Проверяем, что путь абсолютный
-	string fullPath=getFullPath(exePath);
+	string fullPath;
+	getFullPath(exePath,fullPath);
 	int ret=0;
 	ProcessHandle handle=Process::launch(fullPath,vectArgs);// Стартуем
 	
@@ -34,20 +35,27 @@ int Executer::execute(const std::string &exePath,const std::vector<std::string> 
 }
 //------------------------------------------------------------------------
 //! Получить полное имя файла (ищет в %path% каталогах), если путь уже полный, то просто вернет его же
-std::string Executer::getFullPath(std::string aPath)
+bool Executer::getFullPath(const std::string &aPath, std::string &fullPath)
 {
 // Проверяем, что путь абсолютный
+	bool found;
 	Path pPath(aPath);
+	pPath.makeFile();
 	if (pPath.depth()==0) // передано только имя файла
 	{
 		// Ищем полный путь
 		string EnvPath(Environment::get("PATH")); // Переменная окружения Path
 		EnvPath=Path::expand(EnvPath); // Раскрываем всякие %Dir%
 		string fileName=pPath.getFileName();
-		Path::find(EnvPath,fileName,pPath); 
+		found=Path::find(EnvPath,fileName,pPath); 
 		
 	}
-	return pPath.toString();
+	else
+	{
+		found=true;
+	}
+	fullPath=pPath.toString();
+	return found;
 }
 
 //------------------------------------------------------------------------

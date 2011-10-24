@@ -22,6 +22,10 @@ public:
 	void load(const Poco::Util::AbstractConfiguration *pConf);
 	//! Ротировать файлы (основная функция)
 	void rotate();
+	//! Проверка загруженных записей ротации на ошибки
+	bool check();
+	//! Установить режим отладки (эмуляция ротации)
+	void setDebugMode();
 	//! Возвращает версию
 	std::string getVersion();
 	//! Архиватор
@@ -33,7 +37,8 @@ private:
 	std::vector <RotateEntry> items;
 	//! индекс текущей обрабатываемой записи ротации items
 	int currIndex;
-	
+	//! Режим отладки включен
+	bool _debugMode;
 	
 	//! Получить список файлов для обработки
 	//void getFileList(std::vector<std::string> &fileList);
@@ -53,6 +58,9 @@ private:
 	void removeFile(const std::string &fileName);
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
+	//! Создать каталог, если он не существует
+	void createDir(const std::string &dirName);
+
 	//! Преобразование строкового периода в int и определение типа ротации
 	//int convertPeriod(std::string &strPeriod,Rotate::RotateType &rType);
 	//! Преобразование размера в int64

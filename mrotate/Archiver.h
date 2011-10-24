@@ -23,14 +23,16 @@ public:
 	void load(const std::string &fileName);
 	//! Загрузка настроек 
 	void load(const Poco::Util::AbstractConfiguration *pConf);
-
+	//! Установить режим отладки (эмуляция архивации)
+	void setDebugMode();
 	//! Возвращает расширение файла, для текущего установленного архиватора
 	std::string getArhExtention(std::string ArchiveName="");
 private:
 	//! Архиваторы
 	//std::vector<ArchiverParam> Archivers;
 	std::map<std::string,ArchiverParam> Archivers;
-	
+	//! Установлен режим отладки
+	bool _debugMode;
 
 	//! Имя архиватора
 	std::string archiveName;

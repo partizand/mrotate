@@ -15,22 +15,26 @@
 #include <Poco\AutoPtr.h>
 
 #include "Archiver.h"
+#include "Executer.h"
 
 using namespace std;
 using namespace Poco;
 using namespace Util;
 
-Archiver::Archiver(Poco::Logger &logger)
-	
-	
+const std::string noneArchiverName="none";
+
+Archiver::Archiver(Poco::Logger &logger):
+_debugMode(false)
 	
 {
 	log=&logger;
 	// 7z
-	Archivers["7z"]=ArchiverParam("7z",".7z","7z.exe"," a %ArhFileName %FullFileName -m0=PPMd");
+	Archivers["7z"]=ArchiverParam("7z",".7z","7z.exe","a %ArhFileName %FullFileName -m0=PPMd");
 	// rar
-	Archivers["rar"]=ArchiverParam("rar",".rar","rar.exe"," a %ArhFileName %FullFileName");
+	Archivers["rar"]=ArchiverParam("rar",".rar","rar.exe","a %ArhFileName %FullFileName");
+	Archivers["winrar"]=ArchiverParam("winrar",".rar","winrar.exe","a %ArhFileName %FullFileName");
 	
+	Archivers["none"]=ArchiverParam("none","","","");
 	//setOptions("7z","");
 }
 //------------------------------------------------------------------------
@@ -62,7 +66,41 @@ bool Archiver::archiveFile(std::string FileName)
 	
 	// Осталось это все запустить
 	int ExitCode;
-	ExitCode=Executer::execute(exeName,vectArgs);
+	if (icompare(archiveName,noneArchiverName)==0) // переименование
+	{
+		if (!_debugMode)
+			{
+			File pFile(pPathSource);
+			poco_information_f2(*log,"File %s moving to %s",FileName,ArhFileName);
+			try
+			{
+			pFile.moveTo(ArhFileName);
+			ExitCode=0;
+			}
+			catch(...)
+			{
+				poco_error_f2(*log,"Error move file %s to %s",FileName,ArhFileName);
+				ExitCode=1;
+			}
+			}
+		else
+			{
+			poco_information_f2(*log,"Move file %s to %s",FileName,ArhFileName);
+			ExitCode=0;
+			}
+	}
+	else // архивация
+	{
+		if (!_debugMode)
+			{
+			ExitCode=Executer::execute(exeName,vectArgs);
+			}
+		else
+			{
+			poco_information_f1(*log,"Archive file %s",FileName);
+			ExitCode=0;
+			}
+	}
 	if (ExitCode==0) 
 	{
 		return true;
@@ -75,6 +113,12 @@ bool Archiver::archiveFile(std::string FileName)
 
 	
 
+}
+//------------------------------------------------------------------------
+//! Установить режим отладки (эмуляция архивации)
+void Archiver::setDebugMode()
+{
+_debugMode=true;
 }
 //------------------------------------------------------------------------
 //! Загрузка параметров из файла
@@ -134,6 +178,7 @@ if (!RootKeys.empty())
 				
 				// Имя
 				ArchiverName=RootKeys.at(i);
+				toLowerInPlace(ArchiverName);
 				// Exe
 				KeyName=RootKeys.at(i)+".exeName";
 				ExeName=pConf->getString(KeyName,"");
@@ -171,7 +216,13 @@ bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)
 		return false;
 	}
 	archiveName=ArchiveName;
-	
+	string fullPathArh;
+	bool found=Executer::getFullPath(Archivers[ArchiveName].exeName,fullPathArh);
+	if (!found)
+	{
+		poco_error_f2(*log,"Executable %s not found for archiver %s",Archivers[ArchiveName].exeName,ArchiveName);
+		return false;
+	}
 	targetPath=TargetPath;
 	return true;
 

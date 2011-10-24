@@ -11,10 +11,11 @@ RotateEntry::RotateEntry(void)
 {
 }
 
-RotateEntry::RotateEntry(const std::string &Source,int Period,unsigned long int LimitSize,
+RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		const std::string &TargetDir,const std::string &TargetMask,
 		const std::string &FDateMode):
+	name(Name),
 	source(Source),
 	period(Period),
 	limitSize(LimitSize),

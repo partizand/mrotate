@@ -20,7 +20,8 @@ using namespace Util;
 const string ver="0.1"; // Версия ротатора
 
 LogRotator::LogRotator(Poco::Logger &logger):
-	archiver(logger)
+	archiver(logger),
+	_debugMode(false)
 {
 	log=&logger;
 }
@@ -44,14 +45,19 @@ void LogRotator::rotate()
 		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
+		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
+		{
 		// Получить список файлов для обработки
 		getFileList(fileList,items.at(currIndex).source);
+		createDir(items.at(i).targetDir);
 		// Ротируем файлы
 		rotateFile(fileList);
+		}
 		// Удаляем старые архивы
 		if (items[i].keepPeriod>0)
 		{
 			Path pPath(items.at(currIndex).targetDir);
+			pPath.makeDirectory();
 			pPath.setFileName("*"+archiver.getArhExtention()); // только по расширению архива
 			oldArhMask=pPath.toString();
 			getFileList(fileList,oldArhMask,items[i].keepPeriod); // Список файлов для удаления
@@ -83,6 +89,15 @@ if (Period==0 && lSize==0)
 			fileList.push_back(*it);
 		}
 	}
+}
+//------------------------------------------------------------------------
+//! Создать каталог, если он не существует
+void LogRotator::createDir(const std::string &dirName)
+{
+	Path pPath(dirName);
+	pPath.makeDirectory();
+	File pFile(pPath);
+	pFile.createDirectories();
 }
 //------------------------------------------------------------------------
 //! Получить список файлов для обработки
@@ -142,6 +157,11 @@ int i;
 void LogRotator::removeFile(const std::string &fileName)
 {
 Poco::File pFile(fileName);
+if (_debugMode)
+{
+	poco_information_f1(*log,"Deleting file %s",fileName);
+	return;
+}
 try
 {
 pFile.remove(); // Удаляем его
@@ -216,6 +236,48 @@ Poco::File pFile(fileName);
 	return false;
 }
 //------------------------------------------------------------------------
+//! Установить режим отладки (эмуляция ротации)
+void LogRotator::setDebugMode()
+{
+_debugMode=true;
+archiver.setDebugMode();
+}
+//------------------------------------------------------------------------
+//! Проверка загруженных записей ротации на ошибки
+bool LogRotator::check()
+{
+int i;
+	bool suc,ret(true);
+	string oldArhMask;
+	vector<string> fileList;
+	// Перебираем все записи
+	for (i=0;i<items.size();++i)
+	{
+		currIndex=i;
+		poco_information_f1(*log,"Checking entry %s.",items[i].name);
+		// Проверка архиватора
+		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
+		if (!suc) 
+		{
+			ret=false;
+			log->information("Entry contains errors");
+			continue; // Ошибка в архиваторе
+		}
+		// Проверка существования каталогов
+
+		log->information("Entry is ok");
+	}
+	if (ret)
+	{
+		log->information("Everything is ok");
+	}
+	else
+	{
+		log->information("Errors found");
+	}
+	return ret;
+}
+//------------------------------------------------------------------------
 //! Загрузка параметров ротации из файла
 void LogRotator::load(const std::string &fileName)
 {
@@ -241,7 +303,7 @@ void LogRotator::load(const std::string &fileName)
 		pConf=new PropertyFileConfiguration(fileName);
 	}
 	if (pConf.isNull()) return; // Нет нужного расширения
-	
+	poco_information_f1(*log,"Loading config file %s.",fileName);
 	load(pConf);
 }
 //------------------------------------------------------------------------
@@ -288,17 +350,20 @@ if (!RootKeys.empty())
 				KeyName=RootKeys.at(i)+".size";
 				KeyValue=pConf->getString(KeyName,"");
 				LimitSize=convertSize(KeyValue);
-				if (LimitSize==0 && Period==0) 
-				{
-					poco_error_f1(*log,"Skip entry %s. Period and size is null",RootKeys.at(i));
-					continue;
-				}
+				
 				// Keep Период
 				KeyName=RootKeys.at(i)+".keepPeriod";
 				KeepPeriod=pConf->getInt(KeyName,0);
+				
+				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
+				{
+					poco_error_f1(*log,"Skip entry %s. Period, KeepPeriod and size is null",RootKeys.at(i));
+					continue;
+				}
 				// Архиватор
 				KeyName=RootKeys.at(i)+".compress";
 				ArchiverName=pConf->getString(KeyName,"");
+				toLowerInPlace(ArchiverName);
 				if (ArchiverName.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Archiver is empty",RootKeys.at(i));
@@ -318,7 +383,7 @@ if (!RootKeys.empty())
 
 
 				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
+				items.push_back(RotateEntry(RootKeys.at(i),Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
 				//cout<< *it<<endl;
 			 
 			}
