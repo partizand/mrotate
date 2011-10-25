@@ -55,14 +55,15 @@ bool Archiver::archiveFile(std::string FileName)
 	string sFileName(pPathSource.getFileName()); // Короткое имя файла источника
 	//Меняем в targetPath - %FileName и %yydd - на тек дату
 	string ArhFileName(targetPath); // Полное имя архива
-	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName); // Полный путь пропадает!
+	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName); 
 	ArhFileName+=Archivers[archiveName].extention;
 
 	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
 	vector<std::string> vectArgs;
 	Executer::splitArgs(Archivers[archiveName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
-	ReplVar::replaceFileAndDate(vectArgs,FileName,ArhFileName); // Все аргументы становятя полный путь к файлу
+	ReplVar::replaceFileAndDate(vectArgs,FileName,ArhFileName); 
 	
+	// 
 	
 	// Осталось это все запустить
 	int ExitCode;

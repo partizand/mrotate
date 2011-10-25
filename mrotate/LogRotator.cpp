@@ -5,9 +5,10 @@
 #include <Poco\Util\IniFileConfiguration.h>
 #include <Poco\Util\PropertyFileConfiguration.h>
 #include <Poco\AutoPtr.h>
-#include <Poco\Path.h>
+//#include <Poco\Path.h>
 #include <Poco\String.h>
 #include <Poco\File.h>
+#include <Poco\DirectoryIterator.h>
 #include <Poco\NumberParser.h>
 #include <Poco\Glob.h>
 #include <Poco\Timestamp.h>
@@ -36,7 +37,7 @@ void LogRotator::rotate()
 {
 	int i;
 	bool suc;
-	string oldArhMask;
+	//string oldArhMask;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
@@ -48,7 +49,9 @@ void LogRotator::rotate()
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 		{
 		// Получить список файлов для обработки
-		getFileList(fileList,items.at(currIndex).source);
+			Path pathMask(items[i].source);
+			fileList.clear();
+			getFileList(fileList,pathMask,items[i].recurse,items[i].period,items[i].limitSize);
 		createDir(items.at(i).targetDir);
 		// Ротируем файлы
 		rotateFile(fileList);
@@ -59,20 +62,23 @@ void LogRotator::rotate()
 			Path pPath(items.at(currIndex).targetDir);
 			pPath.makeDirectory();
 			pPath.setFileName("*"+archiver.getArhExtention()); // только по расширению архива
-			oldArhMask=pPath.toString();
-			getFileList(fileList,oldArhMask,items[i].keepPeriod); // Список файлов для удаления
+			//oldArhMask=pPath.toString();
+			fileList.clear();
+			getFileList(fileList,pPath,items[i].recurse,items[i].keepPeriod); // Список файлов для удаления
 			removeFile(fileList); 
 		}
 
 	}
 }
 //------------------------------------------------------------------------
-//! Получить список файлов по маске, отобранных по периоду или размеру, если period и lSize не заданы, берутся из настройки текущей ротации
-void LogRotator::getFileList(std::vector<std::string> &fileList, const std::string &pathMask,int Period,unsigned long int lSize)
+//! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
+void LogRotator::getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0)
 {
-set<string> files;
-fileList.clear();
-Glob::glob(pathMask,files); // Волшебная функция получения списка файлов по маске
+	// Получаем список файлов текущего каталога
+	set<string> files;
+	//fileList.clear();
+	
+	Glob::glob(pathMask,files); // Волшебная функция получения списка файлов по маске
 /*
 if (Period==0 && lSize==0) 
 {
@@ -87,6 +93,23 @@ if (Period==0 && lSize==0)
 		if (isRotateFile(*it,Period,lSize)) // Добавляем файл если подходит
 		{
 			fileList.push_back(*it);
+		}
+	}
+	if (recurse) // Рекурсивно обрабатываем подкаталоги
+	{
+		Path pPath(pathMask);
+		pPath.setFileName("");
+		DirectoryIterator it(pPath);
+		DirectoryIterator end;
+		while (it != end)
+		{
+			if (it->isDirectory())
+			{
+				Path p(it.path());
+				p.setFileName(pathMask.getFileName());
+				getFileList(fileList,p,recurse,Period,lSize);
+			}
+			++it;
 		}
 	}
 }
@@ -313,6 +336,7 @@ void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
 //RotateEntry tmpItem;
 string Source,ArchiverName,TargetDir,TargetMask,FDateMode;
 int Period,KeepPeriod;
+bool Recurse;
 unsigned long int LimitSize;
 
 AbstractConfiguration::Keys RootKeys;
@@ -378,12 +402,14 @@ if (!RootKeys.empty())
 				// Date mode
 				KeyName=RootKeys.at(i)+".dateMode";
 				FDateMode=pConf->getString(KeyName,"");
-
+				// Рекурсивность
+				KeyName=RootKeys.at(i)+".recurse";
+				Recurse=pConf->getBool(KeyName,false);
 				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
 
 
 				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(RootKeys.at(i),Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
+				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
 				//cout<< *it<<endl;
 			 
 			}

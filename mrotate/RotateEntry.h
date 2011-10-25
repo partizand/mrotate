@@ -15,7 +15,7 @@ class RotateEntry
 {
 public:
 	RotateEntry(void);
-	RotateEntry(const std::string &Name, const std::string &Source,int Period,unsigned long int LimitSize,
+	RotateEntry(const std::string &Name, const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		const std::string &targetDir,const std::string &targetMask,
 		const std::string &FDateMode);
@@ -24,6 +24,9 @@ public:
 	std::string name;
 	//! Источник
 	std::string source;
+	//! Обрабатывать подкаталоги
+	bool recurse;
+
 	//! Период обработки
 	int period;
 	//! Ограничение размера
