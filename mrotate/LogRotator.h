@@ -46,7 +46,7 @@ private:
 	//! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
 	//void getFileList(std::vector<std::string> &fileList, const std::string &pathMask, int Period=0,unsigned long int lSize=0);
 	void getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0);
-	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, берутся из настройки текущей ротации
+	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
 	bool isRotateFile(const std::string &fileName,int Period=0,unsigned long int lSize=0);
 	//! Ротировать заданный файл
 	void rotateFile(const std::string &fileName);

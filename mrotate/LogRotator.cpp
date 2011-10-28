@@ -195,7 +195,7 @@ catch(...)
 }
 }
 //------------------------------------------------------------------------
-//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, берутся из настройки текущей ротации
+//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
 bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,unsigned long int lSize/*=0*/)
 {
 Poco::File pFile(fileName);
@@ -208,10 +208,9 @@ Poco::File pFile(fileName);
 	unsigned long int iSize(lSize);
 	if (Period==0 && lSize==0) // Параметры не заданы, берем из текущей настройки ротации
 	{
-		iPeriod=items.at(currIndex).period;
-		iSize=items.at(currIndex).limitSize;
+		return true;
 	}
-	if (iPeriod==0 && iSize==0) return false; // Все равно не заданы
+	//if (iPeriod==0 && iSize==0) return false; // Все равно не заданы
 	if (iPeriod>0) //задан период обрабтки
 	{
 		//Timestamp periodTime;  //Текущее время
