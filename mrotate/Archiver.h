@@ -14,10 +14,16 @@ public:
 	Archiver(Poco::Logger &logger);
 	~Archiver(void);
 	//! Установить настройки (действуют на одну ротацию)
-	bool setOptions(std::string ArchiveName,std::string TargetPath);
+	//bool setOptions(const std::string &ArchiveName,const std::string &TargetPath);
 	
+	//! Проверить настройки 
+	bool isValid(const std::string &archiverName);
+
+	//! Заархивировать файл 
+	bool archiveFile(const std::string &arhiverName,const std::string &fileName,const std::string &arhFileName);
+
 	//! Заархивировать файл архиватором с текущими настройками
-	bool archiveFile(std::string FileName);
+	//bool archiveFile(const std::string &FileName);
 
 	//! Загрузка настроек из файла
 	void load(const std::string &fileName);
@@ -25,8 +31,8 @@ public:
 	void load(const Poco::Util::AbstractConfiguration *pConf);
 	//! Установить режим отладки (эмуляция архивации)
 	void setDebugMode();
-	//! Возвращает расширение файла, для текущего установленного архиватора
-	std::string getArhExtention(std::string ArchiveName="");
+	//! Возвращает расширение файла для архиватора
+	std::string getExtension(const std::string &ArchiverName);
 private:
 	//! Архиваторы
 	//std::vector<ArchiverParam> Archivers;
@@ -35,9 +41,9 @@ private:
 	bool _debugMode;
 
 	//! Имя архиватора
-	std::string archiveName;
+	//std::string archiveName;
 	//! Каталог назначения
-	std::string targetPath;
+	//std::string targetPath;
 	//! Логгер
 	Poco::Logger *log;
 	

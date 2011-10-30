@@ -7,6 +7,7 @@
 #include <Poco\Util\AbstractConfiguration.h>
 #include <Poco\Logger.h>
 #include <Poco\Path.h>
+#include <Poco\File.h>
 
 #include "RotateEntry.h"
 #include "Archiver.h"
@@ -46,8 +47,14 @@ private:
 	//! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
 	//void getFileList(std::vector<std::string> &fileList, const std::string &pathMask, int Period=0,unsigned long int lSize=0);
 	void getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0);
+	
+	void rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period=0,unsigned long int lSize=0);
 	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
 	bool isRotateFile(const std::string &fileName,int Period=0,unsigned long int lSize=0);
+	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
+	bool isRotateFile(Poco::File &pFileName,int Period=0,unsigned long int lSize=0);
+	//! Ротировать заданный файл
+	void rotateFile(const Poco::File &pFile,const Poco::Path &destDir);
 	//! Ротировать заданный файл
 	void rotateFile(const std::string &fileName);
 	//! Ротировать список файлов
@@ -58,6 +65,8 @@ private:
 	//void rotateArhFile(const std::vector<std::string> &listFiles);
 	//! Удалить файл
 	void removeFile(const std::string &fileName);
+	//! Удалить файл
+	void removeFile(Poco::File &pFile);
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
 	//! Создать каталог, если он не существует

@@ -14,6 +14,8 @@
 #include <Poco\Timestamp.h>
 #include <Poco\DateTime.h>
 
+#include "ReplVar.h"
+
 using namespace std;
 using namespace Poco;
 using namespace Util;
@@ -37,42 +39,168 @@ void LogRotator::rotate()
 {
 	int i;
 	bool suc;
+	string fileMask;
 	//string oldArhMask;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
 		currIndex=i;
+		Path sourceDir(items[i].source);
+		sourceDir.makeFile(); // 
+		fileMask=sourceDir.getFileName(); // Маска
+		sourceDir.setFileName(""); // Каталог источник
+
+		Path destDir(items.at(currIndex).targetDir);
+		destDir.makeDirectory(); // Каталог приемник
+		
 		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 		{
 		// Получить список файлов для обработки
-			Path pathMask(items[i].source);
-			fileList.clear();
-			getFileList(fileList,pathMask,items[i].recurse,items[i].period,items[i].limitSize);
-		createDir(items.at(i).targetDir);
+			//Path pathMask(items[i].source);
+			//fileList.clear();
+			//getFileList(fileList,pathMask,items[i].recurse,items[i].period,items[i].limitSize);
+			// Ротируем файлы
+			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,items[i].period,items[i].limitSize);
+			//createDir(items.at(i).targetDir);
 		// Ротируем файлы
-		rotateFile(fileList);
+			//rotateFile(fileList);
 		}
 		// Удаляем старые архивы
 		if (items[i].keepPeriod>0)
 		{
-			Path pPath(items.at(currIndex).targetDir);
-			pPath.makeDirectory();
-			pPath.setFileName("*"+archiver.getArhExtention()); // только по расширению архива
+			//Path pPath(items.at(currIndex).targetDir);
+			//pPath.makeDirectory();
+			fileMask="*"+archiver.getExtension(items[i].archiverName);
+			//pPath.setFileName("*"+archiver.getArhExtention()); // только по расширению архива
 			//oldArhMask=pPath.toString();
-			fileList.clear();
-			getFileList(fileList,pPath,items[i].recurse,items[i].keepPeriod); // Список файлов для удаления
-			removeFile(fileList); 
+			//fileList.clear();
+			//getFileList(fileList,pPath,items[i].recurse,items[i].keepPeriod); // Список файлов для удаления
+			//removeFile(fileList);
+			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,false,items[i].keepPeriod,0);
 		}
 
 	}
 }
 //------------------------------------------------------------------------
+//! Ротировать файлы/удалить архивы
+void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period,unsigned long int lSize)
+{
+		// Обрабатываем файлы в каталоге
+	//string fileMask=pSourceMask.getFileName();
+	Glob glob(fileMask);
+		
+		DirectoryIterator it(pSourceDir);
+		DirectoryIterator end;
+		while (it != end)
+		{
+			if (it->isFile()) // Это файл
+			{
+				if (glob.match(it.name())) // Проходит по маске
+				{
+					if (isRotateFile(*it,Period,lSize)) // Проходит по дате/размеру
+					{
+						if (rotate)
+							rotateFile(*it,pDestDir);
+						else
+							removeFile(*it);
+					}
+
+				}
+				
+			}
+			if (recurse && it->isDirectory()) // Это каталог
+			{
+				// По идее здесь нужна проверка на . ..
+				Path newSource(it.path());
+				newSource.setFileName(fileMask);
+				Path newDest(pDestDir);
+				newDest.pushDirectory(it.name());
+				rotateFiles(fileMask,newSource,newDest,recurse,rotate,Period,lSize);
+			}
+			
+			++it;
+		}
+
+	/*
+	if (recurse) // Рекурсивно обрабатываем подкаталоги
+	{
+		
+		DirectoryIterator it(pSourceDir);
+		//DirectoryIterator end;
+		while (it != end)
+		{
+			if (it->isDirectory()) // Это каталог
+			{
+				// По идее здесь нужна проверка на . ..
+				Path newSource(it.path());
+				newSource.setFileName(fileMask);
+				Path newDest(pDestDir);
+				newDest.pushDirectory(it.name());
+				rotateFiles(fileMask,newSource,newDest,recurse,rotate,Period,lSize);
+			}
+			++it;
+		}
+	}
+	*/
+}
+//------------------------------------------------------------------------
+//! Ротировать заданный файл
+void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
+{
+// Нужно построить опции, найти архиватор и запустить
+
+	
+
+	//Path pPathSource(FileName);
+	//pPathSource.makeFile();
+	string fileName=pFile.path();
+	//string sFileName(pFile.getFileName()); // Короткое имя файла источника
+	//Меняем в targetPath - %FileName и %yydd - на тек дату
+	string ArhFileName(items[currIndex].targetMask); // короткое имя архива
+	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,pFile.path());
+
+	Path destFile(destDir);
+	destFile.setFileName(ArhFileName);
+
+	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,destFile.toString());
+	if (suc) // Успешно заархивировался
+	{
+		File tFile(pFile);
+		removeFile(tFile);
+	}
+
+	
+}
+//------------------------------------------------------------------------
+//! Удалить файл
+void LogRotator::removeFile(Poco::File &pFile)
+{
+	
+if (_debugMode)
+{
+	
+	poco_information_f1(*log,"[Debug] Deleting file %s",pFile.path());
+	return;
+}
+try
+{
+pFile.remove(); // Удаляем его
+poco_information_f1(*log,"File deleted %s",pFile.path());
+}
+catch(...) 
+{
+	poco_error_f1(*log,"Error delete file %s",pFile.path());
+}
+}
+
+
+//------------------------------------------------------------------------
 //! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
-void LogRotator::getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0)
+void LogRotator::getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period,unsigned long int lSize)
 {
 	// Получаем список файлов текущего каталога
 	set<string> files;
@@ -180,27 +308,13 @@ int i;
 void LogRotator::removeFile(const std::string &fileName)
 {
 Poco::File pFile(fileName);
-if (_debugMode)
-{
-	poco_information_f1(*log,"Deleting file %s",fileName);
-	return;
-}
-try
-{
-pFile.remove(); // Удаляем его
-}
-catch(...) 
-{
-	log->error("Ошибка удаления файла");
-}
+removeFile(pFile);
 }
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
-bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,unsigned long int lSize/*=0*/)
+bool LogRotator::isRotateFile(Poco::File &pFile,int Period,unsigned long int lSize)
 {
-Poco::File pFile(fileName);
-
-	if (!pFile.exists()) return false; // Файла нет
+if (!pFile.exists()) return false; // Файла нет
 	if (!pFile.isFile()) return false; // Это не файл
 	if (!pFile.canRead()) return false; // Файл не может быть прочитан
 
@@ -256,6 +370,15 @@ Poco::File pFile(fileName);
 		}
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------
+//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
+bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,unsigned long int lSize/*=0*/)
+{
+Poco::File pFile(fileName);
+return isRotateFile(pFile,Period,lSize);
+	
 }
 //------------------------------------------------------------------------
 //! Установить режим отладки (эмуляция ротации)

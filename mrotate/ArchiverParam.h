@@ -14,7 +14,7 @@ public:
 	//! Параметры запуска (без самого .exe)
 	std::string arguments;
 	//! Расширение файла архива
-	std::string extention;
+	std::string extension;
 
 };
 

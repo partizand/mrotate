@@ -13,7 +13,8 @@ public:
 	//! Получить полное имя файла (ищет в %path% каталогах), если путь уже полный, то просто вернет его же
 	static bool getFullPath(const std::string &aPath, std::string &fullPath);
 	
-	
+	//! Создать каталог по имени файла
+	static void createDir(const std::string &fileName);
 	
 	//! Разбить строку аргументов на вектор по разделителю "пробел"
 	static void splitArgs(const std::string &strArgs,std::vector<std::string> &vectArgs);

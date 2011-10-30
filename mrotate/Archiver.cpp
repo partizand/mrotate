@@ -42,8 +42,85 @@ Archiver::~Archiver(void)
 {
 }
 //------------------------------------------------------------------------
+//! Заархивировать файл 
+bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fileName,const std::string &arhFileName)
+{
+// Нужно построить опции, найти архиватор и запустить
+
+	
+	
+
+	string exeName(Archivers[arhiverName].exeName); // Exe файл
+
+	//Path pPathSource(FileName);
+	//pPathSource.makeFile();
+
+	//string sFileName(pPathSource.getFileName()); // Короткое имя файла источника
+	//Меняем в targetPath - %FileName и %yydd - на тек дату
+	
+	string ArhFileName(arhFileName); // Полное имя архива
+	ArhFileName+=Archivers[arhiverName].extension;
+
+	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
+	vector<std::string> vectArgs;
+	Executer::splitArgs(Archivers[arhiverName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
+	ReplVar::replaceFileAndDate(vectArgs,fileName,ArhFileName); 
+	
+	// Создаем каталог назначения
+	Executer::createDir(ArhFileName);
+	
+	// Осталось это все запустить
+	int ExitCode;
+	if (icompare(arhiverName,noneArchiverName)==0) // переименование
+	{
+		if (!_debugMode)
+			{
+			File pFile(fileName);
+			poco_information_f2(*log,"File %s moving to %s",fileName,ArhFileName);
+			try
+			{
+			pFile.moveTo(ArhFileName);
+			ExitCode=0;
+			}
+			catch(...)
+			{
+				poco_error_f2(*log,"Error move file %s to %s",fileName,ArhFileName);
+				ExitCode=1;
+			}
+			}
+		else
+			{
+			poco_information_f2(*log,"Move file %s to %s",fileName,ArhFileName);
+			ExitCode=0;
+			}
+	}
+	else // архивация
+	{
+		if (!_debugMode)
+			{
+			ExitCode=Executer::execute(exeName,vectArgs);
+			}
+		else
+			{
+			poco_information_f1(*log,"Archive file %s",fileName);
+			ExitCode=0;
+			}
+	}
+	if (ExitCode==0) 
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
+
+	
+}
+//------------------------------------------------------------------------
 //! Заархивировать файл архиватором с текущими настройками
-bool Archiver::archiveFile(std::string FileName)
+bool Archiver::archiveFile(const std::string &FileName)
 {
 	// Нужно построить опции, найти архиватор и запустить
 
@@ -56,7 +133,7 @@ bool Archiver::archiveFile(std::string FileName)
 	//Меняем в targetPath - %FileName и %yydd - на тек дату
 	string ArhFileName(targetPath); // Полное имя архива
 	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName); 
-	ArhFileName+=Archivers[archiveName].extention;
+	ArhFileName+=Archivers[archiveName].extension;
 
 	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
 	vector<std::string> vectArgs;
@@ -76,7 +153,7 @@ bool Archiver::archiveFile(std::string FileName)
 			try
 			{
 			pFile.moveTo(ArhFileName);
-			ExitCode=0;
+			ExitCode=1; // Что бы вызывающая функция не удаляла файл которого нет
 			}
 			catch(...)
 			{
@@ -206,8 +283,31 @@ if (!RootKeys.empty())
  }
 }
 //------------------------------------------------------------------------
+//! Проверить настройки 
+bool Archiver::isValid(const std::string &archiverName)
+{
+// Проверяем, есть ли такой архиватор
+	std::map<std::string,ArchiverParam>::iterator it=Archivers.find(archiverName);
+	if (it==Archivers.end()) // Такого архиватора нет
+	{
+		poco_error_f1(*log,"ArchiveName %s not found",archiverName);
+		return false;
+	}
+	
+	string fullPathArh;
+	bool found=Executer::getFullPath(Archivers[archiverName].exeName,fullPathArh);
+	if (!found)
+	{
+		poco_error_f2(*log,"Executable %s not found for archiver %s",Archivers[archiverName].exeName,archiverName);
+		return false;
+	}
+	
+	return true;
+}
+//------------------------------------------------------------------------
 //! Установить настройки (действуют на одну ротацию)
-bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)
+/*
+bool Archiver::setOptions(const std::string &ArchiveName,const std::string &TargetPath)
 {
 	// Проверяем, есть ли такой архиватор
 	std::map<std::string,ArchiverParam>::iterator it=Archivers.find(ArchiveName);
@@ -228,15 +328,13 @@ bool Archiver::setOptions(std::string ArchiveName,std::string TargetPath)
 	return true;
 
 }
+*/
 //------------------------------------------------------------------------
 //! Возвращает расширение файла, для текущего установленного архиватора
-std::string Archiver::getArhExtention(std::string ArchiveName/*=""*/)
+std::string Archiver::getExtension(const std::string &ArchiverName)
 {
-	if (ArchiveName.empty())
-	{
-		return Archivers[archiveName].extention;
-	}
-	else
-		return Archivers[ArchiveName].extention;
+	
+		return Archivers[ArchiverName].extension;
+	
 }
 //------------------------------------------------------------------------

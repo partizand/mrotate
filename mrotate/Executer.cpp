@@ -3,6 +3,7 @@
 
 #include <Poco/StringTokenizer.h>
 #include <Poco\Path.h>
+#include <Poco\File.h>
 #include <Poco\Environment.h>
 #include <Poco\Process.h>
 
@@ -64,4 +65,14 @@ void Executer::splitArgs(const std::string &strArgs,std::vector<std::string> &ve
 {
 	StringTokenizer tok(strArgs," ",StringTokenizer::TOK_IGNORE_EMPTY); // Разбивает на части
 	vectArgs.assign(tok.begin(),tok.end()); // Копирует
+}
+//------------------------------------------------------------------------
+//! Создать каталог по имени файла
+void Executer::createDir(const std::string &fileName)
+{
+	Path pPath(fileName);
+	pPath.makeFile();
+	pPath.setFileName("");
+	File pFile(pPath);
+	pFile.createDirectories();
 }
