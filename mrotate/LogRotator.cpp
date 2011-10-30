@@ -54,7 +54,7 @@ void LogRotator::rotate()
 		Path destDir(items.at(currIndex).targetDir);
 		destDir.makeDirectory(); // Каталог приемник
 		
-		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
+		suc=archiver.isValid(items[i].archiverName);
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
@@ -200,6 +200,7 @@ catch(...)
 
 //------------------------------------------------------------------------
 //! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
+/*
 void LogRotator::getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period,unsigned long int lSize)
 {
 	// Получаем список файлов текущего каталога
@@ -207,13 +208,7 @@ void LogRotator::getFileList(std::vector<std::string> &fileList,const Poco::Path
 	//fileList.clear();
 	
 	Glob::glob(pathMask,files); // Волшебная функция получения списка файлов по маске
-/*
-if (Period==0 && lSize==0) 
-{
-	fileList.assign(files.begin(),files.end());
-	return;
-}
-*/
+
 // Перебираем все файлы
 	set<string>::iterator it=files.begin();
 	for (;it!=files.end();++it)
@@ -241,8 +236,10 @@ if (Period==0 && lSize==0)
 		}
 	}
 }
+*/
 //------------------------------------------------------------------------
 //! Создать каталог, если он не существует
+/*
 void LogRotator::createDir(const std::string &dirName)
 {
 	Path pPath(dirName);
@@ -250,6 +247,7 @@ void LogRotator::createDir(const std::string &dirName)
 	File pFile(pPath);
 	pFile.createDirectories();
 }
+*/
 //------------------------------------------------------------------------
 //! Получить список файлов для обработки
 /*
@@ -273,6 +271,7 @@ void LogRotator::getFileList(std::vector<std::string> &fileList)
 */
 //------------------------------------------------------------------------
 //! Ротировать список файлов
+/*
 void LogRotator::rotateFile(const std::vector<std::string> &listFiles)
 {
 	int i;
@@ -282,10 +281,14 @@ void LogRotator::rotateFile(const std::vector<std::string> &listFiles)
 	}
 	
 }
+*/
 //------------------------------------------------------------------------
 //! Ротировать заданный файл
+/*
 void LogRotator::rotateFile(const std::string &fileName)
 {
+	File pFile(fileName);
+	rotateFile(pFile);
 	// Архивируем файл
 	bool suc=archiver.archiveFile(fileName);
 	if (suc) // Успешно заархивировался
@@ -293,6 +296,7 @@ void LogRotator::rotateFile(const std::string &fileName)
 		removeFile(fileName);
 	}
 }
+*/
 //------------------------------------------------------------------------
 //! Удалить список файлов
 void LogRotator::removeFile(const std::vector<std::string> &listFiles)
@@ -401,7 +405,7 @@ int i;
 		currIndex=i;
 		poco_information_f1(*log,"Checking entry %s.",items[i].name);
 		// Проверка архиватора
-		suc=archiver.setOptions(items[i].archiverName,items[i].targetPath);
+		suc=archiver.isValid(items[i].archiverName);
 		if (!suc) 
 		{
 			ret=false;

@@ -120,6 +120,7 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 }
 //------------------------------------------------------------------------
 //! Заархивировать файл архиватором с текущими настройками
+/*
 bool Archiver::archiveFile(const std::string &FileName)
 {
 	// Нужно построить опции, найти архиватор и запустить
@@ -192,6 +193,7 @@ bool Archiver::archiveFile(const std::string &FileName)
 	
 
 }
+*/
 //------------------------------------------------------------------------
 //! Установить режим отладки (эмуляция архивации)
 void Archiver::setDebugMode()

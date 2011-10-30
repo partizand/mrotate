@@ -46,7 +46,7 @@ private:
 	//void getFileList(std::vector<std::string> &fileList);
 	//! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
 	//void getFileList(std::vector<std::string> &fileList, const std::string &pathMask, int Period=0,unsigned long int lSize=0);
-	void getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0);
+	//void getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0);
 	
 	void rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period=0,unsigned long int lSize=0);
 	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
@@ -56,9 +56,9 @@ private:
 	//! Ротировать заданный файл
 	void rotateFile(const Poco::File &pFile,const Poco::Path &destDir);
 	//! Ротировать заданный файл
-	void rotateFile(const std::string &fileName);
+	//void rotateFile(const std::string &fileName);
 	//! Ротировать список файлов
-	void rotateFile(const std::vector<std::string> &listFiles);
+	//void rotateFile(const std::vector<std::string> &listFiles);
 	//! Ротировать архивные файлы
 	//void rotateArhFile(const std::string &fileName);
 	//! Ротировать список архивных файлов
@@ -70,7 +70,7 @@ private:
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
 	//! Создать каталог, если он не существует
-	void createDir(const std::string &dirName);
+	//void createDir(const std::string &dirName);
 
 	//! Преобразование строкового периода в int и определение типа ротации
 	//int convertPeriod(std::string &strPeriod,Rotate::RotateType &rType);
