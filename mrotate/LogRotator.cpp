@@ -113,7 +113,7 @@ void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSour
 				}
 				
 			}
-			if (recurse && it->isDirectory()) // Это каталог
+			else if (recurse && it->isDirectory()) // Это каталог
 			{
 				// По идее здесь нужна проверка на . ..
 				
