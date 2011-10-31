@@ -66,7 +66,7 @@ private:
 	//! Удалить файл
 	void removeFile(const std::string &fileName);
 	//! Удалить файл
-	void removeFile(Poco::File &pFile);
+	void removeFile(const Poco::File &pFile);
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
 	//! Создать каталог, если он не существует

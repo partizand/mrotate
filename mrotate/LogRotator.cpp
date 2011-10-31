@@ -50,6 +50,7 @@ void LogRotator::rotate()
 		sourceDir.makeFile(); // 
 		fileMask=sourceDir.getFileName(); // Маска
 		sourceDir.setFileName(""); // Каталог источник
+		sourceDir.makeDirectory();
 
 		Path destDir(items.at(currIndex).targetDir);
 		destDir.makeDirectory(); // Каталог приемник
@@ -115,8 +116,11 @@ void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSour
 			if (recurse && it->isDirectory()) // Это каталог
 			{
 				// По идее здесь нужна проверка на . ..
+				
+				string itname=it.name();
 				Path newSource(it.path());
-				newSource.setFileName(fileMask);
+				newSource.makeDirectory();
+				//newSource.setFileName(fileMask);
 				Path newDest(pDestDir);
 				newDest.pushDirectory(it.name());
 				rotateFiles(fileMask,newSource,newDest,recurse,rotate,Period,lSize);
@@ -169,15 +173,15 @@ void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
 	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,destFile.toString());
 	if (suc) // Успешно заархивировался
 	{
-		File tFile(pFile);
-		removeFile(tFile);
+		//File tFile(pFile);
+		removeFile(pFile);
 	}
 
 	
 }
 //------------------------------------------------------------------------
 //! Удалить файл
-void LogRotator::removeFile(Poco::File &pFile)
+void LogRotator::removeFile(const Poco::File &pFile)
 {
 	
 if (_debugMode)
@@ -188,7 +192,8 @@ if (_debugMode)
 }
 try
 {
-pFile.remove(); // Удаляем его
+	File tFile(pFile);
+	tFile.remove(); // Удаляем его
 poco_information_f1(*log,"File deleted %s",pFile.path());
 }
 catch(...) 
