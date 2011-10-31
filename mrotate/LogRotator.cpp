@@ -165,12 +165,16 @@ void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
 	//string sFileName(pFile.getFileName()); // Короткое имя файла источника
 	//Меняем в targetPath - %FileName и %yydd - на тек дату
 	string ArhFileName(items[currIndex].targetMask); // короткое имя архива
-	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,pFile.path());
+	
+	
+	DateTime replDate=getDate(pFile,items[currIndex].dateReplaceMode); // дата/время на замену
+
+	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,pFile.path(),"",replDate);
 
 	Path destFile(destDir);
 	destFile.setFileName(ArhFileName);
 
-	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,destFile.toString());
+	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,destFile.toString(),replDate);
 	if (suc) // Успешно заархивировался
 	{
 		//File tFile(pFile);
@@ -201,7 +205,27 @@ catch(...)
 	poco_error_f1(*log,"Error delete file %s",pFile.path());
 }
 }
-
+//------------------------------------------------------------------------
+//! Возвращает дату в зависимости от режима dateMode
+// Может быть статической или не членом класса
+Poco::DateTime LogRotator::getDate(const Poco::File &pFile,Rotate::DateMode dateMode)
+{
+Timestamp fileTime;
+	switch (items[currIndex].dateReplaceMode)
+	{
+	case Rotate::Created:
+		fileTime=pFile.created();
+		break;
+	case Rotate::Modified:
+		fileTime=pFile.getLastModified();
+		break;
+	case Rotate::Now:
+		fileTime.update();
+		break;
+	}
+	DateTime replDate(fileTime); // дата/время на замену
+	return replDate;
+}
 
 //------------------------------------------------------------------------
 //! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
@@ -340,22 +364,13 @@ if (!pFile.exists()) return false; // Файла нет
 		DateTime pTime; //Время для сравнения
 		//DateTime fTime; // Время файла
 		Timespan diffTime(iPeriod-1,23,0,0,0);  //Сколько нужно отнять
-		pTime-=diffTime; 
+		pTime-=diffTime; // Дата с которой сверяют
 		//periodTime=periodTime-diffTime; // 
-		Timestamp fileTime;
-		switch (items.at(currIndex).dateMode)
-		{
-		case Rotate::Created: 
-			fileTime=pFile.created();
-			break;
-		case Rotate::Modified: 
-			fileTime=pFile.getLastModified();
-			break;
-		}
+		
 		// дата файла должена быть старше period - 1 час
 		//DateTime fTime(pFile.created());
-		// Дата модификации
-		DateTime fTime(fileTime);
+		// Дата модификации/создания
+		DateTime fTime=getDate(pFile,items[currIndex].dateMode); // Дата которую нужно сверять
 		if (fTime<=pTime)
 		{
 			return true;
@@ -465,7 +480,7 @@ void LogRotator::load(const std::string &fileName)
 void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
 {
 //RotateEntry tmpItem;
-string Source,ArchiverName,TargetDir,TargetMask,FDateMode;
+string Source,ArchiverName,TargetDir,TargetMask,FDateMode,DateReplaceMode;
 int Period,KeepPeriod;
 bool Recurse;
 unsigned long int LimitSize;
@@ -533,6 +548,9 @@ if (!RootKeys.empty())
 				// Date mode
 				KeyName=RootKeys.at(i)+".dateMode";
 				FDateMode=pConf->getString(KeyName,"");
+				// Date Replace Mode
+				KeyName=RootKeys.at(i)+".dateReplace";
+				DateReplaceMode=pConf->getString(KeyName,"");
 				// Рекурсивность
 				KeyName=RootKeys.at(i)+".recurse";
 				Recurse=pConf->getBool(KeyName,false);
@@ -540,7 +558,7 @@ if (!RootKeys.empty())
 
 
 				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode));
+				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode,DateReplaceMode));
 				//cout<< *it<<endl;
 			 
 			}

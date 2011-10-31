@@ -43,7 +43,7 @@ Archiver::~Archiver(void)
 }
 //------------------------------------------------------------------------
 //! Заархивировать файл 
-bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fileName,const std::string &arhFileName)
+bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fileName,const std::string &arhFileName,const Poco::DateTime &replDate)
 {
 // Нужно построить опции, найти архиватор и запустить
 
@@ -64,7 +64,7 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
 	vector<std::string> vectArgs;
 	Executer::splitArgs(Archivers[arhiverName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
-	ReplVar::replaceFileAndDate(vectArgs,fileName,ArhFileName); 
+	ReplVar::replaceFileAndDate(vectArgs,fileName,ArhFileName,replDate); 
 	
 	// Создаем каталог назначения
 	Executer::createDir(ArhFileName);

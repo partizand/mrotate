@@ -7,7 +7,11 @@ namespace Rotate
 {
 	//enum RotateType{Single,Multiple};
 	//! Режим обработки даты файла
-	enum DateMode {Created,Modified};
+	enum DateMode {Created,Modified,Now};
+	//! Режим замены даты в параметрах %dd
+	//enum DateReplaceMode{Now,Create,Modify};
+
+	Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode);
 }
 
 //! Одна запись настроек ротации
@@ -18,7 +22,9 @@ public:
 	RotateEntry(const std::string &Name, const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		const std::string &targetDir,const std::string &targetMask,
-		const std::string &FDateMode);
+		const std::string &FDateMode,
+		const std::string &DateReplaceMode
+		);
 	~RotateEntry(void);
 	//! Имя записи
 	std::string name;
@@ -44,7 +50,10 @@ public:
 	//! Каталог назначения и маска
 	std::string targetPath;
 	//! Режим обрабтоки дат файлов
-	Rotate::DateMode dateMode; 
+	Rotate::DateMode dateMode;
+	//! Режим замены даты
+	Rotate::DateMode dateReplaceMode;
+
 
 };
 

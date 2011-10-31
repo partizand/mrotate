@@ -14,7 +14,8 @@ RotateEntry::RotateEntry(void)
 RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		const std::string &TargetDir,const std::string &TargetMask,
-		const std::string &FDateMode):
+		const std::string &FDateMode,
+		const std::string &DateReplaceMode):
 	name(Name),
 	source(Source),
 	recurse(Recurse),
@@ -41,12 +42,37 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	tPath.makeDirectory();
 	tPath.setFileName(targetMask);
 	targetPath=tPath.toString();
-	dateMode=Rotate::Created; // Дата создания по умолчанию
-	if (icompare(FDateMode,"Modified")==0)
-	{
-		dateMode=Rotate::Modified;
-	}
+	dateMode=Rotate::dateModeFromString(FDateMode,Rotate::Created); // Дата создания по умолчанию
+	
+	dateReplaceMode=Rotate::dateModeFromString(DateReplaceMode,Rotate::Now); // Текущая дата по умолчанию
+	
 }
 RotateEntry::~RotateEntry(void)
 {
+}
+
+namespace Rotate
+{
+//! Преобразовывает строку в тип DateMode
+Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode)
+{
+	Rotate::DateMode ret=defaultMode;
+	if (!str.empty())
+	{
+		if (icompare(str,0,1,"M")==0)
+			{
+				ret=Rotate::Modified;
+			}
+		else if (icompare(str,0,1,"C")==0)
+			{
+				ret=Rotate::Created;
+			}
+		else if (icompare(str,0,1,"N")==0)
+			{
+				ret=Rotate::Now;
+			}
+	}
+	return ret;
+	
+}
 }

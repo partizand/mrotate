@@ -8,6 +8,7 @@
 #include <Poco\Logger.h>
 #include <Poco\Path.h>
 #include <Poco\File.h>
+#include <Poco\DateTime.h>
 
 #include "RotateEntry.h"
 #include "Archiver.h"
@@ -69,6 +70,9 @@ private:
 	void removeFile(const Poco::File &pFile);
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
+	//! Возвращает дату в зависимости от режима dateMode
+	Poco::DateTime getDate(const Poco::File &pFile,Rotate::DateMode dateMode);
+	
 	//! Создать каталог, если он не существует
 	//void createDir(const std::string &dirName);
 
