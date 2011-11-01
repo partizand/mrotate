@@ -30,6 +30,10 @@ public:
 	std::string name;
 	//! Источник
 	std::string source;
+	//! Маска источника
+	std::string sourceMask;
+	//! Каталог источника
+	std::string sourceDir;
 	//! Обрабатывать подкаталоги
 	bool recurse;
 

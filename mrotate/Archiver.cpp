@@ -50,7 +50,7 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 	
 	
 
-	string exeName(Archivers[arhiverName].exeName); // Exe פאיכ
+	
 
 	//Path pPathSource(FileName);
 	//pPathSource.makeFile();
@@ -98,7 +98,8 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 	{
 		if (!_debugMode)
 			{
-			ExitCode=Executer::execute(exeName,vectArgs);
+				string fullExeName(Archivers[arhiverName].fullExeName); // Exe פאיכ
+				ExitCode=Executer::execute(fullExeName,vectArgs);
 			}
 		else
 			{
@@ -262,10 +263,12 @@ if (!RootKeys.empty())
 				// Exe
 				KeyName=RootKeys.at(i)+".exeName";
 				ExeName=pConf->getString(KeyName,"");
-				if (ExeName.empty())
-				{
-					continue;
-				}
+
+
+				//if (ExeName.empty())
+				//{
+				//	continue;
+				//}
 
 				// ׀אסרטנוםטו
 				KeyName=RootKeys.at(i)+".Extension";
@@ -280,6 +283,8 @@ if (!RootKeys.empty())
 				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
 
 				Archivers[ArchiverName]=ArchiverParam(ArchiverName,Extension,ExeName,Args);
+
+				
 			 
 			}
  }
@@ -296,9 +301,9 @@ bool Archiver::isValid(const std::string &archiverName)
 		return false;
 	}
 	
-	string fullPathArh;
-	bool found=Executer::getFullPath(Archivers[archiverName].exeName,fullPathArh);
-	if (!found)
+	//string fullPathArh;
+	//bool found=Executer::getFullPath(Archivers[archiverName].exeName,fullPathArh);
+	if (!Archivers[archiverName].exeName.empty() && Archivers[archiverName].fullExeName.empty())
 	{
 		poco_error_f2(*log,"Executable %s not found for archiver %s",Archivers[archiverName].exeName,archiverName);
 		return false;

@@ -74,22 +74,14 @@ protected:
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleHelp)));
 
 		
-			/*	
-		options.addOption(
-			Option("config-file", "f", "load configuration data from a file")
-				.required(false)
-				.repeatable(true)
-				.argument("config-file")
-				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleConfig)));
-
-		*/
+		
 		options.addOption(
 			Option("run", "r", "Run rotate")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleRun)));
 		options.addOption(
-			Option("check", "", "Check rotate entries")
+			Option("verify", "v", "Verification rotate entries")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleCheck)));

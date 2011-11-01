@@ -56,29 +56,21 @@ private:
 	bool isRotateFile(Poco::File &pFileName,int Period=0,unsigned long int lSize=0);
 	//! Ротировать заданный файл
 	void rotateFile(const Poco::File &pFile,const Poco::Path &destDir);
-	//! Ротировать заданный файл
-	//void rotateFile(const std::string &fileName);
-	//! Ротировать список файлов
-	//void rotateFile(const std::vector<std::string> &listFiles);
-	//! Ротировать архивные файлы
-	//void rotateArhFile(const std::string &fileName);
-	//! Ротировать список архивных файлов
-	//void rotateArhFile(const std::vector<std::string> &listFiles);
+	
 	//! Удалить файл
 	void removeFile(const std::string &fileName);
 	//! Удалить файл
 	void removeFile(const Poco::File &pFile);
+	//! Возвращает маску для удаляемых файлов для текущего задания
+	std::string getRemoveMask();
+
 	//! Удалить список файлов
 	void removeFile(const std::vector<std::string> &listFiles);
 	//! Возвращает дату в зависимости от режима dateMode
 	Poco::DateTime getDate(const Poco::File &pFile,Rotate::DateMode dateMode);
 	
-	//! Создать каталог, если он не существует
-	//void createDir(const std::string &dirName);
-
-	//! Преобразование строкового периода в int и определение типа ротации
-	//int convertPeriod(std::string &strPeriod,Rotate::RotateType &rType);
-	//! Преобразование размера в int64
+	
+	//! Преобразование строки в int64
 	unsigned long int convertSize(std::string &strSize);
 	//! Преобразовать target к полному пути
 	//std::string getFullTarget(const std::string &targetPath,const std::string &Source);

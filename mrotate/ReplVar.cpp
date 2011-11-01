@@ -68,13 +68,21 @@ std::string ReplVar::replaceFile(const std::string &str,const std::string &FileN
 }
 
 //------------------------------------------------------------------------
-//! Заменить дату/время в строке, по умолчанию на текущие
+//! Заменить дату/время в строке, если dateTime=0 - то дата заменяется на *
 std::string ReplVar::replaceDate(const std::string &str,Poco::DateTime dateTime)
 {
 string tmpStr;
-DateTime pDateTime;
-if (dateTime!=0) pDateTime=dateTime;
-tmpStr=DateTimeFormatter::format(pDateTime,str);
+//DateTime pDateTime;
+if (dateTime==0) 
+{
+	tmpStr=replaceDateMask(str); // Замена на *
+	
+}
+else
+{
+	tmpStr=DateTimeFormatter::format(dateTime,str); // Замена на дату
+	// DateTimeFormatter::format(dateTime,str);
+}
 return tmpStr;
 }
 //------------------------------------------------------------------------
@@ -110,9 +118,9 @@ std::string ReplVar::replaceDateMask(const std::string &str)
 {
 	string tmpStr(str);
 	map<string,string> Masks; // Параметры на замену
-	Masks["%w"]="???";
-	Masks["%W"]="*";
-	Masks["%b"]="???";
+	Masks["%w"]="???"; //%w - abbreviated weekday (Mon, Tue, ...)
+	Masks["%W"]="*"; // %W - full weekday (Monday, Tuesday, ...)
+	Masks["%b"]="???"; // %b - abbreviated month (Jan, Feb, ...) 
 	Masks["%B"]="*"; //full month (January, February, ...) 
 	Masks["%d"]="??"; //- zero-padded day of month (01 .. 31) 
 	Masks["%e"]="*"; //day of month (1 .. 31) 
@@ -129,19 +137,12 @@ std::string ReplVar::replaceDateMask(const std::string &str)
 	Masks["%M"]="??"; //%M - minute (00 .. 59) 
 	Masks["%S"]="??"; //%S - second (00 .. 59) 
 	Masks["%s"]="??."; //%s - seconds and microseconds (equivalent to %S.%F) 
-	Masks["%M"]="??"; //
-	Masks["%M"]="??"; //
-	Masks["%M"]="??"; //
+	Masks["%i"]="???"; //%i - millisecond (000 .. 999) 
+	Masks["%c"]="?"; // %c - centisecond (0 .. 9) 
+	Masks["%F"]="??????"; // %F - fractional seconds/microseconds (000000 - 999999) 
+	Masks["%z"]="*"; //%z - time zone differential in ISO 8601 format (Z or +NN.NN) 
+	Masks["%Z"]="??"; //%Z - time zone differential in RFC format (GMT or +NNNN)
 	
-
-
-%i - millisecond (000 .. 999) 
-%c - centisecond (0 .. 9) 
-%F - fractional seconds/microseconds (000000 - 999999) 
-%z - time zone differential in ISO 8601 format (Z or +NN.NN) 
-%Z - time zone differential in RFC format (GMT or +NNNN) 
-%% - percent sign
-
 
 	map<string,string>::const_iterator it=Masks.begin();
 	for (;it!=Masks.end();++it)
@@ -150,4 +151,5 @@ std::string ReplVar::replaceDateMask(const std::string &str)
 	//To=pPath.getExtension();
 	tmpStr=replace (tmpStr,it->first,it->second);
 	}
+	return tmpStr;
 }

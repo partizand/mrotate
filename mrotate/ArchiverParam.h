@@ -11,6 +11,9 @@ public:
 	std::string archiverName;
 	//! Имя запускаемого файла (7z.exe,rar.exe без пути)
 	std::string exeName;
+	//! Полный путь запускаемого файла
+	std::string fullExeName;
+
 	//! Параметры запуска (без самого .exe)
 	std::string arguments;
 	//! Расширение файла архива

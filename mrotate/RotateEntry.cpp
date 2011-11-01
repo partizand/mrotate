@@ -26,6 +26,14 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	targetDir(TargetDir),
 	targetMask(TargetMask)
 {
+	// Маска файлов источника
+	Path sPath(source);
+	sPath.makeFile();
+	sourceMask=sPath.getFileName();
+	// Каталог источника
+	sPath.setFileName("");
+	sourceDir=sPath.toString();
+	
 	// Заполнение target если оно пусто
 	if (targetMask.empty())
 	{
@@ -33,10 +41,10 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	}
 	if (targetDir.empty())
 	{
-		Path sPath(source);
-		sPath.makeFile();
-		sPath.setFileName("");
-		targetDir=sPath.toString();
+		//Path sPath(source);
+		//sPath.makeFile();
+		//sPath.setFileName("");
+		targetDir=sourceDir;
 	}
 	Path tPath(targetDir);
 	tPath.makeDirectory();

@@ -45,14 +45,14 @@ public:
 	ReplVar(void);
 	~ReplVar(void);
 	//! Заменить дату/время в строке, по умолчанию на текущие
-	static std::string replaceDate(const std::string &str,Poco::DateTime dateTime=0);
+	static std::string replaceDate(const std::string &str,Poco::DateTime dateTime);
 	
 	//! Заменить имя файла в строке
 	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="");
 	//! Заменить имя файла и дату в строке
-	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0);
+	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime);
 	//! Заменить имя файла и дату в векторе
-	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName="",Poco::DateTime dateTime=0);
+	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime);
 private:
 	//! Заменить дату/время в строке на *
 	static std::string replaceDateMask(const std::string &str);
