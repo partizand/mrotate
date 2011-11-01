@@ -92,7 +92,7 @@ void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSour
 {
 		// Обрабатываем файлы в каталоге
 	//string fileMask=pSourceMask.getFileName();
-	Glob glob(fileMask);
+	Glob glob(fileMask,Glob::GLOB_CASELESS); // Регистр не важен в маске
 		
 		DirectoryIterator it(pSourceDir);
 		DirectoryIterator end;
@@ -211,7 +211,7 @@ catch(...)
 Poco::DateTime LogRotator::getDate(const Poco::File &pFile,Rotate::DateMode dateMode)
 {
 Timestamp fileTime;
-	switch (items[currIndex].dateReplaceMode)
+	switch (dateMode)
 	{
 	case Rotate::Created:
 		fileTime=pFile.created();

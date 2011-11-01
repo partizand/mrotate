@@ -21,7 +21,7 @@ public:
 	bool isValid(const std::string &archiverName);
 
 	//! Заархивировать файл 
-	bool archiveFile(const std::string &arhiverName,const Poco::File &pFile,const std::string &arhFileName,const Poco::DateTime &replDate);
+	bool archiveFile(const std::string &arhiverName,const std::string &fileName,const std::string &arhFileName,const Poco::DateTime &replDate);
 
 	//! Заархивировать файл архиватором с текущими настройками
 	//bool archiveFile(const std::string &FileName);
