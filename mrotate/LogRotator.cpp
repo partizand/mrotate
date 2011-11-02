@@ -15,6 +15,7 @@
 #include <Poco\DateTime.h>
 
 #include "ReplVar.h"
+#include "Executer.h"
 
 using namespace std;
 using namespace Poco;
@@ -41,7 +42,7 @@ void LogRotator::rotate()
 	bool suc;
 	string fileMask;
 	//string oldArhMask;
-	vector<string> fileList;
+	vector<string> vectArgs;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
@@ -58,6 +59,12 @@ void LogRotator::rotate()
 		suc=archiver.isValid(items[i].archiverName);
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
+		// Скрипт перед ротацией
+		if (!items[i].preRotate.empty())
+		{
+			poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
+			Executer::execute(items[i].preRotate,vectArgs);
+		}
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 		{
 		
@@ -72,7 +79,12 @@ void LogRotator::rotate()
 			fileMask=getRemoveMask(); //"*"+archiver.getExtension(items[i].archiverName);
 			rotateFiles(fileMask,destDir,destDir,items[i].recurse,false,items[i].keepPeriod,0);
 		}
-
+		// Скрипт после ротации
+		if (!items[i].postRotate.empty())
+		{
+			poco_information_f1(*log,"Launch process %s.",items[i].postRotate);
+			Executer::execute(items[i].postRotate,vectArgs);
+		}
 	}
 }
 //------------------------------------------------------------------------
@@ -152,7 +164,90 @@ void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
 
 	
 }
+//------------------------------------------------------------------------
+//! Сдвинуть старые файлы заданного файла
+// Удаляем совсем старые, потом сдвигаем n->n+1,..1->2
+void LogRotator::shiftFile(const Poco::Path &destFile)
+{
+	// Получаем маску поиска
+	
+	string shortFileName=destFile.getFileName();
+	string fileMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,shortFileName,"",0,-1);
+	Path destDir(destFile);
+	destDir.setFileName("");
+	// Строим список файлов
+	
+	Glob glob(fileMask,Glob::GLOB_CASELESS); // Регистр не важен в маске
+		map<int,string> fileList; // Список файлов с индексами
+		int ind;
+		DirectoryIterator it(destDir);
+		DirectoryIterator end;
+		while (it != end)
+		{
+			if (it->isFile()) // Это файл
+			{
+				if (glob.match(it.name())) // Проходит по маске
+				{
+					// Добавляем в список
+					ind=getIndexOfFile(it.name());
+					if (ind>=0)
+					{
+						fileList[ind]=it.path();
+					}
 
+				}
+				
+			}
+			
+			
+			++it;
+		}
+
+	// Проходим по списку
+	// Пример прохода в обратном направлении (по убыванию индексов)
+	
+	map<int,string>::reverse_iterator rit;
+	for (rit=fileList.rbegin();rit!=fileList.rend();++rit)
+	{
+		// Удаляем лишнее
+		if (items[currIndex].keepPeriod>0)
+		{
+		if (rit->first>items[currIndex].keepPeriod) // Индекс файла больше
+		{
+			removeFile(rit->second);
+			continue;
+		}
+		}
+		// Сдвигаем остальное
+
+	}
+
+	//string fileMask=Re
+}
+//------------------------------------------------------------------------
+//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2)
+// Если ничего не получилось вернет -1
+int LogRotator::getIndexOfFile(const std::string &fileName)
+{
+	string fName(fileName);
+	int ind=-1;
+	// Убрать расширение архиватора
+	string ext=archiver.getExtension(items[currIndex].archiverName);
+	if (!ext.empty())
+	{
+		string to="";
+		replaceInPlace(fName,ext,to); // Тупой вариант, нужно переделать на более надежный
+	}
+	Path pFileName(fName);
+	pFileName.makeFile();
+	ext=pFileName.getExtension(); // Расширение без точки, типа 2
+	
+	NumberParser::tryParse(ext,ind);
+	
+	return ind;
+
+
+}
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
 bool LogRotator::isRotateFile(Poco::File &pFile,int Period,unsigned long int lSize)
@@ -361,9 +456,9 @@ void LogRotator::load(const std::string &fileName)
 void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
 {
 //RotateEntry tmpItem;
-string Source,ArchiverName,TargetDir,TargetMask,FDateMode,DateReplaceMode;
+string Source,ArchiverName,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate;
 int Period,KeepPeriod;
-bool Recurse;
+bool Recurse,Shift;
 unsigned long int LimitSize;
 
 AbstractConfiguration::Keys RootKeys;
@@ -371,6 +466,7 @@ pConf-> keys("",RootKeys); // Список корневых ключей
 if (!RootKeys.empty())
  {
 	string KeyName,KeyValue;
+	//RotateEntry re;
 	int i;
 	for (i=0;i<RootKeys.size();++i)
 	
@@ -386,7 +482,7 @@ if (!RootKeys.empty())
 
 				//KeyName=*it+".source";
 				// Источник
-				KeyName=RootKeys.at(i)+".source";
+				KeyName=RootKeys.at(i)+".Source";
 				Source=pConf->getString(KeyName,"");
 				if (Source.empty()) 
 				{
@@ -394,16 +490,16 @@ if (!RootKeys.empty())
 					continue;
 				}
 				//Период
-				KeyName=RootKeys.at(i)+".period";
+				KeyName=RootKeys.at(i)+".Period";
 				Period=pConf->getInt(KeyName,0);
 				
 				// Размер
-				KeyName=RootKeys.at(i)+".size";
+				KeyName=RootKeys.at(i)+".Size";
 				KeyValue=pConf->getString(KeyName,"");
 				LimitSize=convertSize(KeyValue);
 				
 				// Keep Период
-				KeyName=RootKeys.at(i)+".keepPeriod";
+				KeyName=RootKeys.at(i)+".KeepPeriod";
 				KeepPeriod=pConf->getInt(KeyName,0);
 				
 				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
@@ -412,7 +508,7 @@ if (!RootKeys.empty())
 					continue;
 				}
 				// Архиватор
-				KeyName=RootKeys.at(i)+".compress";
+				KeyName=RootKeys.at(i)+".Compress";
 				ArchiverName=pConf->getString(KeyName,"");
 				toLowerInPlace(ArchiverName);
 				if (ArchiverName.empty()) 
@@ -421,51 +517,39 @@ if (!RootKeys.empty())
 					continue;
 				}
 				// Target Dir
-				KeyName=RootKeys.at(i)+".targetDir";
+				KeyName=RootKeys.at(i)+".TargetDir";
 				TargetDir=pConf->getString(KeyName,"");
 				// Target Mask
-				KeyName=RootKeys.at(i)+".targetMask";
+				KeyName=RootKeys.at(i)+".TargetMask";
 				TargetMask=pConf->getString(KeyName,"");
 				// Date mode
-				KeyName=RootKeys.at(i)+".dateMode";
+				KeyName=RootKeys.at(i)+".DateMode";
 				FDateMode=pConf->getString(KeyName,"");
 				// Date Replace Mode
-				KeyName=RootKeys.at(i)+".dateReplace";
+				KeyName=RootKeys.at(i)+".DateReplace";
 				DateReplaceMode=pConf->getString(KeyName,"");
 				// Рекурсивность
-				KeyName=RootKeys.at(i)+".recurse";
+				KeyName=RootKeys.at(i)+".Recurse";
 				Recurse=pConf->getBool(KeyName,false);
 				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
-
+				// Скрипт перед ротацией
+				KeyName=RootKeys.at(i)+".PreRotate";
+				PreRotate=pConf->getString(KeyName,"");
+				// Скрипт после ротации
+				KeyName=RootKeys.at(i)+".PostRotate";
+				PostRotate=pConf->getString(KeyName,"");
+				// Режим сдвига
+				KeyName=RootKeys.at(i)+".Shift";
+				Shift=pConf->getBool(KeyName,false);
 
 				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask,FDateMode,DateReplaceMode));
+				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,Shift,KeepPeriod,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
 				//cout<< *it<<endl;
 			 
 			}
  }
 }
-//------------------------------------------------------------------------
-//! Преобразовать target к полному пути
-/*
-std::string LogRotator::getFullTarget(const std::string &targetPath,const std::string &Source)
-{
-	string shortFileName; // Короткое имя файла target
-	Path sPath(Source);
-	sPath.makeFile();
-	
-	sPath.setFileName("");
-	Path tPath(targetPath);
-	shortFileName=tPath.getFileName();
-	if (shortFileName.empty()) shortFileName="%FileName";
-	Path rPath; // Результирующий 
-	if (tPath.depth()==0) 
-	{tPath.assign(
 
-	}
-
-}
-*/
 //------------------------------------------------------------------------
 //! Преобразование размера в int64 (Т.е. строка может содержать K и M)
 unsigned long int LogRotator::convertSize(std::string &strSize)
@@ -502,41 +586,3 @@ std::string LogRotator::getVersion()
 {
 return ver;
 }
-//! Преобразование строкового периода в int и определение типа ротации
-/*
-int LogRotator::convertPeriod(std::string &strPeriod,Rotate::RotateType &rType)
-{
-	int iPeriod;
-	//string sPeriod;
-	trimInPlace(strPeriod); // Обрезаем пробелы
-	// Ищем строки 
-	rType=Rotate::RotateType.Single; 
-	if (icompare(strPeriod,"Daily")==0)
-	{
-		
-		return 1;
-	}
-	if (icompare(strPeriod,"weekly")==0)
-	{
-		
-		return 7;
-	}
-	if (icompare(strPeriod,"monthly")==0)
-	{
-		
-		return 30;
-	}
-	// Преобразуем строку в число
-	rType=Rotate::RotateType.Multiple;
-	if (NumberParser::tryParse(strPeriod,iPeriod))
-	{
-		return iPeriod;
-	}
-	else
-	{
-		return 0;
-	}
-
-}
-*/
-

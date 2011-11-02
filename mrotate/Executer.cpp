@@ -47,6 +47,7 @@ bool Executer::getFullPath(const std::string &aPath, std::string &fullPath)
 		// Ищем полный путь
 		string EnvPath(Environment::get("PATH")); // Переменная окружения Path
 		EnvPath=Path::expand(EnvPath); // Раскрываем всякие %Dir%
+		EnvPath+=";"+Path::current(); // Добавляем текущий каталог для поиска
 		string fileName=pPath.getFileName();
 		found=Path::find(EnvPath,fileName,pPath); 
 		

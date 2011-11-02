@@ -13,9 +13,12 @@ RotateEntry::RotateEntry(void)
 
 RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
+		bool Shift,
 		const std::string &TargetDir,const std::string &TargetMask,
 		const std::string &FDateMode,
-		const std::string &DateReplaceMode):
+		const std::string &DateReplaceMode,
+		const std::string &PreRotate,
+		const std::string &PostRotate):
 	name(Name),
 	source(Source),
 	recurse(Recurse),
@@ -23,8 +26,11 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	limitSize(LimitSize),
 	archiverName(ArchiverName),
 	keepPeriod(KeepPeriod),
+	shift(Shift),
 	targetDir(TargetDir),
-	targetMask(TargetMask)
+	targetMask(TargetMask),
+	preRotate(PreRotate),
+	postRotate(PostRotate)
 {
 	// Маска файлов источника
 	Path sPath(source);
@@ -37,8 +43,17 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	// Заполнение target если оно пусто
 	if (targetMask.empty())
 	{
+		if (Shift)
+		{
+		targetMask="%FileName%Index";
+		}
+		else
+		{
 		targetMask="%FileName";
+		}
+
 	}
+	
 	if (targetDir.empty())
 	{
 		//Path sPath(source);

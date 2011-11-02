@@ -21,7 +21,7 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-const std::string noneArchiverName="none";
+const std::string noneArchiverName="no";
 
 Archiver::Archiver(Poco::Logger &logger):
 _debugMode(false)
@@ -34,7 +34,7 @@ _debugMode(false)
 	Archivers["rar"]=ArchiverParam("rar",".rar","rar.exe","a %ArhFileName %FullFileName");
 	Archivers["winrar"]=ArchiverParam("winrar",".rar","winrar.exe","a %ArhFileName %FullFileName");
 	
-	Archivers["none"]=ArchiverParam("none","","","");
+	Archivers[noneArchiverName]=ArchiverParam(noneArchiverName,"","","");
 	//setOptions("7z","");
 }
 //------------------------------------------------------------------------

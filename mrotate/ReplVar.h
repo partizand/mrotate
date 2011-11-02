@@ -48,11 +48,11 @@ public:
 	static std::string replaceDate(const std::string &str,Poco::DateTime dateTime);
 	
 	//! Заменить имя файла в строке
-	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="");
+	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="",int index=0);
 	//! Заменить имя файла и дату в строке
-	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime);
+	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTim,int index=0);
 	//! Заменить имя файла и дату в векторе
-	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime);
+	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime,int index=0);
 private:
 	//! Заменить дату/время в строке на *
 	static std::string replaceDateMask(const std::string &str);

@@ -61,6 +61,11 @@ private:
 	void removeFile(const std::string &fileName);
 	//! Удалить файл
 	void removeFile(const Poco::File &pFile);
+	//! Сдвинуть старые файлы заданного файла
+	void shiftFile(const Poco::Path &destFile);
+	//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2)
+	int getIndexOfFile(const std::string &fileName);
+
 	//! Возвращает маску для удаляемых файлов для текущего задания
 	std::string getRemoveMask();
 

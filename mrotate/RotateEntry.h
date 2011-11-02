@@ -21,9 +21,12 @@ public:
 	RotateEntry(void);
 	RotateEntry(const std::string &Name, const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
+		bool Shift,
 		const std::string &targetDir,const std::string &targetMask,
 		const std::string &FDateMode,
-		const std::string &DateReplaceMode
+		const std::string &DateReplaceMode,
+		const std::string &PreRotate,
+		const std::string &PostRotate
 		);
 	~RotateEntry(void);
 	//! Имя записи
@@ -47,6 +50,8 @@ public:
 	//Rotate::RotateType type;
 	//! Сколько дней хранить архивы
 	int keepPeriod;
+	//! Режим сдвига файлов при переименовании
+	bool shift;
 	//! Каталог назначения
 	std::string targetDir;
 	//! Маска названия архивного файла назначения
@@ -57,7 +62,10 @@ public:
 	Rotate::DateMode dateMode;
 	//! Режим замены даты
 	Rotate::DateMode dateReplaceMode;
-
-
+	//! Скрипт выполнения до ротации
+	std::string  preRotate;
+	//! Скрипт выполнение после ротации
+	std::string postRotate;
+	
 };
 

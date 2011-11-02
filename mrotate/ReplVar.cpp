@@ -6,6 +6,7 @@
 #include <Poco/DateTimeFormatter.h>
 #include <Poco\String.h>
 #include <Poco\Path.h>
+#include <Poco\NumberFormatter.h>
 
 using namespace std;
 using namespace Poco;
@@ -19,7 +20,7 @@ ReplVar::~ReplVar(void)
 }
 //------------------------------------------------------------------------
 //! Заменить имя файла и дату в векторе
-void ReplVar::replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime)
+void ReplVar::replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime,int index)
 {
 	vector<string>::iterator it=strVect.begin();
 	
@@ -29,7 +30,7 @@ void ReplVar::replaceFileAndDate(std::vector<std::string> &strVect,const std::st
 	}
 }
 //! Заменить имя файла и дату в строке
-std::string ReplVar::replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime)
+std::string ReplVar::replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime,int index)
 {
 string ret(str);
 ret=replaceFile(ret,FileName,ArhFileName);
@@ -38,7 +39,7 @@ return ret;
 }
 //------------------------------------------------------------------------
 //! Заменить имя файла и имя архива в строке
-std::string ReplVar::replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName)
+std::string ReplVar::replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName,int index)
 {
 	string From,To;
 	string tmpStr(str);
@@ -64,6 +65,19 @@ std::string ReplVar::replaceFile(const std::string &str,const std::string &FileN
 		From="%ArhFileName"; // имя файла архива
 		tmpStr=replace (tmpStr,From,ArhFileName);
 	}
+	
+	
+	From="%Index"; // Индекс
+	if (index>=0)
+	{
+		To=NumberFormatter::format0(index,2);
+	}
+	else
+	{
+		To="??";
+	}
+	tmpStr=replace (tmpStr,From,To);
+	
 	return tmpStr;
 }
 
@@ -136,7 +150,7 @@ std::string ReplVar::replaceDateMask(const std::string &str)
 	Masks["%A"]="??"; //%A - AM/PM 
 	Masks["%M"]="??"; //%M - minute (00 .. 59) 
 	Masks["%S"]="??"; //%S - second (00 .. 59) 
-	Masks["%s"]="??."; //%s - seconds and microseconds (equivalent to %S.%F) 
+	Masks["%s"]="??.??????"; //%s - seconds and microseconds (equivalent to %S.%F) 
 	Masks["%i"]="???"; //%i - millisecond (000 .. 999) 
 	Masks["%c"]="?"; // %c - centisecond (0 .. 9) 
 	Masks["%F"]="??????"; // %F - fractional seconds/microseconds (000000 - 999999) 
