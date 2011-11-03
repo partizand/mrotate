@@ -76,7 +76,7 @@ protected:
 		
 		
 		options.addOption(
-			Option("run", "r", "Run rotate")
+			Option("rotate", "r", "Run rotate")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleRun)));

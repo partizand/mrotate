@@ -1,1 +1,294 @@
- 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=Windows-1251" http-equiv="content-type"><title>mrotate help</title></head><body>
+<h1 style="text-align: center;">mRotate v. 0.1 help<br>
+</h1>
+
+
+Консольная утилита по ротации файлов.<br>
+
+
+<br>
+
+
+Работает на Windows. Установка не требуется, зависимостей нет.<br>
+
+
+<br>
+
+<span style="font-weight: bold;">Распространяется по лицензии </span><a href="http://www.gnu.org/copyleft/gpl.html" target="_blank">GNU GPL v.3</a><br>
+
+
+<br>
+<a href="http://www.gnu.org/copyleft/gpl.html" target="_blank"></a><span style="color: rgb(255, 102, 102);">ВАЖНО!!! ВЫ ИСПОЛЬЗУЕТЕ ДАННЫЙ
+ПРОГРАММНЫЙ
+ПРОДУКТ НА СВОЙ СТРАХ И РИСК!!!</span>
+<br>
+
+
+
+Автор заранее слагает с себя ответственность за весь возможный ущерб,
+причиненный программой.
+<br>
+
+<h3>Описание<br>
+</h3>
+Программа позволяет ротировать (т.е. архивировать, удалять устаревшие)
+лог файлы (не обязательно текстовые) для программ которые сами этого не
+умеют.<br>
+<br>
+Используется два режима ротации.<br>
+<ol>
+  <li>В имени архивов используется дата/время, старые файлы удаляются
+если они старше определенной даты. Используетя, в основном, когда
+программа создает множество файлов, например по дате.</li>
+  <li>В имени архивов используется индекс. (Обычное поведение logrotate из
+linux). Т.е. предыдущий файл будет иметь индекс 001, более старший 002
+и т.д. При архивации они сдвигаются. Файлы удаляются по превышении индексом заданного числа (количества ротаций).<br>
+  </li>
+</ol>
+По умолчанию используется первый режим. Для указания второго режима в настройках пропишите Shift=yes<br>
+<br>
+Для испльзования пропишите настройки ротаций в файле mrotate.ini и добавьте в планировщик ежденвный запуск <span style="font-style: italic;">mrotate.exe /r</span><br>
+<br>
+Параметры запуска<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">/help, /h</td>
+      <td style="vertical-align: top;">Отобразить список доступных ключей</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/rotate, /r</td>
+      <td style="vertical-align: top;">Запустить процесс ротации для всех загруженных настроек ротации</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/verify, /v</td>
+      <td style="vertical-align: top;">Проверить настройки ротации</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/debug, /d</td>
+      <td style="vertical-align: top;">Эмуляция работы, файлы при этом не обрабатываются, выводятся диагностические сообщения<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/force, /f </td>
+      <td style="vertical-align: top;">Принудительный запуск ротации, только для записей с shift=yes</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/conf=file, /c=file</td>
+      <td style="vertical-align: top;">Загрузить указанный файл с
+настройками ротации, параметр можно указывать несколько раз. Если
+параметр не укзан, загружается файл mrotate.ini<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">/arh=file, /a=file<br>
+      </td>
+      <td style="vertical-align: top;">Загрузить настройки архиваторов из указанного файла, параметр можно указывать несколько раз. Кроме указанных обрабатывается файл archivers.ini<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Файл с настройками ротации содержит настройки ротации (обычный формат
+ini). Если что-то нужно написать по русски, используйте кодировку UTF-8<br>
+<br>
+[Имя_записи1]<br>
+Параметры<br>
+[Имя_записи2]<br>
+Параметры<br>
+<h3>Описание параметров</h3>
+<span style="font-weight: bold;">; Каталог и маска ротируемых файлов</span><br>
+<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br>
+<span style="font-weight: bold;">; Рекурсивно обрабатывать подкаталоги, по умолчанию no</span>. <span style="font-weight: bold;">Если указан yes, для архивов в TargetDir будут создаваться подкаталоги для хранения.</span><br>
+<span style="font-style: italic;">Recurse=yes</span><br>
+<span style="font-weight: bold;">; Период хранения оригиналов в днях, относительно даты файла указанном в параметре DateMode, по умолчанию 0 (т.е. хранить файлы вечно)</span><br>
+<span style="font-style: italic;">Period=90</span><br>
+<span style="font-weight: bold;">; Обрабатывать все файлы больше указанного размера в байтах, возможно использование букв K,M,G (или этот параметр или period)</span>, по умолчанию - 0<br>
+<span style="font-style: italic;">;Size=100K </span><br>
+<span style="font-weight: bold;">; Режим работы аналогичный logrotate
+из linux - т.е. файлы имеют индекс, и сдвигаются. По умолчанию
+отключен. При укзании данного режима имя файла должно быть постоянным и
+не изменятся</span><br style="font-weight: bold;">
+<span style="font-style: italic;">;Shift=yes</span><br>
+<span style="font-weight: bold;">; сжимать файлы указанным "архиватором", или не сжимать ("no") - будет простое переименование</span><br>
+<span style="font-style: italic;">compress=7z</span><br>
+<span style="font-weight: bold;">; Каталог размещения старых файлов, если не указан то он Source</span><br>
+<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br>
+<span style="font-weight: bold;">; Маска наименования архивов, по
+умолчанию %FileName (для режима shift - %FileName.%Index), к ней всегда
+добавляется расширение архиватора. В случае указания режима shift,
+должно обязательно содержать параметр %Index и не содержать параметров
+даты. Если маска не уникальна, то в архиве окажется несколько файлов (без режима shift)</span><br>
+<span style="font-style: italic;">;TargetMask=%Y%d</span><br>
+<span style="font-weight: bold;">; Сколько дней хранить старые файлы, аналог Period, если не указан, то вечно. При режиме shift это количество хранимых ротаций</span><br>
+<span style="font-style: italic;">Keep=180 </span><br>
+<span style="font-weight: bold;">; Какую дату брать у файлов (по умолчанию Created), </span><span style="font-weight: bold;">возможны Modify, Created</span><span style="font-weight: bold;"> (реально сверяется только первая буква</span>)<br>
+<span style="font-style: italic;">DateMode=Modified</span><br>
+<span style="font-weight: bold;">; Дата на замену в параметрах даты
+(типа %d), по умолчанию Now - текущая, возможны так же Modify, Created
+(реально проверяется только первая буква)</span>.<span style="font-weight: bold;"> Позволяет запаковать несколько файлов в один архив</span><br style="font-weight: bold;">
+<span style="font-style: italic;">DateReplace=Created</span><br>
+<span style="font-weight: bold;">; Скрипт перед ротацией, выполняется один раз для всей записи</span><br>
+<span style="font-style: italic;">prerotate=d:\load.bat</span><br>
+<span style="font-weight: bold;">; Скрипт после ротации, выполняется один раз для всей записи</span><br>
+<span style="font-style: italic;">postrotate=d:\unload.bat</span><br>
+<br>
+Архивация производится внешним архиватором, он должен находится в путях %Path% или в текущем каталоге. <br>
+В программу зашиты следующие "архиваторы":<br>
+no - файлы просто переименовываются<br>
+7z - Архивация по алгоритму PPMD (для текстовых файлов). (Производится запуск 7z.exe)<br>
+7zLzma - Архивация по алгоритму LZMA. (Производится запуск 7z.exe)<br>
+rar - Архивация rar. (Производится запуск rar.exe)<br>
+WinRar - Архивация rar. (Производится запуск winrar.exe)<br>
+<br>
+Добавить свои&nbsp; "архиваторы" можно создав файл archivers.ini, примерно такого содержания:<br>
+; Имя раздела это имя архиватора, обязательно маленькими буквами! Имя должно быть уникальным<br>
+[7zlzma2]<br>
+; Имя исполняемого файла, без указания пути (хотя допустимо указать и
+полный путь, но при этом не будет происходить поиск в Path)<br>
+ExeName=7z.exe<br>
+; Расширение файла архива<br>
+Extension=.7z<br>
+; Аргументы архиватора, делятся по пробелам, кавычки не сработают!
+Вместо имени файла подставляем %FullFileName, вместо имени архива
+%ArhFileName<br>
+Args=a %ArhFileName %FullFileName -m0=LZMA2<br>
+<br>
+После этого в параметре compress можно использовать 7zLzma2, файлы будут сжиматься по алгоритму Lzma2<br>
+<h3>Примеры настроек</h3>
+Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
+которых дата создания старше 35 дней. Они упаковываются в архивы 7z
+(алгоритм PPMD) с именем ГодМесяц.7z, после чего удаляются. Причем в
+одном архиве хранятся все файлы за месяц (дата создания в пределах
+месяца). Архивы старше 180 дней удаляются.<br>
+<span style="font-style: italic;">[Simple]</span><br style="font-style: italic;">
+<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+<span style="font-style: italic;">recurse=yes</span><br style="font-style: italic;">
+<span style="font-style: italic;">Period=35</span><br style="font-style: italic;">
+<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
+<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
+<span style="font-style: italic;">TargetMask=%Y%m</span><br style="font-style: italic;">
+<span style="font-style: italic;">Keep=180</span><br style="font-style: italic;">
+<span style="font-style: italic;">dateReplace=Create</span><br style="font-style: italic;">
+<br>
+Просто удаляются все файлы *.log в d:\temp\rotate и подкаталогах, у
+которых дата создания старше 90 дней.<br>
+
+<span style="font-style: italic;">[SimpleDelete]</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">recurse=yes</span><br style="font-style: italic;">
+
+<span style="font-style: italic;"></span><span style="font-style: italic;">compress=no</span><br style="font-style: italic;">
+<span style="font-style: italic;">Keep=90</span><br style="font-style: italic;">
+<br>
+Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
+которых размер больше 100 Кб. Они упаковываются в архивы 7z
+(алгоритм PPMD) с именем Имя_файла.Индекс.7z (test.log.001.7z,
+test.log.002.7z...), после чего удаляются. Будет хранится 10 последних
+ротаций (Keep=10).<br>
+<span style="font-style: italic;">[ShiftExample]</span><br style="font-style: italic;">
+<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+<span style="font-style: italic;">Shift=yes</span><br style="font-style: italic;">
+<span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
+<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
+<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
+<span style="font-style: italic;">Keep=10</span><br>
+<br>
+Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
+которых размер больше 100 Кб. Они упаковываются в архивы 7z
+(алгоритм PPMD) с именем ИмяФайлаГодМесяцДата.7z (дата - это дата ротации, например test.log.20111101.7z,
+test.log.20111102.7z...), после чего удаляются. Архивы хранятся 180 дней.<br>
+
+<span style="font-style: italic;">[DateExample]</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+<span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
+
+<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">TargetMask=%FileName%Y%m%d<br>
+Keep=180</span><br>
+<h3><span style="font-weight: bold;">Ссылки</span></h3>
+Использована библиотека <a href="http://pocoproject.org" target="_blank">Poco</a>.<br>
+Архиватор 7-zip можно бесплатно скачать <a href="http://7-zip.org/" target="_blank">здесь</a>.<br>
+<h3><span style="font-weight: bold;">Исходные тексты</span></h3>
+Исходники mRotate можно найти на <a href="https://github.com/partizand/mrotate" target="_blank">GitHub</a><br>
+<span style="font-weight: bold;"></span>
+<h3><span style="font-weight: bold;">Контакты
+</span></h3>
+
+
+Вопросы, предложения, замечания принимаются по адресу <a href="mailto:%20atsave@narod.ru">atsave@narod.ru</a>
+<br>
+
+
+Сайт программы: <a href="http://atsave.narod.ru/">http://atsave.narod.ru</a><br>
+
+
+<h3><span style="font-weight: bold;">Приложение</span></h3>
+
+
+Допустимые параметры в targetMask<br>
+<br>
+Имена файлов<br>
+<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">%FileName</td>
+      <td style="vertical-align: top;">Имя файла<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">%FileBaseName</td>
+      <td style="vertical-align: top;">Имя файла без расширения</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">%FileExt</td>
+      <td style="vertical-align: top;">Расширение файла (без точки)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">%Index<br>
+      </td>
+      <td style="vertical-align: top;">Индекс файла, при режиме shift<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Дата/время<br>
+<br>
+%w - abbreviated weekday (Mon, Tue, ...) <br>
+%W - full weekday (Monday, Tuesday, ...) <br>
+%b - abbreviated month (Jan, Feb, ...) <br>
+%B - full month (January, February, ...) <br>
+%d - zero-padded day of month (01 .. 31) <br>
+%e - day of month (1 .. 31) <br>
+%f - space-padded day of month ( 1 .. 31) <br>
+%m - zero-padded month (01 .. 12) <br>
+%n - month (1 .. 12) <br>
+%o - space-padded month ( 1 .. 12) <br>
+%y - year without century (70) <br>
+%Y - year with century (1970) <br>
+%H - hour (00 .. 23) <br>
+%h - hour (00 .. 12) <br>
+%a - am/pm <br>
+%A - AM/PM <br>
+%M - minute (00 .. 59) <br>
+%S - second (00 .. 59) <br>
+%s - seconds and microseconds (equivalent to %S.%F) <br>
+%i - millisecond (000 .. 999) <br>
+%c - centisecond (0 .. 9) <br>
+%F - fractional seconds/microseconds (000000 - 999999) <br>
+%z - time zone differential in ISO 8601 format (Z or +NN.NN) <br>
+%Z - time zone differential in RFC format (GMT or +NNNN) <br>
+%% - percent sign (Реально может и не сработать, например если написать %%FileName - получится %ИмяФайла)<br>
+<br>
+</body></html>

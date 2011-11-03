@@ -30,6 +30,7 @@ _debugMode(false)
 	log=&logger;
 	// 7z
 	Archivers["7z"]=ArchiverParam("7z",".7z","7z.exe","a %ArhFileName %FullFileName -m0=PPMd");
+	Archivers["7zlzma"]=ArchiverParam("7z",".7z","7z.exe","a %ArhFileName %FullFileName");
 	// rar
 	Archivers["rar"]=ArchiverParam("rar",".rar","rar.exe","a %ArhFileName %FullFileName");
 	Archivers["winrar"]=ArchiverParam("winrar",".rar","winrar.exe","a %ArhFileName %FullFileName");
