@@ -73,6 +73,8 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 	int ExitCode;
 	if (icompare(arhiverName,noneArchiverName)==0) // переименование
 	{
+		Executer::moveFile(fileName,ArhFileName,_debugMode,*log);
+		/*
 		if (!_debugMode)
 			{
 			File pFile(fileName);
@@ -93,6 +95,7 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 			poco_information_f2(*log,"Move file %s to %s",fileName,ArhFileName);
 			ExitCode=0;
 			}
+			*/
 	}
 	else // архивация
 	{

@@ -6,6 +6,7 @@
 #include <Poco\File.h>
 #include <Poco\Environment.h>
 #include <Poco\Process.h>
+#include <Poco\String.h>
 
 using namespace std;
 using namespace Poco;
@@ -59,6 +60,51 @@ bool Executer::getFullPath(const std::string &aPath, std::string &fullPath)
 	fullPath=pPath.toString();
 	return found;
 }
+//------------------------------------------------------------------------
+//! Переименовать/переместить файл
+bool Executer::moveFile(const std::string &srcFile,const std::string &dstFile,bool debug, Poco::Logger &log)
+{
+if (debug)
+{
+	
+	poco_information_f2(log,"[Debug] Moving/renaming file %s to %s",srcFile,dstFile);
+	return true;
+}
+
+	// Каталог источника
+	Path srcPath(srcFile);
+	srcPath.makeFile();
+	srcPath.setFileName("");
+	// Каталог приемника
+	Path dstPath(dstFile);
+	dstPath.makeFile();
+	dstPath.setFileName("");
+	int rename=icompare(srcPath.toString(),dstPath.toString()); // Сравнение каталогов
+try
+{
+	File tFile(srcFile);
+	if (rename==0) // Переименование
+	{
+		tFile.renameTo(dstFile);
+		poco_information_f2(log,"File %s renamed to %s",srcFile,dstFile);
+		return true;
+	}
+	else // Перемещение
+	{
+		tFile.moveTo(dstFile);
+		poco_information_f2(log,"File %s moved to %s",srcFile,dstFile);
+		return true;
+	}
+
+}
+catch(...) 
+{
+	poco_error_f2(log,"Error moving/renaming file %s to %s",srcFile,dstFile);
+	return false;
+}
+
+}
+
 
 //------------------------------------------------------------------------
 //! Разбить строку аргументов на вектор по разделителю "пробел"

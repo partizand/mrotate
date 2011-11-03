@@ -11,6 +11,7 @@
 using namespace std;
 using namespace Poco;
 
+
 ReplVar::ReplVar(void)
 {
 }
@@ -39,6 +40,10 @@ return ret;
 }
 //------------------------------------------------------------------------
 //! Заменить имя файла и имя архива в строке
+/* index = -1 - %Index=???
+   index = -2 - %Index=%Index (оставляет не замененным)
+   index >= 0 - %Index=index
+*/
 std::string ReplVar::replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName,int index)
 {
 	string From,To;
@@ -70,13 +75,16 @@ std::string ReplVar::replaceFile(const std::string &str,const std::string &FileN
 	From="%Index"; // Индекс
 	if (index>=0)
 	{
-		To=NumberFormatter::format0(index,2);
+		To=NumberFormatter::format0(index,zeroPad);
 	}
 	else
 	{
-		To="??";
+		To=string(zeroPad,'?');
 	}
+	if (index!=-2)
+	{
 	tmpStr=replace (tmpStr,From,To);
+	}
 	
 	return tmpStr;
 }

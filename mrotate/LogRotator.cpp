@@ -72,8 +72,8 @@ void LogRotator::rotate()
 			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,items[i].period,items[i].limitSize);
 			
 		}
-		// Удаляем старые архивы
-		if (items[i].keepPeriod>0)
+		// Удаляем старые архивы (если не сдвиг)
+		if (!items[i].shift && items[i].keepPeriod>0)
 		{
 			
 			fileMask=getRemoveMask(); //"*"+archiver.getExtension(items[i].archiverName);
@@ -145,20 +145,25 @@ void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
 	string fileName=pFile.path();
 	//string sFileName(pFile.getFileName()); // Короткое имя файла источника
 	//Меняем в targetPath - %FileName и %yydd - на тек дату
-	string ArhFileName(items[currIndex].targetMask); // короткое имя архива
+	//string ArhFileName(items[currIndex].targetMask); // короткое имя архива
 	
 	
 	DateTime replDate=getDate(pFile,items[currIndex].dateReplaceMode); // дата/время на замену
-
-	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,pFile.path(),"",replDate);
+	// Короткое имя архива
+	string ArhFileName=ReplVar::replaceFileAndDate(items[currIndex].targetMask,fileName,"",replDate,1);
 
 	Path destFile(destDir);
 	destFile.setFileName(ArhFileName);
+	string strDestFile=destFile.toString();
 
-	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,destFile.toString(),replDate);
+	if (items[currIndex].shift) // Сдвигаем старые файлы
+		{
+			shiftFile(fileName,destDir.toString()); 
+		}
+
+	bool suc=archiver.archiveFile(items[currIndex].archiverName,fileName,strDestFile,replDate);
 	if (suc) // Успешно заархивировался
 	{
-		//File tFile(pFile);
 		removeFile(pFile);
 	}
 
@@ -166,15 +171,15 @@ void LogRotator::rotateFile(const Poco::File &pFile,const Poco::Path &destDir)
 }
 //------------------------------------------------------------------------
 //! Сдвинуть старые файлы заданного файла
+// pFile - исходный файл, destDir - каталог где лежат старые файлы
 // Удаляем совсем старые, потом сдвигаем n->n+1,..1->2
-void LogRotator::shiftFile(const Poco::Path &destFile)
+void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir)
 {
 	// Получаем маску поиска
 	
-	string shortFileName=destFile.getFileName();
-	string fileMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,shortFileName,"",0,-1);
-	Path destDir(destFile);
-	destDir.setFileName("");
+	//string fullFileName=pFile.path();
+	string fileMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,srcFile,"",0,-1);
+	fileMask+=archiver.getExtension(items[currIndex].archiverName);
 	// Строим список файлов
 	
 	Glob glob(fileMask,Glob::GLOB_CASELESS); // Регистр не важен в маске
@@ -192,7 +197,7 @@ void LogRotator::shiftFile(const Poco::Path &destFile)
 					ind=getIndexOfFile(it.name());
 					if (ind>=0)
 					{
-						fileList[ind]=it.path();
+						fileList[ind]=it->path();
 					}
 
 				}
@@ -203,29 +208,34 @@ void LogRotator::shiftFile(const Poco::Path &destFile)
 			++it;
 		}
 
-	// Проходим по списку
-	// Пример прохода в обратном направлении (по убыванию индексов)
-	
+	// Проходим по списку в обратном направлении (по убыванию индексов)
+	Path pDest(destDir);
+	pDest.makeDirectory();
+
 	map<int,string>::reverse_iterator rit;
 	for (rit=fileList.rbegin();rit!=fileList.rend();++rit)
 	{
 		// Удаляем лишнее
 		if (items[currIndex].keepPeriod>0)
 		{
-		if (rit->first>items[currIndex].keepPeriod) // Индекс файла больше
+		if (rit->first > items[currIndex].keepPeriod) // Индекс файла больше
 		{
 			removeFile(rit->second);
 			continue;
 		}
 		}
 		// Сдвигаем остальное
+		
+		string newFileName=ReplVar::replaceFile(items[currIndex].targetMask,srcFile,"",rit->first+1);
+		pDest.setFileName(newFileName); // Новое имя файла с новым индексом
+		Executer::moveFile(srcFile,pDest.toString(),_debugMode,*log);
 
 	}
 
 	//string fileMask=Re
 }
 //------------------------------------------------------------------------
-//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2)
+//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2, если targetMask=%FileName.%Index)
 // Если ничего не получилось вернет -1
 int LogRotator::getIndexOfFile(const std::string &fileName)
 {
@@ -238,11 +248,20 @@ int LogRotator::getIndexOfFile(const std::string &fileName)
 		string to="";
 		replaceInPlace(fName,ext,to); // Тупой вариант, нужно переделать на более надежный
 	}
-	Path pFileName(fName);
-	pFileName.makeFile();
-	ext=pFileName.getExtension(); // Расширение без точки, типа 2
+	// fName теперь - имя файла без расширения архиватора
+	string strFind=ReplVar::replaceFile(items[currIndex].targetMask,fName,"",-2);
+	// strFind- имя файла, где вместо индекса, написано %Index
+	string::size_type i=strFind.find("%Index"); // Позиция начала
+	if (i==string::npos || i+zeroPad>fName.length()) return ind; // Идекс не нашли
+	string strNum=string(fName,i,zeroPad); // Читаем индекс
+
+	NumberParser::tryParse(strNum,ind); // Пытаемся декодировать
+
+	//Path pFileName(fName);
+	//pFileName.makeFile();
+	//ext=pFileName.getExtension(); // Расширение без точки, типа 2
 	
-	NumberParser::tryParse(ext,ind);
+	//NumberParser::tryParse(ext,ind);
 	
 	return ind;
 
@@ -309,6 +328,7 @@ retMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,items[currIndex]
 retMask+=archiver.getExtension(items[currIndex].archiverName);
 return retMask;
 }
+
 
 //------------------------------------------------------------------------
 //! Удалить файл

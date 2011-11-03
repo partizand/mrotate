@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <Poco\Logger.h>
+
 //! Запуск внешних программ
 class Executer
 {
@@ -18,5 +20,8 @@ public:
 	
 	//! Разбить строку аргументов на вектор по разделителю "пробел"
 	static void splitArgs(const std::string &strArgs,std::vector<std::string> &vectArgs);
+
+	//! Переименовать/переместить файл
+	static bool moveFile(const std::string &srcFile,const std::string &dstFile,bool debug, Poco::Logger &log);
 };
 

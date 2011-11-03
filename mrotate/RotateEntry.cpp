@@ -45,7 +45,7 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	{
 		if (Shift)
 		{
-		targetMask="%FileName%Index";
+		targetMask="%FileName.%Index";
 		}
 		else
 		{
