@@ -25,7 +25,8 @@ const string ver="0.1"; // Версия ротатора
 
 LogRotator::LogRotator(Poco::Logger &logger):
 	archiver(logger),
-	_debugMode(false)
+	_debugMode(false),
+	_force(false)
 {
 	log=&logger;
 }
@@ -194,7 +195,7 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 				if (glob.match(it.name())) // Проходит по маске
 				{
 					// Добавляем в список
-					ind=getIndexOfFile(it.name());
+					ind=getIndexOfFile(srcFile,it.name());
 					if (ind>=0)
 					{
 						fileList[ind]=it->path();
@@ -218,7 +219,7 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 		// Удаляем лишнее
 		if (items[currIndex].keepPeriod>0)
 		{
-		if (rit->first > items[currIndex].keepPeriod) // Индекс файла больше
+		if (rit->first >= items[currIndex].keepPeriod) // Индекс файла больше
 		{
 			removeFile(rit->second);
 			continue;
@@ -227,8 +228,9 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 		// Сдвигаем остальное
 		
 		string newFileName=ReplVar::replaceFile(items[currIndex].targetMask,srcFile,"",rit->first+1);
+		newFileName+=archiver.getExtension(items[currIndex].archiverName);
 		pDest.setFileName(newFileName); // Новое имя файла с новым индексом
-		Executer::moveFile(srcFile,pDest.toString(),_debugMode,*log);
+		Executer::moveFile(rit->second,pDest.toString(),_debugMode,*log);
 
 	}
 
@@ -237,7 +239,7 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 //------------------------------------------------------------------------
 //! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2, если targetMask=%FileName.%Index)
 // Если ничего не получилось вернет -1
-int LogRotator::getIndexOfFile(const std::string &fileName)
+int LogRotator::getIndexOfFile(const std::string &baseFileName,const std::string &fileName)
 {
 	string fName(fileName);
 	int ind=-1;
@@ -249,7 +251,7 @@ int LogRotator::getIndexOfFile(const std::string &fileName)
 		replaceInPlace(fName,ext,to); // Тупой вариант, нужно переделать на более надежный
 	}
 	// fName теперь - имя файла без расширения архиватора
-	string strFind=ReplVar::replaceFile(items[currIndex].targetMask,fName,"",-2);
+	string strFind=ReplVar::replaceFile(items[currIndex].targetMask,baseFileName,"",-2);
 	// strFind- имя файла, где вместо индекса, написано %Index
 	string::size_type i=strFind.find("%Index"); // Позиция начала
 	if (i==string::npos || i+zeroPad>fName.length()) return ind; // Идекс не нашли
@@ -281,6 +283,7 @@ if (!pFile.exists()) return false; // Файла нет
 	{
 		return true;
 	}
+	if (_force && items[currIndex].shift) return true;
 	//if (iPeriod==0 && iSize==0) return false; // Все равно не заданы
 	if (iPeriod>0) //задан период обрабтки
 	{
@@ -408,6 +411,12 @@ _debugMode=true;
 archiver.setDebugMode();
 }
 //------------------------------------------------------------------------
+//! Установить режим force
+void LogRotator::setForceMode()
+{
+_force=true;
+}
+//------------------------------------------------------------------------
 //! Проверка загруженных записей ротации на ошибки
 bool LogRotator::check()
 {
@@ -519,7 +528,7 @@ if (!RootKeys.empty())
 				LimitSize=convertSize(KeyValue);
 				
 				// Keep Период
-				KeyName=RootKeys.at(i)+".KeepPeriod";
+				KeyName=RootKeys.at(i)+".Keep";
 				KeepPeriod=pConf->getInt(KeyName,0);
 				
 				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
@@ -563,7 +572,7 @@ if (!RootKeys.empty())
 				Shift=pConf->getBool(KeyName,false);
 
 				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,Shift,KeepPeriod,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
+				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,Shift,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
 				//cout<< *it<<endl;
 			 
 			}

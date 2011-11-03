@@ -91,6 +91,11 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleDebug)));
 		options.addOption(
+			Option("force", "f", "Set force mode (only for shift rotate)")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleForce)));
+		options.addOption(
 			Option("conf", "c", "load rotate entries from a file")
 				.required(false)
 				.repeatable(true)
@@ -120,6 +125,12 @@ protected:
 	{
 		rotator.setDebugMode();
 		_debugReq = true;
+		
+	}
+	void handleForce(const std::string& name, const std::string& value)
+	{
+		rotator.setForceMode();
+		
 		
 	}
 

@@ -29,6 +29,8 @@ public:
 	bool check();
 	//! Установить режим отладки (эмуляция ротации)
 	void setDebugMode();
+	//! Установить режим force
+	void setForceMode();
 	//! Возвращает версию
 	std::string getVersion();
 	//! Архиватор
@@ -42,7 +44,8 @@ private:
 	int currIndex;
 	//! Режим отладки включен
 	bool _debugMode;
-	
+	//! Режим force
+	bool _force;
 	//! Получить список файлов для обработки
 	//void getFileList(std::vector<std::string> &fileList);
 	//! Получить список файлов по маске, отобранных по периоду или размеру, если period=0 и lSize=0 возвращаются все файлы по маске
@@ -66,7 +69,7 @@ private:
 	//! Сдвинуть старые файлы заданного файла
 	void shiftFile(const std::string &srcFile,const std::string &destDir);
 	//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2)
-	int getIndexOfFile(const std::string &fileName);
+	int getIndexOfFile(const std::string &baseFileName,const std::string &fileName);
 
 	//! Возвращает маску для удаляемых файлов для текущего задания
 	std::string getRemoveMask();

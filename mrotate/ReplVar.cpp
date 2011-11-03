@@ -27,14 +27,14 @@ void ReplVar::replaceFileAndDate(std::vector<std::string> &strVect,const std::st
 	
 	for (;it!=strVect.end();++it)
 	{
-		*it=replaceFileAndDate(*it,FileName,ArhFileName,dateTime);
+		*it=replaceFileAndDate(*it,FileName,ArhFileName,dateTime,index);
 	}
 }
 //! Заменить имя файла и дату в строке
 std::string ReplVar::replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime,int index)
 {
 string ret(str);
-ret=replaceFile(ret,FileName,ArhFileName);
+ret=replaceFile(ret,FileName,ArhFileName,index);
 ret=replaceDate(ret,dateTime);
 return ret;
 }
