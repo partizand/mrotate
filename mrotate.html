@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
+
 <meta content="text/html; charset=Windows-1251" http-equiv="content-type"><title>mrotate help</title></head><body>
 <h1 style="text-align: center;">mRotate v. 0.1 help<br>
 </h1>
@@ -85,7 +86,9 @@ linux). Т.е. предыдущий файл будет иметь индекс 001, более старший 002
     <tr>
       <td style="vertical-align: top;">/arh=file, /a=file<br>
       </td>
-      <td style="vertical-align: top;">Загрузить настройки архиваторов из указанного файла, параметр можно указывать несколько раз. Кроме указанных обрабатывается файл archivers.ini<br>
+      <td style="vertical-align: top;">Загрузить
+настройки архиваторов из указанного файла, параметр можно указывать
+несколько раз. Кроме указанных обрабатывается файл archivers.ini<br>
       </td>
     </tr>
   </tbody>
@@ -103,7 +106,9 @@ ini). Если что-то нужно написать по русски, используйте кодировку UTF-8<br>
 <span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br>
 <span style="font-weight: bold;">; Рекурсивно обрабатывать подкаталоги, по умолчанию no</span>. <span style="font-weight: bold;">Если указан yes, для архивов в TargetDir будут создаваться подкаталоги для хранения.</span><br>
 <span style="font-style: italic;">Recurse=yes</span><br>
-<span style="font-weight: bold;">; Период хранения оригиналов в днях, относительно даты файла указанном в параметре DateMode, по умолчанию 0 (т.е. хранить файлы вечно)</span><br>
+<span style="font-weight: bold;">; Период хранения оригиналов в днях,
+относительно даты файла указанном в параметре DateMode, по умолчанию 0
+(т.е. хранить файлы вечно)</span><br>
 <span style="font-style: italic;">Period=90</span><br>
 <span style="font-weight: bold;">; Обрабатывать все файлы больше указанного размера в байтах, возможно использование букв K,M,G (или этот параметр или period)</span>, по умолчанию - 0<br>
 <span style="font-style: italic;">;Size=100K </span><br>
@@ -160,7 +165,7 @@ Args=a %ArhFileName %FullFileName -m0=LZMA2<br>
 <h3>Примеры настроек</h3>
 Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
 которых дата создания старше 35 дней. Они упаковываются в архивы 7z
-(алгоритм PPMD) с именем ГодМесяц.7z, после чего удаляются. Причем в
+с именем ГодМесяц.7z, после чего удаляются. Причем в
 одном архиве хранятся все файлы за месяц (дата создания в пределах
 месяца). Архивы старше 180 дней удаляются.<br>
 <span style="font-style: italic;">[Simple]</span><br style="font-style: italic;">
@@ -186,8 +191,7 @@ Args=a %ArhFileName %FullFileName -m0=LZMA2<br>
 <span style="font-style: italic;">Keep=90</span><br style="font-style: italic;">
 <br>
 Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых размер больше 100 Кб. Они упаковываются в архивы 7z
-(алгоритм PPMD) с именем Имя_файла.Индекс.7z (test.log.001.7z,
+которых размер больше 100 Кб. Они упаковываются в архивы 7z с именем Имя_файла.Индекс.7z (test.log.001.7z,
 test.log.002.7z...), после чего удаляются. Будет хранится 10 последних
 ротаций (Keep=10).<br>
 <span style="font-style: italic;">[ShiftExample]</span><br style="font-style: italic;">
@@ -199,9 +203,11 @@ test.log.002.7z...), после чего удаляются. Будет хранится 10 последних
 <span style="font-style: italic;">Keep=10</span><br>
 <br>
 Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых размер больше 100 Кб. Они упаковываются в архивы 7z
-(алгоритм PPMD) с именем ИмяФайлаГодМесяцДата.7z (дата - это дата ротации, например test.log.20111101.7z,
-test.log.20111102.7z...), после чего удаляются. Архивы хранятся 180 дней.<br>
+которых размер больше 100 Кб. Они упаковываются в архивы 7z с именем
+ИмяФайлаГодМесяцДата.7z (дата - это дата ротации, например
+test.log.20111101.7z,
+test.log.20111102.7z...), после чего удаляются. Архивы хранятся 180
+дней.<br>
 
 <span style="font-style: italic;">[DateExample]</span><br style="font-style: italic;">
 
@@ -214,7 +220,32 @@ test.log.20111102.7z...), после чего удаляются. Архивы хранятся 180 дней.<br>
 
 <span style="font-style: italic;">TargetMask=%FileName%Y%m%d<br>
 Keep=180</span><br>
+<h3>Вывод сообщений в файл</h3>По умолчанию все сообщения выводятся на
+консоль. Перенаправление вывода в файл (&gt; log.txt) не сработает
+(стандартный поток вывода не используется). Если необходима запись
+сообщений в файл, создайте секцию logging в файле mrotate.ini<br>
+<br>
+<span style="font-style: italic;">[logging]</span><br style="font-style: italic;">
+<span style="font-style: italic;">; Лог ведется на консоль и в файл</span><br style="font-style: italic;">
+<span style="font-style: italic;">formatters.f1.class = PatternFormatter</span><br style="font-style: italic;">
+<span style="font-style: italic;">formatters.f1.pattern =%Y-%m-%d %H:%M:%S [%p] %t</span><br style="font-style: italic;">
+<span style="font-style: italic;">formatters.f1.times = local</span><br style="font-style: italic;">
+<br style="font-style: italic;">
+<span style="font-style: italic;">channels.c1.class = ConsoleChannel</span><br style="font-style: italic;">
+<span style="font-style: italic;">channels.c2.class = FileChannel</span><br style="font-style: italic;">
+<span style="font-style: italic;">channels.c2.path = mrotate.log</span><br style="font-style: italic;">
+<span style="font-style: italic;">channels.c2.formatter = f1</span><br style="font-style: italic;">
+<br style="font-style: italic;">
+<span style="font-style: italic;">channels.croot.class = SplitterChannel</span><br style="font-style: italic;">
+<span style="font-style: italic;">channels.croot.channels = c1,c2</span><br style="font-style: italic;">
+<br style="font-style: italic;">
+<span style="font-style: italic;">loggers.root.channel = croot</span><br style="font-style: italic;">
+<span style="font-style: italic;">loggers.root.level = information</span><br>
+<br>
+Вобще, можно использовать любые настройки логгирования из Poco.<br>
+Мне показалось излишним создавать логи в разборщике логов.<br>
 <h3><span style="font-weight: bold;">Ссылки</span></h3>
+
 Использована библиотека <a href="http://pocoproject.org" target="_blank">Poco</a>.<br>
 Архиватор 7-zip можно бесплатно скачать <a href="http://7-zip.org/" target="_blank">здесь</a>.<br>
 <h3><span style="font-weight: bold;">Исходные тексты</span></h3>

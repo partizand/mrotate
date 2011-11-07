@@ -421,25 +421,37 @@ _force=true;
 bool LogRotator::check()
 {
 int i;
-	bool suc,ret(true);
+	bool suc,ret(true),entryOk;
 	string oldArhMask;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
-		currIndex=i;
+		//currIndex=i;
+		entryOk=true;
 		poco_information_f1(*log,"Checking entry %s.",items[i].name);
 		// Проверка архиватора
-		suc=archiver.isValid(items[i].archiverName);
-		if (!suc) 
+		entryOk=archiver.isValid(items[i].archiverName);
+		if (!entryOk) 
 		{
 			ret=false;
-			log->information("Entry contains errors");
-			continue; // Ошибка в архиваторе
+			//log->information("Entry contains errors");
+			//continue; // Ошибка в архиваторе
 		}
-		// Проверка существования каталогов
-
-		log->information("Entry is ok");
+		// Проверка существования каталога с логами
+		File pFile(items[i].sourceDir);
+		if (!pFile.exists())
+		{
+			ret=false;
+			entryOk=false;
+			poco_error_f1(*log,"Source directory %s not found",items[i].sourceDir);
+			//continue; // Каталог не найден
+		}
+		if (entryOk)
+			log->information("Entry is ok");
+		else
+			log->information("Entry contains errors");
+		
 	}
 	if (ret)
 	{

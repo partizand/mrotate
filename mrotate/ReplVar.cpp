@@ -94,6 +94,7 @@ std::string ReplVar::replaceFile(const std::string &str,const std::string &FileN
 std::string ReplVar::replaceDate(const std::string &str,Poco::DateTime dateTime)
 {
 string tmpStr;
+
 //DateTime pDateTime;
 if (dateTime==0) 
 {
@@ -102,7 +103,8 @@ if (dateTime==0)
 }
 else
 {
-	tmpStr=DateTimeFormatter::format(dateTime,str); // Замена на дату
+	LocalDateTime localDT(dateTime);
+	tmpStr=DateTimeFormatter::format(localDT,str); // Замена на дату
 	// DateTimeFormatter::format(dateTime,str);
 }
 return tmpStr;
