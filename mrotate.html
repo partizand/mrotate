@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
 
+
 <meta content="text/html; charset=Windows-1251" http-equiv="content-type"><title>mrotate help</title></head><body>
 <h1 style="text-align: center;">mRotate v. 0.1 help<br>
 </h1>
@@ -139,17 +140,61 @@ ini). Если что-то нужно написать по русски, используйте кодировку UTF-8<br>
 <span style="font-style: italic;">prerotate=d:\load.bat</span><br>
 <span style="font-weight: bold;">; Скрипт после ротации, выполняется один раз для всей записи</span><br>
 <span style="font-style: italic;">postrotate=d:\unload.bat</span><br>
-<br>
-Архивация производится внешним архиватором, он должен находится в путях %Path% или в текущем каталоге. <br>
+<h3>Архивация</h3>
+Архивация производится внешним архиватором, он должен находится в путях %Path% или в текущем каталоге. <br>Имя "архиватора" указывается в параметре compress. (Этот параметр обязателен)<br>
 В программу зашиты следующие "архиваторы":<br>
-no - файлы просто переименовываются<br>
-7z - Архивация по алгоритму PPMD (для текстовых файлов). (Производится запуск 7z.exe)<br>
-7zLzma - Архивация по алгоритму LZMA. (Производится запуск 7z.exe)<br>
-rar - Архивация rar. (Производится запуск rar.exe)<br>
-WinRar - Архивация rar. (Производится запуск winrar.exe)<br>
 <br>
-Добавить свои&nbsp; "архиваторы" можно создав файл archivers.ini, примерно такого содержания:<br>
-; Имя раздела это имя архиватора, обязательно маленькими буквами! Имя должно быть уникальным<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">Название<br>
+      </td>
+      <td style="vertical-align: top;">Описание<br>
+      </td>
+      <td style="vertical-align: top;">Команда запуска<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+no</td>
+      <td style="vertical-align: top;">Простое переименование файлов<br>
+      </td>
+      <td style="vertical-align: top;">нет<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+7z</td>
+      <td style="vertical-align: top;">Архивация в контейнер 7z по алгоритму PPMD (для текстовых файлов)</td>
+      <td style="vertical-align: top;">7z.exe a %ArhFileName %FullFileName -m0=PPMd</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+7zLzma</td>
+      <td style="vertical-align: top;">Архивация 7z по алгоритму LZMA</td>
+      <td style="vertical-align: top;">7z.exe a %ArhFileName %FullFileName</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+rar </td>
+      <td style="vertical-align: top;">Архивация rar</td>
+      <td style="vertical-align: top;">rar.exe a %ArhFileName %FullFileName<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+WinRar</td>
+      <td style="vertical-align: top;">Архивация WinRar</td>
+      <td style="vertical-align: top;">winrar.exe a %ArhFileName %FullFileName<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Добавить свои&nbsp; "архиваторы" можно создав файл archivers.ini, примерно такого содержания:<br>;
+Имя раздела это имя архиватора, обязательно маленькими буквами! Имя
+должно быть уникальным. Если укажете имя зашитое в программу, оно
+переопределится.<br>
 [7zlzma2]<br>
 ; Имя исполняемого файла, без указания пути (хотя допустимо указать и
 полный путь, но при этом не будет происходить поиск в Path)<br>
@@ -244,6 +289,20 @@ Keep=180</span><br>
 <br>
 Вобще, можно использовать любые настройки логгирования из Poco.<br>
 Мне показалось излишним создавать логи в разборщике логов.<br>
+<h3>Формат .properties</h3>
+Вместо формата .ini возможно испльзовать формат .properties (Т.е.
+указываем такое расширение файла вместо ini). Этот формат в java-стиле.<br>
+Последний пример в этом формате будет выглядеть так:<br>
+<br>
+<span style="font-style: italic;"># Это комментарий</span><br style="font-style: italic;">
+<span style="font-style: italic;">DateExample.Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
+<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Compress=7z</span><br style="font-style: italic;">
+<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
+<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">TargetMask=%FileName%Y%m%d<br></span><span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Keep=180</span><br>
+<br>
+Регистр названий здесь важен, в отличие от ini. Т.е. запись <span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">keep=180</span> не прочитается.<br>
 <h3><span style="font-weight: bold;">Ссылки</span></h3>
 
 Использована библиотека <a href="http://pocoproject.org" target="_blank">Poco</a>.<br>

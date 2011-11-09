@@ -104,10 +104,12 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 			{
 				string fullExeName(Archivers[arhiverName].fullExeName); // Exe פאיכ
 				ExitCode=Executer::execute(fullExeName,vectArgs);
+				if (ExitCode==0)
+				poco_information_f2(*log,"File archived %s. Exit code %i",fileName,ExitCode);
 			}
 		else
 			{
-			poco_information_f1(*log,"Archive file %s",fileName);
+			poco_information_f1(*log,"[Debug] Archiving file %s",fileName);
 			ExitCode=0;
 			}
 	}
