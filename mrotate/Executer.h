@@ -34,7 +34,7 @@ public:
 	Executer(void);
 	~Executer(void);
 	//! «апустить внешнюю прогу и ждать завершени€, возвращает код возврата
-	static int execute(const std::string &exePath,const std::vector<std::string> &vectArgs,bool wait=true);
+	static int execute(const std::string &exePath,const std::vector<std::string> &vectArgs,Poco::Logger &log,bool wait=true);
 	//! ѕолучить полное им€ файла (ищет в %path% каталогах), если путь уже полный, то просто вернет его же
 	static bool getFullPath(const std::string &aPath, std::string &fullPath);
 	

@@ -44,17 +44,30 @@ Executer::~Executer(void)
 }
 //------------------------------------------------------------------------
 //! Запустить внешнюю прогу и ждать завершения, возвращает успех
-int Executer::execute(const std::string &exePath,const std::vector<std::string> &vectArgs,bool wait)
+int Executer::execute(const std::string &exePath,const std::vector<std::string> &vectArgs,Poco::Logger &log,bool wait)
 {
 	// Проверяем, что путь абсолютный
 	string fullPath;
-	getFullPath(exePath,fullPath);
+	bool exist=getFullPath(exePath,fullPath);
+	if (!exist) 
+	{
+		poco_error_f1(log,"Didn't found %s for execute",exePath);
+		return -1;
+
+	}
 	int ret=0;
+	try
+	{
 	ProcessHandle handle=Process::launch(fullPath,vectArgs);// Стартуем
-	
 	if (wait) // Ждем
 	{
 		ret=handle.wait();
+		
+	}
+	}
+	catch (...)
+	{
+		poco_error_f1(log,"Exeption when execute %s",exePath);
 	}
 	return ret;
 }
@@ -78,7 +91,15 @@ bool Executer::getFullPath(const std::string &aPath, std::string &fullPath)
 	}
 	else
 	{
+		File pFile(pPath);
+		if (pFile.exists())
+		{
 		found=true;
+		}
+		else
+		{
+			found=false;
+		}
 	}
 	fullPath=pPath.toString();
 	return found;

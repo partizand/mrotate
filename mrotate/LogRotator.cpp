@@ -61,7 +61,7 @@ LogRotator::~LogRotator(void)
 //! Ротировать файлы (основная функция)
 void LogRotator::rotate()
 {
-	int i;
+	int i,ret;
 	bool suc;
 	string fileMask;
 	//string oldArhMask;
@@ -85,8 +85,16 @@ void LogRotator::rotate()
 		// Скрипт перед ротацией
 		if (!items[i].preRotate.empty())
 		{
-			poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
-			Executer::execute(items[i].preRotate,vectArgs);
+			if (!_debugMode)
+			{
+			//poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
+			ret=Executer::execute(items[i].preRotate,vectArgs,*log);
+			poco_information_f2(*log,"Executed %s. Exit code %i",items[i].preRotate,ret);
+			}
+			else
+			{
+			poco_information_f1(*log,"[Debug] Launch process %s.",items[i].preRotate);
+			}
 		}
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 		{
@@ -105,8 +113,18 @@ void LogRotator::rotate()
 		// Скрипт после ротации
 		if (!items[i].postRotate.empty())
 		{
-			poco_information_f1(*log,"Launch process %s.",items[i].postRotate);
-			Executer::execute(items[i].postRotate,vectArgs);
+			if (!_debugMode)
+			{
+			//poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
+			ret=Executer::execute(items[i].postRotate,vectArgs,*log);
+			poco_information_f2(*log,"Executed %s. Exit code %i",items[i].preRotate,ret);
+			}
+			else
+			{
+			poco_information_f1(*log,"[Debug] Launch process %s.",items[i].postRotate);
+			}
+			
+			
 		}
 	}
 }
@@ -444,7 +462,8 @@ bool LogRotator::check()
 {
 int i;
 	bool suc,ret(true),entryOk;
-	string oldArhMask;
+	//string oldArhMask;
+	string fullExe;
 	vector<string> fileList;
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
@@ -469,6 +488,31 @@ int i;
 			poco_error_f1(*log,"Source directory %s not found",items[i].sourceDir);
 			//continue; // Каталог не найден
 		}
+		// Скрипт перед ротацией существует
+		if (!items[i].preRotate.empty())
+		{
+			suc=Executer::getFullPath(items[i].preRotate,fullExe);
+			if (!suc)
+			{
+				ret=false;
+				entryOk=false;
+				poco_error_f1(*log,"Prerotate script %s not found",items[i].preRotate);
+			}
+
+		}
+		// Скрипт после ротации существует
+		if (!items[i].postRotate.empty())
+		{
+			suc=Executer::getFullPath(items[i].postRotate,fullExe);
+			if (!suc)
+			{
+				ret=false;
+				entryOk=false;
+				poco_error_f1(*log,"Postrotate script %s not found",items[i].postRotate);
+			}
+
+		}
+
 		if (entryOk)
 			log->information("Entry is ok");
 		else

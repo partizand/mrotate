@@ -126,13 +126,13 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 		if (!_debugMode)
 			{
 				string fullExeName(Archivers[arhiverName].fullExeName); // Exe файл
-				ExitCode=Executer::execute(fullExeName,vectArgs);
+				ExitCode=Executer::execute(fullExeName,vectArgs,*log);
 				if (ExitCode==0)
-				poco_information_f2(*log,"File archived %s. Exit code %i",fileName,ExitCode);
+				poco_information_f3(*log,"File archived %s to %s. Exit code %i",fileName,ArhFileName,ExitCode);
 			}
 		else
 			{
-			poco_information_f1(*log,"[Debug] Archiving file %s",fileName);
+			poco_information_f2(*log,"[Debug] Archiving file %s to %s",fileName,ArhFileName);
 			ExitCode=0;
 			}
 	}
@@ -148,82 +148,6 @@ bool Archiver::archiveFile(const std::string &arhiverName,const std::string &fil
 
 	
 }
-//------------------------------------------------------------------------
-//! Заархивировать файл архиватором с текущими настройками
-/*
-bool Archiver::archiveFile(const std::string &FileName)
-{
-	// Нужно построить опции, найти архиватор и запустить
-
-	string exeName(Archivers[archiveName].exeName); // Exe файл
-
-	Path pPathSource(FileName);
-	pPathSource.makeFile();
-
-	string sFileName(pPathSource.getFileName()); // Короткое имя файла источника
-	//Меняем в targetPath - %FileName и %yydd - на тек дату
-	string ArhFileName(targetPath); // Полное имя архива
-	ArhFileName=ReplVar::replaceFileAndDate(ArhFileName,sFileName); 
-	ArhFileName+=Archivers[archiveName].extension;
-
-	//меняем в аргументах архиватора %ArhFileName на полный путь и имя архива, %FileName - полный путь и имя архивируемого файла
-	vector<std::string> vectArgs;
-	Executer::splitArgs(Archivers[archiveName].arguments,vectArgs); // Разбиваем строку аргументов на вектор
-	ReplVar::replaceFileAndDate(vectArgs,FileName,ArhFileName); 
-	
-	// 
-	
-	// Осталось это все запустить
-	int ExitCode;
-	if (icompare(archiveName,noneArchiverName)==0) // переименование
-	{
-		if (!_debugMode)
-			{
-			File pFile(pPathSource);
-			poco_information_f2(*log,"File %s moving to %s",FileName,ArhFileName);
-			try
-			{
-			pFile.moveTo(ArhFileName);
-			ExitCode=1; // Что бы вызывающая функция не удаляла файл которого нет
-			}
-			catch(...)
-			{
-				poco_error_f2(*log,"Error move file %s to %s",FileName,ArhFileName);
-				ExitCode=1;
-			}
-			}
-		else
-			{
-			poco_information_f2(*log,"Move file %s to %s",FileName,ArhFileName);
-			ExitCode=0;
-			}
-	}
-	else // архивация
-	{
-		if (!_debugMode)
-			{
-			ExitCode=Executer::execute(exeName,vectArgs);
-			}
-		else
-			{
-			poco_information_f1(*log,"Archive file %s",FileName);
-			ExitCode=0;
-			}
-	}
-	if (ExitCode==0) 
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
-
-	
-
-}
-*/
 //------------------------------------------------------------------------
 //! Установить режим отладки (эмуляция архивации)
 void Archiver::setDebugMode()
