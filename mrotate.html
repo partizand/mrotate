@@ -1,384 +1,1231 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
+п»ї<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
+<title>mRotate</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
 
 
-<meta content="text/html; charset=Windows-1251" http-equiv="content-type"><title>mrotate help</title></head><body>
-<h1 style="text-align: center;">mRotate v. 0.1 help<br>
-</h1>
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
 
-Консольная утилита по ротации файлов.<br>
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
 
 
-<br>
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
 
 
-Работает на Windows. Установка не требуется, зависимостей нет.<br>
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
 
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
 
-<br>
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
 
-<span style="font-weight: bold;">Распространяется по лицензии </span><a href="http://www.gnu.org/copyleft/gpl.html" target="_blank">GNU GPL v.3</a><br>
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
 
+install: function(toclevels) {
+  var timerId;
 
-<br>
-<a href="http://www.gnu.org/copyleft/gpl.html" target="_blank"></a><span style="color: rgb(255, 102, 102);">ВАЖНО!!! ВЫ ИСПОЛЬЗУЕТЕ ДАННЫЙ
-ПРОГРАММНЫЙ
-ПРОДУКТ НА СВОЙ СТРАХ И РИСК!!!</span>
-<br>
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
 
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
 
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
 
-Автор заранее слагает с себя ответственность за весь возможный ущерб,
-причиненный программой.
-<br>
-
-<h3>Описание<br>
-</h3>
-Программа позволяет ротировать (т.е. архивировать, удалять устаревшие)
-лог файлы (не обязательно текстовые) для программ которые сами этого не
-умеют.<br>
-<br>
-Используется два режима ротации.<br>
-<ol>
-  <li>В имени архивов используется дата/время, старые файлы удаляются
-если они старше определенной даты. Используетя, в основном, когда
-программа создает множество файлов, например по дате.</li>
-  <li>В имени архивов используется индекс. (Обычное поведение logrotate из
-linux). Т.е. предыдущий файл будет иметь индекс 001, более старший 002
-и т.д. При архивации они сдвигаются. Файлы удаляются по превышении индексом заданного числа (количества ротаций).<br>
-  </li>
-</ol>
-По умолчанию используется первый режим. Для указания второго режима в настройках пропишите Shift=yes<br>
-<br>
-Для испльзования пропишите настройки ротаций в файле mrotate.ini и добавьте в планировщик ежденвный запуск <span style="font-style: italic;">mrotate.exe /r</span><br>
-<br>
-Параметры запуска<br>
-<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">/help, /h</td>
-      <td style="vertical-align: top;">Отобразить список доступных ключей</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/rotate, /r</td>
-      <td style="vertical-align: top;">Запустить процесс ротации для всех загруженных настроек ротации</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/verify, /v</td>
-      <td style="vertical-align: top;">Проверить настройки ротации</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/debug, /d</td>
-      <td style="vertical-align: top;">Эмуляция работы, файлы при этом не обрабатываются, выводятся диагностические сообщения<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/force, /f </td>
-      <td style="vertical-align: top;">Принудительный запуск ротации, только для записей с shift=yes</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/conf=file, /c=file</td>
-      <td style="vertical-align: top;">Загрузить указанный файл с
-настройками ротации, параметр можно указывать несколько раз. Если
-параметр не укзан, загружается файл mrotate.ini<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">/arh=file, /a=file<br>
-      </td>
-      <td style="vertical-align: top;">Загрузить
-настройки архиваторов из указанного файла, параметр можно указывать
-несколько раз. Кроме указанных обрабатывается файл archivers.ini<br>
-      </td>
-    </tr>
-  </tbody>
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>mRotate</h1>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>РљРѕРЅСЃРѕР»СЊРЅР°СЏ СѓС‚РёР»РёС‚Р° РїРѕ СЂРѕС‚Р°С†РёРё С„Р°Р№Р»РѕРІ.</p></div>
+<div class="paragraph"><p>Р Р°Р±РѕС‚Р°РµС‚ РЅР° Windows. РЈСЃС‚Р°РЅРѕРІРєР° РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ, Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№ РЅРµС‚.</p></div>
+<div class="paragraph"><p>Р Р°СЃРїСЂРѕСЃС‚СЂР°РЅСЏРµС‚СЃСЏ РїРѕ Р»РёС†РµРЅР·РёРё <a href="http://www.gnu.org/licenses/gpl-3.0.html">GNU GPL 3</a></p></div>
+<div class="paragraph"><p><span class="red">Р’РђР–РќРћ!!! Р’Р« РРЎРџРћР›Р¬Р—РЈР•РўР• Р”РђРќРќР«Р™ РџР РћР“Р РђРњРњРќР«Р™ РџР РћР”РЈРљРў РќРђ РЎР’РћР™ РЎРўР РђРҐ Р Р РРЎРљ!!!</span></p></div>
+<div class="paragraph"><p><strong>РђРІС‚РѕСЂ Р·Р°СЂР°РЅРµРµ СЃР»Р°РіР°РµС‚ СЃ СЃРµР±СЏ РѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕСЃС‚СЊ Р·Р° РІРµСЃСЊ РІРѕР·РјРѕР¶РЅС‹Р№ СѓС‰РµСЂР±, РїСЂРёС‡РёРЅРµРЅРЅС‹Р№ РїСЂРѕРіСЂР°РјРјРѕР№.</strong></p></div>
+<div class="paragraph"><p><strong>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</strong></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РѕРїРёСЃР°РЅРёРµ">РћРїРёСЃР°РЅРёРµ</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>РџСЂРѕРіСЂР°РјРјР° РїРѕР·РІРѕР»СЏРµС‚ СЂРѕС‚РёСЂРѕРІР°С‚СЊ С‚РµРєСЃС‚РѕРІС‹Рµ Р»РѕРі С„Р°Р№Р»С‹ РґР»СЏ РїСЂРѕРіСЂР°РјРј РєРѕС‚РѕСЂС‹Рµ СЃР°РјРё СЌС‚РѕРіРѕ РЅРµ СѓРјРµСЋС‚.</p></div>
+<div class="paragraph"><p>РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґРІР° СЂРµР¶РёРјР° СЂРѕС‚Р°С†РёРё.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Р’ РёРјРµРЅРё Р°СЂС…РёРІРѕРІ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР°С‚Р°/РІСЂРµРјСЏ, СЃС‚Р°СЂС‹Рµ С„Р°Р№Р»С‹ СѓРґР°Р»СЏСЋС‚СЃСЏ РµСЃР»Рё РѕРЅРё СЃС‚Р°СЂС€Рµ РѕРїСЂРµРґРµР»РµРЅРЅРѕР№ РґР°С‚С‹. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, РІ РѕСЃРЅРѕРІРЅРѕРј, РєРѕРіРґР° РїСЂРѕРіСЂР°РјРјР° СЃРѕР·РґР°РµС‚ РјРЅРѕР¶РµСЃС‚РІРѕ С„Р°Р№Р»РѕРІ, РЅР°РїСЂРёРјРµСЂ РїРѕ РґР°С‚Рµ. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.
+</p>
+</li>
+<li>
+<p>
+Р’ РёРјРµРЅРё Р°СЂС…РёРІРѕРІ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РёРЅРґРµРєСЃ. (РћР±С‹С‡РЅРѕРµ РїРѕРІРµРґРµРЅРёРµ logrotate РёР· linux). Рў.Рµ. РїСЂРµРґС‹РґСѓС‰РёР№ С„Р°Р№Р» Р±СѓРґРµС‚ РёРјРµС‚СЊ РёРЅРґРµРєСЃ 001, Р±РѕР»РµРµ СЃС‚Р°СЂС€РёР№ 002 Рё С‚.Рґ. РџСЂРё Р°СЂС…РёРІР°С†РёРё РѕРЅРё СЃРґРІРёРіР°СЋС‚СЃСЏ. Р¤Р°Р№Р»С‹ СѓРґР°Р»СЏСЋС‚СЃСЏ РїРѕ РїСЂРµРІС‹С€РµРЅРёРё РёРЅРґРµРєСЃРѕРј Р·Р°РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° (РєРѕР»РёС‡РµСЃС‚РІР° СЂРѕС‚Р°С†РёР№). Р”Р»СЏ СЂРѕС‚Р°С†РёРё РІ СЌС‚РѕРј СЂРµР¶РёРјРµ СѓРєР°Р¶РёС‚Рµ РІ РЅР°СЃС‚СЂРѕР№РєР°С… Shift=yes
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>РќР°СЃС‚СЂРѕР№РєРё СЂРѕС‚Р°С†РёРё Р·Р°РґР°СЋС‚СЃСЏ С‡РµСЂРµР· С‚РµРєСЃС‚РѕРІС‹Рµ РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅС‹Рµ С„Р°Р№Р»С‹ С„РѕСЂРјР°С‚Р° ini. (РўР°Рє Р¶Рµ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С„РѕСЂРјР°С‚ РІ <a href="#java-style">java-СЃС‚РёР»Рµ</a>).
+Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ mrotate.ini.</p></div>
+<div class="paragraph"><p>РћР±С‰Р°СЏ СЃС…РµРјР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ С‚Р°РєР°СЏ: РїСЂРѕРїРёС€РёС‚Рµ РЅР°СЃС‚СЂРѕР№РєРё СЂРѕС‚Р°С†РёР№ РІ С„Р°Р№Р»Рµ mrotate.ini Рё РґРѕР±Р°РІСЊС‚Рµ РІ РїР»Р°РЅРёСЂРѕРІС‰РёРє РµР¶РµРґРЅРµРІРЅС‹Р№ Р·Р°РїСѓСЃРє mrotate.exe /r</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РѕРїС†РёРё_Р·Р°РїСѓСЃРєР°">РћРїС†РёРё Р·Р°РїСѓСЃРєР°</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+/help, /h
+</dt>
+<dd>
+<p>
+ РћС‚РѕР±СЂР°Р·РёС‚СЊ СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… РєР»СЋС‡РµР№
+</p>
+</dd>
+<dt class="hdlist1">
+/rotate, /r
+</dt>
+<dd>
+<p>
+ Р—Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕС†РµСЃСЃ СЂРѕС‚Р°С†РёРё РґР»СЏ РІСЃРµС… Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РЅР°СЃС‚СЂРѕРµРє СЂРѕС‚Р°С†РёРё
+</p>
+</dd>
+<dt class="hdlist1">
+/verify, /v
+</dt>
+<dd>
+<p>
+ РџСЂРѕРІРµСЂРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё СЂРѕС‚Р°С†РёРё
+</p>
+</dd>
+<dt class="hdlist1">
+/debug, /d
+</dt>
+<dd>
+<p>
+ Р­РјСѓР»СЏС†РёСЏ СЂР°Р±РѕС‚С‹, С„Р°Р№Р»С‹ РїСЂРё СЌС‚РѕРј РЅРµ РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ, РІС‹РІРѕРґСЏС‚СЃСЏ РґРёР°РіРЅРѕСЃС‚РёС‡РµСЃРєРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ
+</p>
+</dd>
+<dt class="hdlist1">
+/force, /f
+</dt>
+<dd>
+<p>
+ РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅС‹Р№ Р·Р°РїСѓСЃРє СЂРѕС‚Р°С†РёРё, С‚РѕР»СЊРєРѕ РґР»СЏ Р·Р°РїРёСЃРµР№ СЃ shift=yes
+</p>
+</dd>
+<dt class="hdlist1">
+/conf=file, /c=file
+</dt>
+<dd>
+<p>
+ Р—Р°РіСЂСѓР·РёС‚СЊ СѓРєР°Р·Р°РЅРЅС‹Р№ С„Р°Р№Р» СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё СЂРѕС‚Р°С†РёРё, РїР°СЂР°РјРµС‚СЂ РјРѕР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ СЂР°Р·. Р•СЃР»Рё РїР°СЂР°РјРµС‚СЂ СѓРєР°Р·Р°РЅ С„Р°Р№Р» mrotate.ini РЅРµ Р·Р°РіСЂСѓР¶Р°РµС‚СЃСЏ
+</p>
+</dd>
+<dt class="hdlist1">
+/arh=file, /a=file
+</dt>
+<dd>
+<p>
+ Р—Р°РіСЂСѓР·РёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё Р°СЂС…РёРІР°С‚РѕСЂРѕРІ РёР· СѓРєР°Р·Р°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°, РїР°СЂР°РјРµС‚СЂ РјРѕР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ СЂР°Р·. РљСЂРѕРјРµ СѓРєР°Р·Р°РЅРЅС‹С… РІСЃРµРіРґР° РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ С„Р°Р№Р» archivers.ini
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_С„РѕСЂРјР°С‚_С„Р°Р№Р»Р°_РєРѕРЅС„РёРіСѓСЂР°С†РёРё">Р¤РѕСЂРјР°С‚ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Р¤Р°Р№Р» СЃ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ СЃРѕРґРµСЂР¶РёС‚ РЅР°СЃС‚СЂРѕР№РєРё СЂРѕС‚Р°С†РёРё (РѕР±С‹С‡РЅС‹Р№ С„РѕСЂРјР°С‚ ini). Р•СЃР»Рё С‡С‚Рѕ-С‚Рѕ РЅСѓР¶РЅРѕ РЅР°РїРёСЃР°С‚СЊ РїРѕ СЂСѓСЃСЃРєРё, РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєРѕРґРёСЂРѕРІРєСѓ UTF-8</p></div>
+<div class="paragraph"><p>РћР±С‰РёР№ С„РѕСЂРјР°С‚ С„Р°Р№Р»Р°:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[РРјСЏ_Р·Р°РїРёСЃРё1]
+РџР°СЂР°РјРµС‚СЂС‹
+[РРјСЏ_Р·Р°РїРёСЃРё2]
+РџР°СЂР°РјРµС‚СЂС‹</tt></pre>
+</div></div>
+<div class="paragraph"><p><strong>РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ</strong></p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Source
+</dt>
+<dd>
+<p>
+ РљР°С‚Р°Р»РѕРі Рё РјР°СЃРєР° СЂРѕС‚РёСЂСѓРµРјС‹С… С„Р°Р№Р»РѕРІ
+</p>
+</dd>
+<dt class="hdlist1">
+Recurse
+</dt>
+<dd>
+<p>
+ Р РµРєСѓСЂСЃРёРІРЅРѕ РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ РїРѕРґРєР°С‚Р°Р»РѕРіРё, РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ no. Р•СЃР»Рё СѓРєР°Р·Р°РЅ yes, РґР»СЏ Р°СЂС…РёРІРѕРІ РІ TargetDir Р±СѓРґСѓС‚ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РїРѕРґРєР°С‚Р°Р»РѕРіРё РґР»СЏ С…СЂР°РЅРµРЅРёСЏ.
+</p>
+</dd>
+<dt class="hdlist1">
+Period
+</dt>
+<dd>
+<p>
+ РџРµСЂРёРѕРґ С…СЂР°РЅРµРЅРёСЏ РѕСЂРёРіРёРЅР°Р»РѕРІ РІ РґРЅСЏС…, РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РґР°С‚С‹ С„Р°Р№Р»Р° СѓРєР°Р·Р°РЅРЅРѕРј РІ РїР°СЂР°РјРµС‚СЂРµ DateMode, РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 0 (С‚.Рµ. С…СЂР°РЅРёС‚СЊ С„Р°Р№Р»С‹ РІРµС‡РЅРѕ)
+</p>
+</dd>
+<dt class="hdlist1">
+Size
+</dt>
+<dd>
+<p>
+ РћР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ РІСЃРµ С„Р°Р№Р»С‹ Р±РѕР»СЊС€Рµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РІ Р±Р°Р№С‚Р°С…, РІРѕР·РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ Р±СѓРєРІ K,M (РёР»Рё СЌС‚РѕС‚ РїР°СЂР°РјРµС‚СЂ РёР»Рё period), РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ - 0
+</p>
+</dd>
+<dt class="hdlist1">
+Shift
+</dt>
+<dd>
+<p>
+ Р РµР¶РёРј СЂР°Р±РѕС‚С‹ Р°РЅР°Р»РѕРіРёС‡РЅС‹Р№ logrotate РёР· linux - С‚.Рµ. С„Р°Р№Р»С‹ РёРјРµСЋС‚ РёРЅРґРµРєСЃ, Рё СЃРґРІРёРіР°СЋС‚СЃСЏ. РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РѕС‚РєР»СЋС‡РµРЅ. РџСЂРё СѓРєР°Р·Р°РЅРёРё РґР°РЅРЅРѕРіРѕ СЂРµР¶РёРјР° РёРјСЏ С„Р°Р№Р»Р° РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїРѕСЃС‚РѕСЏРЅРЅС‹Рј Рё РЅРµ РёР·РјРµРЅСЏС‚СЃСЏ
+</p>
+</dd>
+<dt class="hdlist1">
+Compress
+</dt>
+<dd>
+<p>
+ CР¶РёРјР°С‚СЊ С„Р°Р№Р»С‹ СѓРєР°Р·Р°РЅРЅС‹Рј "Р°СЂС…РёРІР°С‚РѕСЂРѕРј", РёР»Рё РЅРµ СЃР¶РёРјР°С‚СЊ ("no") - Р±СѓРґРµС‚ РїСЂРѕСЃС‚РѕРµ РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
+</p>
+</dd>
+<dt class="hdlist1">
+TargetDir
+</dt>
+<dd>
+<p>
+ РљР°С‚Р°Р»РѕРі СЂР°Р·РјРµС‰РµРЅРёСЏ СЃС‚Р°СЂС‹С… С„Р°Р№Р»РѕРІ, РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅ С‚Рѕ Р°СЂС…РёРІРЅС‹Рµ С„Р°Р№Р»С‹ СЃРѕР·РґР°СЋС‚СЃСЏ СЂСЏРґРѕРј СЃ РѕСЂРёРіРёРЅР°Р»Р°РјРё
+</p>
+</dd>
+<dt class="hdlist1">
+TargetMask
+</dt>
+<dd>
+<p>
+ РњР°СЃРєР° РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ Р°СЂС…РёРІРѕРІ, РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ %FileName (РґР»СЏ СЂРµР¶РёРјР° shift - %FileName.%Index), Рє РЅРµР№ РІСЃРµРіРґР° РґРѕР±Р°РІР»СЏРµС‚СЃСЏ СЂР°СЃС€РёСЂРµРЅРёРµ Р°СЂС…РёРІР°С‚РѕСЂР°. Р’ СЃР»СѓС‡Р°Рµ СѓРєР°Р·Р°РЅРёСЏ СЂРµР¶РёРјР° shift, РґРѕР»Р¶РЅРѕ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РїР°СЂР°РјРµС‚СЂ %Index Рё РЅРµ СЃРѕРґРµСЂР¶Р°С‚СЊ РїР°СЂР°РјРµС‚СЂРѕРІ РґР°С‚С‹. Р•СЃР»Рё РјР°СЃРєР° РЅРµ СѓРЅРёРєР°Р»СЊРЅР°, С‚Рѕ РІ Р°СЂС…РёРІРµ РѕРєР°Р¶РµС‚СЃСЏ РЅРµСЃРєРѕР»СЊРєРѕ С„Р°Р№Р»РѕРІ (РЅРµ РґР»СЏ СЂРµР¶РёРјР° shift)
+</p>
+</dd>
+<dt class="hdlist1">
+Keep
+</dt>
+<dd>
+<p>
+ РЎРєРѕР»СЊРєРѕ РґРЅРµР№ С…СЂР°РЅРёС‚СЊ СЃС‚Р°СЂС‹Рµ С„Р°Р№Р»С‹, Р°РЅР°Р»РѕРі Period, РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅ, С‚Рѕ РІРµС‡РЅРѕ. РџСЂРё СЂРµР¶РёРјРµ shift СЌС‚Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ С…СЂР°РЅРёРјС‹С… СЂРѕС‚Р°С†РёР№
+</p>
+</dd>
+<dt class="hdlist1">
+DateMode
+</dt>
+<dd>
+<p>
+ РљР°РєСѓСЋ РґР°С‚Сѓ Р±СЂР°С‚СЊ Сѓ С„Р°Р№Р»РѕРІ, РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Last. Р’РѕР·РјРѕР¶РЅС‹ (СЃРІРµСЂСЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРµСЂРІР°СЏ Р±СѓРєРІР°):
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Modify
+</dt>
+<dd>
+<p>
+   РґР°С‚Р° РјРѕРґРёС„РёРєР°С†РёРё С„Р°Р№Р»Р°
+</p>
+</dd>
+<dt class="hdlist1">
+Created
+</dt>
+<dd>
+<p>
+   РґР°С‚Р° СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
+</p>
+</dd>
+<dt class="hdlist1">
+Last
+</dt>
+<dd>
+<p>
+   СЃР°РјР°СЏ РїРѕР·РґРЅСЏСЏ РёР· РґР°С‚ СЃРѕР·РґР°РЅРёСЏ Рё РјРѕРґРёС„РёРєР°С†РёРё. Рў.Рµ. РґР°С‚Р° РЅР°РёР±РѕР»РµРµ Р±Р»РёР·РєР°СЏ Рє С‚РµРєСѓС‰РµР№
+</p>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
+DateReplace
+</dt>
+<dd>
+<p>
+ Р”Р°С‚Р° РЅР° Р·Р°РјРµРЅСѓ РІ РїР°СЂР°РјРµС‚СЂР°С… РґР°С‚С‹ (С‚РёРїР° %d), РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Now - С‚РµРєСѓС‰Р°СЏ, РІРѕР·РјРѕР¶РЅС‹ С‚Р°Рє Р¶Рµ Modify, Created, Last (СЃРј. РїР°СЂР°РјРµС‚СЂ DateMode, РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРµСЂРІР°СЏ Р±СѓРєРІР°). РџРѕР·РІРѕР»СЏРµС‚ Р·Р°РїР°РєРѕРІР°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ С„Р°Р№Р»РѕРІ РІ РѕРґРёРЅ Р°СЂС…РёРІ
+</p>
+</dd>
+<dt class="hdlist1">
+Prerotate
+</dt>
+<dd>
+<p>
+ РЎРєСЂРёРїС‚ РїРµСЂРµРґ СЂРѕС‚Р°С†РёРµР№, РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РґР»СЏ РІСЃРµР№ Р·Р°РїРёСЃРё
+</p>
+</dd>
+<dt class="hdlist1">
+Postrotate
+</dt>
+<dd>
+<p>
+ РЎРєСЂРёРїС‚ РїРѕСЃР»Рµ СЂРѕС‚Р°С†РёРё, РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РґР»СЏ РІСЃРµР№ Р·Р°РїРёСЃРё
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_Р°СЂС…РёРІР°С†РёСЏ">РђСЂС…РёРІР°С†РёСЏ</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>РђСЂС…РёРІР°С†РёСЏ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІРЅРµС€РЅРёРј Р°СЂС…РёРІР°С‚РѕСЂРѕРј, РѕРЅ РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЃСЏ РІ РїСѓС‚СЏС… %Path% РёР»Рё РІ С‚РµРєСѓС‰РµРј РєР°С‚Р°Р»РѕРіРµ.
+РРјСЏ "Р°СЂС…РёРІР°С‚РѕСЂР°" СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РІ РїР°СЂР°РјРµС‚СЂРµ compress. (Р­С‚РѕС‚ РїР°СЂР°РјРµС‚СЂ РѕР±СЏР·Р°С‚РµР»РµРЅ)</p></div>
+<div class="paragraph"><p>Р’ РїСЂРѕРіСЂР°РјРјСѓ Р·Р°С€РёС‚С‹ СЃР»РµРґСѓСЋС‰РёРµ "Р°СЂС…РёРІР°С‚РѕСЂС‹":</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="11%" />
+<col width="55%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">РќР°Р·РІР°РЅРёРµ</th>
+<th align="left" valign="top">РћРїРёСЃР°РЅРёРµ                                                                                                                      </th>
+<th align="left" valign="top">       РљРѕРјР°РЅРґР° Р·Р°РїСѓСЃРєР°</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">no</p></td>
+<td align="left" valign="top"><p class="table">РџСЂРѕСЃС‚РѕРµ РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ С„Р°Р№Р»РѕРІ</p></td>
+<td align="left" valign="top"><p class="table">РЅРµС‚</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">7z</p></td>
+<td align="left" valign="top"><p class="table">РђСЂС…РёРІР°С†РёСЏ РІ РєРѕРЅС‚РµР№РЅРµСЂ 7z РїРѕ Р°Р»РіРѕСЂРёС‚РјСѓ PPMD (РґР»СЏ С‚РµРєСЃС‚РѕРІС‹С… С„Р°Р№Р»РѕРІ)</p></td>
+<td align="left" valign="top"><p class="table">7z.exe a %ArhFileName %FullFileName -m0=PPMd</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">7zLzma</p></td>
+<td align="left" valign="top"><p class="table">РђСЂС…РёРІР°С†РёСЏ 7z РїРѕ Р°Р»РіРѕСЂРёС‚РјСѓ LZMA</p></td>
+<td align="left" valign="top"><p class="table">7z.exe a %ArhFileName %FullFileName</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">rar</p></td>
+<td align="left" valign="top"><p class="table">РђСЂС…РёРІР°С†РёСЏ rar</p></td>
+<td align="left" valign="top"><p class="table">rar.exe a %ArhFileName %FullFileName</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">WinRar</p></td>
+<td align="left" valign="top"><p class="table">РђСЂС…РёРІР°С†РёСЏ WinRar</p></td>
+<td align="left" valign="top"><p class="table">winrar.exe a %ArhFileName %FullFileName</p></td>
+</tr>
+</tbody>
 </table>
-<br>
-Файл с настройками ротации содержит настройки ротации (обычный формат
-ini). Если что-то нужно написать по русски, используйте кодировку UTF-8<br>
-<br>
-[Имя_записи1]<br>
-Параметры<br>
-[Имя_записи2]<br>
-Параметры<br>
-<h3>Описание параметров</h3>
-<span style="font-weight: bold;">; Каталог и маска ротируемых файлов</span><br>
-<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br>
-<span style="font-weight: bold;">; Рекурсивно обрабатывать подкаталоги, по умолчанию no</span>. <span style="font-weight: bold;">Если указан yes, для архивов в TargetDir будут создаваться подкаталоги для хранения.</span><br>
-<span style="font-style: italic;">Recurse=yes</span><br>
-<span style="font-weight: bold;">; Период хранения оригиналов в днях,
-относительно даты файла указанном в параметре DateMode, по умолчанию 0
-(т.е. хранить файлы вечно)</span><br>
-<span style="font-style: italic;">Period=90</span><br>
-<span style="font-weight: bold;">; Обрабатывать все файлы больше указанного размера в байтах, возможно использование букв K,M,G (или этот параметр или period)</span>, по умолчанию - 0<br>
-<span style="font-style: italic;">;Size=100K </span><br>
-<span style="font-weight: bold;">; Режим работы аналогичный logrotate
-из linux - т.е. файлы имеют индекс, и сдвигаются. По умолчанию
-отключен. При укзании данного режима имя файла должно быть постоянным и
-не изменятся</span><br style="font-weight: bold;">
-<span style="font-style: italic;">;Shift=yes</span><br>
-<span style="font-weight: bold;">; сжимать файлы указанным "архиватором", или не сжимать ("no") - будет простое переименование</span><br>
-<span style="font-style: italic;">compress=7z</span><br>
-<span style="font-weight: bold;">; Каталог размещения старых файлов, если не указан то он Source</span><br>
-<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br>
-<span style="font-weight: bold;">; Маска наименования архивов, по
-умолчанию %FileName (для режима shift - %FileName.%Index), к ней всегда
-добавляется расширение архиватора. В случае указания режима shift,
-должно обязательно содержать параметр %Index и не содержать параметров
-даты. Если маска не уникальна, то в архиве окажется несколько файлов (без режима shift)</span><br>
-<span style="font-style: italic;">;TargetMask=%Y%d</span><br>
-<span style="font-weight: bold;">; Сколько дней хранить старые файлы, аналог Period, если не указан, то вечно. При режиме shift это количество хранимых ротаций</span><br>
-<span style="font-style: italic;">Keep=180 </span><br>
-<span style="font-weight: bold;">; Какую дату брать у файлов (по умолчанию Created), </span><span style="font-weight: bold;">возможны Modify, Created</span><span style="font-weight: bold;"> (реально сверяется только первая буква</span>)<br>
-<span style="font-style: italic;">DateMode=Modified</span><br>
-<span style="font-weight: bold;">; Дата на замену в параметрах даты
-(типа %d), по умолчанию Now - текущая, возможны так же Modify, Created
-(реально проверяется только первая буква)</span>.<span style="font-weight: bold;"> Позволяет запаковать несколько файлов в один архив</span><br style="font-weight: bold;">
-<span style="font-style: italic;">DateReplace=Created</span><br>
-<span style="font-weight: bold;">; Скрипт перед ротацией, выполняется один раз для всей записи</span><br>
-<span style="font-style: italic;">prerotate=d:\load.bat</span><br>
-<span style="font-weight: bold;">; Скрипт после ротации, выполняется один раз для всей записи</span><br>
-<span style="font-style: italic;">postrotate=d:\unload.bat</span><br>
-<h3>Архивация</h3>
-Архивация производится внешним архиватором, он должен находится в путях %Path% или в текущем каталоге. <br>Имя "архиватора" указывается в параметре compress. (Этот параметр обязателен)<br>
-В программу зашиты следующие "архиваторы":<br>
-<br>
-<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">Название<br>
-      </td>
-      <td style="vertical-align: top;">Описание<br>
-      </td>
-      <td style="vertical-align: top;">Команда запуска<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
-no</td>
-      <td style="vertical-align: top;">Простое переименование файлов<br>
-      </td>
-      <td style="vertical-align: top;">нет<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
-7z</td>
-      <td style="vertical-align: top;">Архивация в контейнер 7z по алгоритму PPMD (для текстовых файлов)</td>
-      <td style="vertical-align: top;">7z.exe a %ArhFileName %FullFileName -m0=PPMd</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
-7zLzma</td>
-      <td style="vertical-align: top;">Архивация 7z по алгоритму LZMA</td>
-      <td style="vertical-align: top;">7z.exe a %ArhFileName %FullFileName</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
-rar </td>
-      <td style="vertical-align: top;">Архивация rar</td>
-      <td style="vertical-align: top;">rar.exe a %ArhFileName %FullFileName<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
-WinRar</td>
-      <td style="vertical-align: top;">Архивация WinRar</td>
-      <td style="vertical-align: top;">winrar.exe a %ArhFileName %FullFileName<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-Добавить свои&nbsp; "архиваторы" можно создав файл archivers.ini, примерно такого содержания:<br>;
-Имя раздела это имя архиватора, обязательно маленькими буквами! Имя
-должно быть уникальным. Если укажете имя зашитое в программу, оно
-переопределится.<br>
-[7zlzma2]<br>
-; Имя исполняемого файла, без указания пути (хотя допустимо указать и
-полный путь, но при этом не будет происходить поиск в Path)<br>
-ExeName=7z.exe<br>
-; Расширение файла архива<br>
-Extension=.7z<br>
-; Аргументы архиватора, делятся по пробелам, кавычки не сработают!
-Вместо имени файла подставляем %FullFileName, вместо имени архива
-%ArhFileName<br>
-Args=a %ArhFileName %FullFileName -m0=LZMA2<br>
-<br>
-После этого в параметре compress можно использовать 7zLzma2, файлы будут сжиматься по алгоритму Lzma2<br>
-<h3>Примеры настроек</h3>
-Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых дата создания старше 35 дней. Они упаковываются в архивы 7z
-с именем ГодМесяц.7z, после чего удаляются. Причем в
-одном архиве хранятся все файлы за месяц (дата создания в пределах
-месяца). Архивы старше 180 дней удаляются.<br>
-<span style="font-style: italic;">[Simple]</span><br style="font-style: italic;">
-<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
-<span style="font-style: italic;">recurse=yes</span><br style="font-style: italic;">
-<span style="font-style: italic;">Period=35</span><br style="font-style: italic;">
-<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
-<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
-<span style="font-style: italic;">TargetMask=%Y%m</span><br style="font-style: italic;">
-<span style="font-style: italic;">Keep=180</span><br style="font-style: italic;">
-<span style="font-style: italic;">dateReplace=Create</span><br style="font-style: italic;">
-<br>
-Просто удаляются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых дата создания старше 90 дней.<br>
+</div>
+<div class="paragraph"><p>Р”РѕР±Р°РІРёС‚СЊ СЃРІРѕРё  "Р°СЂС…РёРІР°С‚РѕСЂС‹" РјРѕР¶РЅРѕ СЃРѕР·РґР°РІ С„Р°Р№Р» archivers.ini, РїСЂРёРјРµСЂРЅРѕ С‚Р°РєРѕРіРѕ СЃРѕРґРµСЂР¶Р°РЅРёСЏ:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>; РРјСЏ СЂР°Р·РґРµР»Р° СЌС‚Рѕ РёРјСЏ Р°СЂС…РёРІР°С‚РѕСЂР°, РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РјР°Р»РµРЅСЊРєРёРјРё Р±СѓРєРІР°РјРё!
+; РРјСЏ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ СѓРЅРёРєР°Р»СЊРЅС‹Рј. Р•СЃР»Рё СѓРєР°Р¶РµС‚Рµ РёРјСЏ Р·Р°С€РёС‚РѕРµ РІ РїСЂРѕРіСЂР°РјРјСѓ, РѕРЅРѕ РїРµСЂРµРѕРїСЂРµРґРµР»РёС‚СЃСЏ.
+[7zlzma2]
+; РРјСЏ РёСЃРїРѕР»РЅСЏРµРјРѕРіРѕ С„Р°Р№Р»Р°, Р±РµР· СѓРєР°Р·Р°РЅРёСЏ РїСѓС‚Рё
+;(С…РѕС‚СЏ РґРѕРїСѓСЃС‚РёРјРѕ СѓРєР°Р·Р°С‚СЊ Рё РїРѕР»РЅС‹Р№ РїСѓС‚СЊ, РЅРѕ РїСЂРё СЌС‚РѕРј РЅРµ Р±СѓРґРµС‚ РїСЂРѕРёСЃС…РѕРґРёС‚СЊ РїРѕРёСЃРє РІ Path)
+ExeName=7z.exe
+; Р Р°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р° Р°СЂС…РёРІР°
+Extension=.7z
+; РђСЂРіСѓРјРµРЅС‚С‹ Р°СЂС…РёРІР°С‚РѕСЂР°, РґРµР»СЏС‚СЃСЏ РїРѕ РїСЂРѕР±РµР»Р°Рј, РєР°РІС‹С‡РєРё РЅРµ СЃСЂР°Р±РѕС‚Р°СЋС‚!
+; Р’РјРµСЃС‚Рѕ РёРјРµРЅРё С„Р°Р№Р»Р° РїРѕРґСЃС‚Р°РІР»СЏРµРј %FullFileName, РІРјРµСЃС‚Рѕ РёРјРµРЅРё Р°СЂС…РёРІР° %ArhFileName
+Args=a %ArhFileName %FullFileName -m0=LZMA2</tt></pre>
+</div></div>
+<div class="paragraph"><p>РџРѕСЃР»Рµ СЌС‚РѕРіРѕ РІ РїР°СЂР°РјРµС‚СЂРµ compress РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ 7zLzma2, С„Р°Р№Р»С‹ Р±СѓРґСѓС‚ СЃР¶РёРјР°С‚СЊСЃСЏ РїРѕ Р°Р»РіРѕСЂРёС‚РјСѓ Lzma2</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РїСЂРёРјРµСЂС‹_РЅР°СЃС‚СЂРѕРµРє">РџСЂРёРјРµСЂС‹ РЅР°СЃС‚СЂРѕРµРє</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="title">Example 1. РћР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ *.log РІ d:\temp\rotate Рё РїРѕРґРєР°С‚Р°Р»РѕРіР°С…, Сѓ РєРѕС‚РѕСЂС‹С… РґР°С‚Р° СЃРѕР·РґР°РЅРёСЏ СЃС‚Р°СЂС€Рµ 35 РґРЅРµР№. РћРЅРё СѓРїР°РєРѕРІС‹РІР°СЋС‚СЃСЏ РІ Р°СЂС…РёРІС‹ 7z СЃ РёРјРµРЅРµРј Р“РѕРґРњРµСЃСЏС†.7z, РїРѕСЃР»Рµ С‡РµРіРѕ СѓРґР°Р»СЏСЋС‚СЃСЏ. РџСЂРёС‡РµРј РІ РѕРґРЅРѕРј Р°СЂС…РёРІРµ С…СЂР°РЅСЏС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ Р·Р° РјРµСЃСЏС† (РґР°С‚Р° СЃРѕР·РґР°РЅРёСЏ РІ РїСЂРµРґРµР»Р°С… РјРµСЃСЏС†Р°). РђСЂС…РёРІС‹ СЃС‚Р°СЂС€Рµ 180 РґРЅРµР№ СѓРґР°Р»СЏСЋС‚СЃСЏ.</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre><tt>[Simple]
+Source=d:\temp\rotate\*.log
+recurse=yes
+Period=35
+compress=7z
+TargetDir=d:\temp\rotateold
+TargetMask=%Y%m
+Keep=180
+dateReplace=Create</tt></pre>
+</div></div>
+</div></div>
+<div class="exampleblock">
+<div class="title">Example 2. РџСЂРѕСЃС‚Рѕ СѓРґР°Р»СЏСЋС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ *.log РІ d:\temp\rotate Рё РїРѕРґРєР°С‚Р°Р»РѕРіР°С…, Сѓ РєРѕС‚РѕСЂС‹С… РґР°С‚Р° СЃРѕР·РґР°РЅРёСЏ СЃС‚Р°СЂС€Рµ 90 РґРЅРµР№.</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre><tt>[SimpleDelete]
+Source=d:\temp\rotate\*.log
+recurse=yes
+compress=no
+Keep=90</tt></pre>
+</div></div>
+</div></div>
+<div class="exampleblock">
+<div class="title">Example 3. РћР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ *.log РІ d:\temp\rotate Рё РїРѕРґРєР°С‚Р°Р»РѕРіР°С…, Сѓ РєРѕС‚РѕСЂС‹С… СЂР°Р·РјРµСЂ Р±РѕР»СЊС€Рµ 100 РљР±. РћРЅРё СѓРїР°РєРѕРІС‹РІР°СЋС‚СЃСЏ РІ Р°СЂС…РёРІС‹ 7z СЃ РёРјРµРЅРµРј РРјСЏ_С„Р°Р№Р»Р°.РРЅРґРµРєСЃ.7z (test.log.001.7z, test.log.002.7z&#8230;), РїРѕСЃР»Рµ С‡РµРіРѕ СѓРґР°Р»СЏСЋС‚СЃСЏ. Р‘СѓРґРµС‚ С…СЂР°РЅРёС‚СЃСЏ 10 РїРѕСЃР»РµРґРЅРёС… СЂРѕС‚Р°С†РёР№ (Keep=10).</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre><tt>[ShiftExample]
+Source=d:\temp\rotate\*.log
+Shift=yes
+Size=100K
+compress=7z
+TargetDir=d:\temp\rotateold
+Keep=10</tt></pre>
+</div></div>
+</div></div>
+<div class="exampleblock">
+<div class="title">Example 4. РћР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ *.log РІ d:\temp\rotate Рё РїРѕРґРєР°С‚Р°Р»РѕРіР°С…, Сѓ РєРѕС‚РѕСЂС‹С… СЂР°Р·РјРµСЂ Р±РѕР»СЊС€Рµ 100 РљР±. РћРЅРё СѓРїР°РєРѕРІС‹РІР°СЋС‚СЃСЏ РІ Р°СЂС…РёРІС‹ 7z СЃ РёРјРµРЅРµРј РРјСЏР¤Р°Р№Р»Р°Р“РѕРґРњРµСЃСЏС†Р”Р°С‚Р°.7z (РґР°С‚Р° - СЌС‚Рѕ РґР°С‚Р° СЂРѕС‚Р°С†РёРё, РЅР°РїСЂРёРјРµСЂ test.log.20111101.7z, test.log.20111102.7z&#8230;), РїРѕСЃР»Рµ С‡РµРіРѕ СѓРґР°Р»СЏСЋС‚СЃСЏ. РђСЂС…РёРІС‹ С…СЂР°РЅСЏС‚СЃСЏ 180 РґРЅРµР№.</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre><tt>[DateExample]
+Source=d:\temp\rotate\*.log
+Size=100K
+compress=7z
+TargetDir=d:\temp\rotateold
+TargetMask=%FileName%Y%m%d
+ Keep=180</tt></pre>
+</div></div>
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РІС‹РІРѕРґ_СЃРѕРѕР±С‰РµРЅРёР№_РІ_С„Р°Р№Р»">Р’С‹РІРѕРґ СЃРѕРѕР±С‰РµРЅРёР№ РІ С„Р°Р№Р»</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ РІС‹РІРѕРґСЏС‚СЃСЏ РЅР° РєРѕРЅСЃРѕР»СЊ. РџРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹РІРѕРґР° РІ С„Р°Р№Р» (&gt; log.txt) РЅРµ СЃСЂР°Р±РѕС‚Р°РµС‚ (СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РїРѕС‚РѕРє РІС‹РІРѕРґР° РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ). Р•СЃР»Рё РЅРµРѕР±С…РѕРґРёРјР° Р·Р°РїРёСЃСЊ СЃРѕРѕР±С‰РµРЅРёР№ РІ С„Р°Р№Р», СЃРѕР·РґР°Р№С‚Рµ СЃРµРєС†РёСЋ logging РІ С„Р°Р№Р»Рµ mrotate.ini</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[logging]
+; Р›РѕРі РІРµРґРµС‚СЃСЏ РЅР° РєРѕРЅСЃРѕР»СЊ Рё РІ С„Р°Р№Р»
+formatters.f1.class = PatternFormatter
+formatters.f1.pattern =%Y-%m-%d %H:%M:%S [%p] %t
+formatters.f1.times = local
 
-<span style="font-style: italic;">[SimpleDelete]</span><br style="font-style: italic;">
+channels.c1.class = ConsoleChannel
+channels.c2.class = FileChannel
+channels.c2.path = mrotate.log
+channels.c2.formatter = f1
 
-<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
+channels.croot.class = SplitterChannel
+channels.croot.channels = c1,c2
 
-<span style="font-style: italic;">recurse=yes</span><br style="font-style: italic;">
-
-<span style="font-style: italic;"></span><span style="font-style: italic;">compress=no</span><br style="font-style: italic;">
-<span style="font-style: italic;">Keep=90</span><br style="font-style: italic;">
-<br>
-Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых размер больше 100 Кб. Они упаковываются в архивы 7z с именем Имя_файла.Индекс.7z (test.log.001.7z,
-test.log.002.7z...), после чего удаляются. Будет хранится 10 последних
-ротаций (Keep=10).<br>
-<span style="font-style: italic;">[ShiftExample]</span><br style="font-style: italic;">
-<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
-<span style="font-style: italic;">Shift=yes</span><br style="font-style: italic;">
-<span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
-<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
-<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
-<span style="font-style: italic;">Keep=10</span><br>
-<br>
-Обрабатываются все файлы *.log в d:\temp\rotate и подкаталогах, у
-которых размер больше 100 Кб. Они упаковываются в архивы 7z с именем
-ИмяФайлаГодМесяцДата.7z (дата - это дата ротации, например
-test.log.20111101.7z,
-test.log.20111102.7z...), после чего удаляются. Архивы хранятся 180
-дней.<br>
-
-<span style="font-style: italic;">[DateExample]</span><br style="font-style: italic;">
-
-<span style="font-style: italic;">Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
-<span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
-
-<span style="font-style: italic;">compress=7z</span><br style="font-style: italic;">
-
-<span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
-
-<span style="font-style: italic;">TargetMask=%FileName%Y%m%d<br>
-Keep=180</span><br>
-<h3>Вывод сообщений в файл</h3>По умолчанию все сообщения выводятся на
-консоль. Перенаправление вывода в файл (&gt; log.txt) не сработает
-(стандартный поток вывода не используется). Если необходима запись
-сообщений в файл, создайте секцию logging в файле mrotate.ini<br>
-<br>
-<span style="font-style: italic;">[logging]</span><br style="font-style: italic;">
-<span style="font-style: italic;">; Лог ведется на консоль и в файл</span><br style="font-style: italic;">
-<span style="font-style: italic;">formatters.f1.class = PatternFormatter</span><br style="font-style: italic;">
-<span style="font-style: italic;">formatters.f1.pattern =%Y-%m-%d %H:%M:%S [%p] %t</span><br style="font-style: italic;">
-<span style="font-style: italic;">formatters.f1.times = local</span><br style="font-style: italic;">
-<br style="font-style: italic;">
-<span style="font-style: italic;">channels.c1.class = ConsoleChannel</span><br style="font-style: italic;">
-<span style="font-style: italic;">channels.c2.class = FileChannel</span><br style="font-style: italic;">
-<span style="font-style: italic;">channels.c2.path = mrotate.log</span><br style="font-style: italic;">
-<span style="font-style: italic;">channels.c2.formatter = f1</span><br style="font-style: italic;">
-<br style="font-style: italic;">
-<span style="font-style: italic;">channels.croot.class = SplitterChannel</span><br style="font-style: italic;">
-<span style="font-style: italic;">channels.croot.channels = c1,c2</span><br style="font-style: italic;">
-<br style="font-style: italic;">
-<span style="font-style: italic;">loggers.root.channel = croot</span><br style="font-style: italic;">
-<span style="font-style: italic;">loggers.root.level = information</span><br>
-<br>
-Вобще, можно использовать любые настройки логгирования из Poco.<br>
-Мне показалось излишним создавать логи в разборщике логов.<br>
-<h3>Формат .properties</h3>
-Вместо формата .ini возможно испльзовать формат .properties (Т.е.
-указываем такое расширение файла вместо ini). Этот формат в java-стиле.<br>
-Последний пример в этом формате будет выглядеть так:<br>
-<br>
-<span style="font-style: italic;"># Это комментарий</span><br style="font-style: italic;">
-<span style="font-style: italic;">DateExample.Source=d:\temp\rotate\*.log</span><br style="font-style: italic;">
-
-<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Size=100K </span><br style="font-style: italic;">
-<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Compress=7z</span><br style="font-style: italic;">
-<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">TargetDir=d:\temp\rotateold</span><br style="font-style: italic;">
-<span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">TargetMask=%FileName%Y%m%d<br></span><span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">Keep=180</span><br>
-<br>
-Регистр названий здесь важен, в отличие от ini. Т.е. запись <span style="font-style: italic;">DateExample.</span><span style="font-style: italic;">keep=180</span> не прочитается.<br>
-<h3><span style="font-weight: bold;">Ссылки</span></h3>
-
-Использована библиотека <a href="http://pocoproject.org" target="_blank">Poco</a>.<br>
-Архиватор 7-zip можно бесплатно скачать <a href="http://7-zip.org/" target="_blank">здесь</a>.<br>
-<h3><span style="font-weight: bold;">Исходные тексты</span></h3>
-Исходники mRotate можно найти на <a href="https://github.com/partizand/mrotate" target="_blank">GitHub</a><br>
-<span style="font-weight: bold;"></span>
-<h3><span style="font-weight: bold;">Контакты
-</span></h3>
-
-
-Вопросы, предложения, замечания принимаются по адресу <a href="mailto:%20atsave@narod.ru">atsave@narod.ru</a>
-<br>
-
-
-Сайт программы: <a href="http://atsave.narod.ru/">http://atsave.narod.ru</a><br>
-
-
-<h3><span style="font-weight: bold;">Приложение</span></h3>
-
-
-Допустимые параметры в targetMask<br>
-<br>
-Имена файлов<br>
-<br>
-<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">%FileName</td>
-      <td style="vertical-align: top;">Имя файла<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">%FileBaseName</td>
-      <td style="vertical-align: top;">Имя файла без расширения</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">%FileExt</td>
-      <td style="vertical-align: top;">Расширение файла (без точки)<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">%Index<br>
-      </td>
-      <td style="vertical-align: top;">Индекс файла, при режиме shift<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-Дата/время<br>
-<br>
-%w - abbreviated weekday (Mon, Tue, ...) <br>
-%W - full weekday (Monday, Tuesday, ...) <br>
-%b - abbreviated month (Jan, Feb, ...) <br>
-%B - full month (January, February, ...) <br>
-%d - zero-padded day of month (01 .. 31) <br>
-%e - day of month (1 .. 31) <br>
-%f - space-padded day of month ( 1 .. 31) <br>
-%m - zero-padded month (01 .. 12) <br>
-%n - month (1 .. 12) <br>
-%o - space-padded month ( 1 .. 12) <br>
-%y - year without century (70) <br>
-%Y - year with century (1970) <br>
-%H - hour (00 .. 23) <br>
-%h - hour (00 .. 12) <br>
-%a - am/pm <br>
-%A - AM/PM <br>
-%M - minute (00 .. 59) <br>
-%S - second (00 .. 59) <br>
-%s - seconds and microseconds (equivalent to %S.%F) <br>
-%i - millisecond (000 .. 999) <br>
-%c - centisecond (0 .. 9) <br>
-%F - fractional seconds/microseconds (000000 - 999999) <br>
-%z - time zone differential in ISO 8601 format (Z or +NN.NN) <br>
-%Z - time zone differential in RFC format (GMT or +NNNN) <br>
-%% - percent sign (Реально может и не сработать, например если написать %%FileName - получится %ИмяФайла)<br>
-<br>
-</body></html>
+loggers.root.channel = croot
+loggers.root.level = information</tt></pre>
+</div></div>
+<div class="paragraph"><p>Р’РѕРѕР±С‰Рµ, РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р»СЋР±С‹Рµ РЅР°СЃС‚СЂРѕР№РєРё Р»РѕРіРіРёСЂРѕРІР°РЅРёСЏ РёР· Poco.
+РњРЅРµ РїРѕРєР°Р·Р°Р»РѕСЃСЊ РёР·Р»РёС€РЅРёРј СЃРѕР·РґР°РІР°С‚СЊ Р»РѕРіРё РІ СЂР°Р·Р±РѕСЂС‰РёРєРµ Р»РѕРіРѕРІ.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="java-style">Р¤РѕСЂРјР°С‚ РІ java-СЃС‚РёР»Рµ</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Р’РјРµСЃС‚Рѕ С„РѕСЂРјР°С‚Р° .ini РІРѕР·РјРѕР¶РЅРѕ РёСЃРїР»СЊР·РѕРІР°С‚СЊ С„РѕСЂРјР°С‚ РІ java-СЃС‚РёР»Рµ. Р”Р»СЏ СЌС‚РѕРіРѕ СѓРєР°Р·С‹РІР°РµРј СЂР°СЃС€РёСЂРµРЅРёРµ .properties РІРјРµСЃС‚Рѕ ini.
+РџРѕСЃР»РµРґРЅРёР№ РїСЂРёРјРµСЂ РІ СЌС‚РѕРј С„РѕСЂРјР°С‚Рµ Р±СѓРґРµС‚ РІС‹РіР»СЏРґРµС‚СЊ С‚Р°Рє:</p></div>
+<div class="exampleblock">
+<div class="title">Example 5. РћР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РІСЃРµ С„Р°Р№Р»С‹ *.log РІ d:\temp\rotate Рё РїРѕРґРєР°С‚Р°Р»РѕРіР°С…, Сѓ РєРѕС‚РѕСЂС‹С… СЂР°Р·РјРµСЂ Р±РѕР»СЊС€Рµ 100 РљР±. РћРЅРё СѓРїР°РєРѕРІС‹РІР°СЋС‚СЃСЏ РІ Р°СЂС…РёРІС‹ 7z СЃ РёРјРµРЅРµРј РРјСЏР¤Р°Р№Р»Р°Р“РѕРґРњРµСЃСЏС†Р”Р°С‚Р°.7z (РґР°С‚Р° - СЌС‚Рѕ РґР°С‚Р° СЂРѕС‚Р°С†РёРё, РЅР°РїСЂРёРјРµСЂ test.log.20111101.7z, test.log.20111102.7z&#8230;), РїРѕСЃР»Рµ С‡РµРіРѕ СѓРґР°Р»СЏСЋС‚СЃСЏ. РђСЂС…РёРІС‹ С…СЂР°РЅСЏС‚СЃСЏ 180 РґРЅРµР№.</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre><tt># Р­С‚Рѕ РєРѕРјРјРµРЅС‚Р°СЂРёР№
+DateExample.Source=d:\temp\rotate\*.log
+DateExample.Size=100K
+DateExample.Compress=7z
+DateExample.TargetDir=d:\temp\rotateold
+DateExample.TargetMask=%FileName%Y%m%d
+DateExample.Keep=180</tt></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>Р РµРіРёСЃС‚СЂ РЅР°Р·РІР°РЅРёР№ Р·РґРµСЃСЊ РІР°Р¶РµРЅ, РІ РѕС‚Р»РёС‡РёРµ РѕС‚ ini. Рў.Рµ. Р·Р°РїРёСЃСЊ DateExample.keep=180 РЅРµ РїСЂРѕС‡РёС‚Р°РµС‚СЃСЏ.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_СЃСЃС‹Р»РєРё">РЎСЃС‹Р»РєРё</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>РСЃРїРѕР»СЊР·РѕРІР°РЅР° Р±РёР±Р»РёРѕС‚РµРєР° Poco. <a href="http://pocoproject.org">http://pocoproject.org</a></p></div>
+<div class="paragraph"><p>РђСЂС…РёРІР°С‚РѕСЂ 7-zip РјРѕР¶РЅРѕ Р±РµСЃРїР»Р°С‚РЅРѕ СЃРєР°С‡Р°С‚СЊ РЅР° <a href="http://7-zip.org/">http://7-zip.org/</a></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РєРѕРЅС‚Р°РєС‚С‹">РљРѕРЅС‚Р°РєС‚С‹</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Р’РѕРїСЂРѕСЃС‹, РїСЂРµРґР»РѕР¶РµРЅРёСЏ, Р·Р°РјРµС‡Р°РЅРёСЏ РїСЂРёРЅРёРјР°СЋС‚СЃСЏ РїРѕ Р°РґСЂРµСЃСѓ <a href="mailto:atsave@narod.ru">atsave@narod.ru</a>   <br />
+РЎР°Р№С‚ РїСЂРѕРіСЂР°РјРјС‹: <a href="http://atsave.narod.ru">http://atsave.narod.ru</a></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_РїСЂРёР»РѕР¶РµРЅРёРµ">РџСЂРёР»РѕР¶РµРЅРёРµ</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Р”РѕРїСѓСЃС‚РёРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РІ targetMask</p></div>
+<div class="paragraph"><p>РРјРµРЅР° С„Р°Р№Р»РѕРІ</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>%FileName      РРјСЏ С„Р°Р№Р»Р°</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>%FileBaseName  РРјСЏ С„Р°Р№Р»Р° Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>%FileExt       Р Р°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р° (Р±РµР· С‚РѕС‡РєРё)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>%Index         РРЅРґРµРєСЃ С„Р°Р№Р»Р°, С‚РѕР»СЊРєРѕ РїСЂРё СЂРµР¶РёРјРµ shift</tt></pre>
+</div></div>
+<div class="paragraph"><p>Р”Р°С‚Р°/РІСЂРµРјСЏ</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>%w - abbreviated weekday (Mon, Tue, ...)
+%W - full weekday (Monday, Tuesday, ...)
+%b - abbreviated month (Jan, Feb, ...)
+%B - full month (January, February, ...)
+%d - zero-padded day of month (01 .. 31)
+%e - day of month (1 .. 31)
+%f - space-padded day of month ( 1 .. 31)
+%m - zero-padded month (01 .. 12)
+%n - month (1 .. 12)
+%o - space-padded month ( 1 .. 12)
+%y - year without century (70)
+%Y - year with century (1970)
+%H - hour (00 .. 23)
+%h - hour (00 .. 12)
+%a - am/pm
+%A - AM/PM
+%M - minute (00 .. 59)
+%S - second (00 .. 59)
+%s - seconds and microseconds (equivalent to %S.%F)
+%i - millisecond (000 .. 999)
+%c - centisecond (0 .. 9)
+%F - fractional seconds/microseconds (000000 - 999999)
+%z - time zone differential in ISO 8601 format (Z or +NN.NN)
+%Z - time zone differential in RFC format (GMT or +NNNN)
+%% - percent sign (Р РµР°Р»СЊРЅРѕ РјРѕР¶РµС‚ Рё РЅРµ СЃСЂР°Р±РѕС‚Р°С‚СЊ, РЅР°РїСЂРёРјРµСЂ РµСЃР»Рё РЅР°РїРёСЃР°С‚СЊ %%FileName - РїРѕР»СѓС‡РёС‚СЃСЏ %РРјСЏР¤Р°Р№Р»Р°)</tt></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2011-11-19 19:39:16 РњРѕСЃРєРѕРІСЃРєРѕРµ РІСЂРµРјСЏ (Р·РёРјР°)
+</div>
+</div>
+</body>
+</html>
