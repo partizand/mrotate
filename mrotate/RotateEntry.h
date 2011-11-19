@@ -30,7 +30,7 @@ namespace Rotate
 {
 	//enum RotateType{Single,Multiple};
 	//! Режим обработки даты файла
-	enum DateMode {Created,Modified,Now};
+	enum DateMode {Created,Modified,Last,Now};
 	//! Режим замены даты в параметрах %dd
 	//enum DateReplaceMode{Now,Create,Modify};
 

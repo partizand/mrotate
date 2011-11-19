@@ -412,6 +412,14 @@ Timestamp fileTime;
 	case Rotate::Now:
 		fileTime.update();
 		break;
+	case Rotate::Last: // Наибольшая дата
+		fileTime=pFile.created();
+		Timestamp fmTime=pFile.getLastModified();
+		if (fmTime>fileTime)
+		{
+			fileTime=fmTime;
+		}
+		break;
 	}
 	DateTime replDate(fileTime); // дата/время на замену
 	return replDate;

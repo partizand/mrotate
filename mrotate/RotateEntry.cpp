@@ -88,7 +88,7 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	tPath.makeDirectory();
 	tPath.setFileName(targetMask);
 	targetPath=tPath.toString();
-	dateMode=Rotate::dateModeFromString(FDateMode,Rotate::Created); // Дата создания по умолчанию
+	dateMode=Rotate::dateModeFromString(FDateMode,Rotate::Last); // Дата создания по умолчанию
 	
 	dateReplaceMode=Rotate::dateModeFromString(DateReplaceMode,Rotate::Now); // Текущая дата по умолчанию
 	
@@ -116,6 +116,10 @@ Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defa
 		else if (icompare(str,0,1,"N")==0)
 			{
 				ret=Rotate::Now;
+			}
+		else if (icompare(str,0,1,"L")==0)
+			{
+				ret=Rotate::Last;
 			}
 	}
 	return ret;
