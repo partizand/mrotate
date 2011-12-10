@@ -1,4 +1,4 @@
-﻿mRotate 
+mRotate 
 =======
 
 //Log rotation for Windows
