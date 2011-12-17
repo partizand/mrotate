@@ -31,7 +31,7 @@
 namespace Rotate
 {
 	//! Режим обработки даты файла
-	enum DateMode {Created,Modified,Last,Now};
+	enum DateMode {Created,Modified,Last,First,Now};
 	//! Режим ротации при shift	
 	enum PeriodMode {None,Daily,Weekly,Monthly};
 	//! Получение режима обработки даты из строки

@@ -28,8 +28,8 @@ private:
 	//! Имя файла со статусами ротацийs
 	std::string statusFileName;
 	//! Открытый файл конфигурации
-	Poco::Util::PropertyFileConfiguration *pConf;
-	//Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> pConf;
+	//Poco::Util::PropertyFileConfiguration *pConf;
+	Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> pConf;
 	//Poco::Util::AbstractConfiguration *pConf;
 
 	//! Даты ротаций

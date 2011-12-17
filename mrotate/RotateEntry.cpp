@@ -224,6 +224,10 @@ Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defa
 			{
 				ret=Rotate::Last;
 			}
+		else if (icompare(str,0,1,"F")==0)
+			{
+				ret=Rotate::First;
+			}
 	}
 	return ret;
 	

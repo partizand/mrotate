@@ -508,6 +508,7 @@ catch(...)
 Poco::DateTime LogRotator::getDate(const Poco::File &pFile,Rotate::DateMode dateMode)
 {
 Timestamp fileTime;
+Timestamp fmTime;
 	switch (dateMode)
 	{
 	case Rotate::Created:
@@ -521,8 +522,16 @@ Timestamp fileTime;
 		break;
 	case Rotate::Last: // Наибольшая дата
 		fileTime=pFile.created();
-		Timestamp fmTime=pFile.getLastModified();
+		fmTime=pFile.getLastModified();
 		if (fmTime>fileTime)
+		{
+			fileTime=fmTime;
+		}
+		break;
+	case Rotate::First: // Наименьшая дата
+		fileTime=pFile.created();
+		fmTime=pFile.getLastModified();
+		if (fmTime<fileTime)
 		{
 			fileTime=fmTime;
 		}

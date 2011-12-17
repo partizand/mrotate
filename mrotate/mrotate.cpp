@@ -53,12 +53,12 @@ class RotateApp: public Application
 {
 public:
 	RotateApp(): _helpRequested(false),_runRequested(false),_loadRequested(false),
-		_checkRequested(false),_debugReq(false),
+		_checkRequested(false),_debugReq(false),_statusFNameReg(false),
 		rotator(logger())
 	{
 		
 		//bak=new Backup(logger());
-		poco_information_f1(logger(),"mrotate v.%s. Rotate text logs for Windows.",rotator.getVersion());
+		poco_information_f1(logger(),"mrotate v.%s",rotator.getVersion());
 		//logger().information("mrotate v.0.1. Rotate logs utility for Windows");
 		//logger().debug("debug mes");
 	}
@@ -184,6 +184,7 @@ protected:
 	}
 	void handleStatusFile(const std::string& name, const std::string& value)
 	{
+		_statusFNameReg=true;
 		rotator.setStatusFileName(value); // Установка файла статуса
 	}
 	void handleLoadEntries(const std::string& name, const std::string& value)
@@ -196,7 +197,7 @@ protected:
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Rotate logs utility.");
+		helpFormatter.setHeader("Rotate text logs utility.");
 		helpFormatter.format(std::cout);
 	}
 	
@@ -206,9 +207,11 @@ protected:
 	{
 		if (!_helpRequested)
 		{
+			if (!_statusFNameReg) // Имя файла статуса по умолчанию
+			{
 			std::string statusFile=config().getString("application.dir","")+"mrotate.status";
 			rotator.setStatusFileName(statusFile);
-			
+			}
 			std::string arhFile=config().getString("application.dir","")+"archivers.ini";
 			rotator.archiver.load(arhFile); // Грузим пользовательские архиваторы
 
@@ -245,7 +248,9 @@ private:
 	bool _loadRequested; // Указан параметр загрузки конфигурации из файла
 	bool _checkRequested; // Проверка конфигурации
 	bool _debugReq; // Режим эмуляции
+	bool _statusFNameReg; // Имя файла статуса указано в параметре
 	LogRotator rotator;
+	
 };
 
 

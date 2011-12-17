@@ -31,7 +31,7 @@ statusFileName("mrotate.status")
 RStatus::~RStatus(void)
 {
 	//save();
-	pConf->release();
+	//pConf->release();
 }
 //======================================================
 //! Устанавливает каталог сохранения файлов конфигураций
@@ -43,7 +43,7 @@ void RStatus::setStatusFileName(const std::string &fName)
 //! Сохранить статусы
 void RStatus::save()
 {
-try
+ try
 	{
 	pConf->save(statusFileName);
 	}
@@ -59,8 +59,8 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 	//Timestamp stampDate;
 	DateTime rDate; // Текущая дата
 	
-	//if (pConf.isNull()) return rDate;
-	if (pConf==0) return rDate;
+	if (pConf.isNull()) return rDate;
+	//if (pConf==0) return rDate;
 	rDate.assign(2001,1,1); // Начало 2001 года
 	string sDate;
 	Int64 iDate;
@@ -91,8 +91,8 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 //! Сохраняет дату последней ротации. Дата становится текущей
 void RStatus::setDate(const std::string &confName,const std::string &entryName)
 {
-	//if (pConf.isNull()) return;
-	if (pConf==0) return;
+	if (pConf.isNull()) return;
+	//if (pConf==0) return;
 	Timestamp nowDate;
 	Int64 iDate=nowDate.epochTime();// utcTime();// epochTime();// epochMicroseconds();
 	string strDate=NumberFormatter::format(iDate);
