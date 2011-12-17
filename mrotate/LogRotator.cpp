@@ -92,20 +92,45 @@ void LogRotator::rotate()
 		// Скрипт перед ротацией
 		executeScript(items[i].preRotate);
 		
-		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
+
+		if (items[i].shift) // Ротация в режиме сдвига
 		{
+			// Возможна ротация либо по расписанию либо по размеру
+			if (items[i].periodMode!=Rotate::None) // Ротация по расписанию
+			{
+				// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
+				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
+			}
+			else if (items[i].limitSize>0) // Ротация по размеру
+			{
+				// Ротируем файлы
+			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,items[i].limitSize);
+			}
+
+
+		}
+		else // Ротация в режиме Win
+		{
+			if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
+			{
 		
 			// Ротируем файлы
 			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,items[i].period,items[i].limitSize);
 			
-		}
-		// Удаляем старые архивы (если не сдвиг)
-		if (!items[i].shift && items[i].keepPeriod>0)
-		{
+			}
+			// Удаляем старые архивы (если не сдвиг)
+			if (items[i].keepPeriod>0)
+			{
 			
 			fileMask=getRemoveMask(); //"*"+archiver.getExtension(items[i].archiverName);
 			rotateFiles(fileMask,destDir,destDir,items[i].recurse,false,items[i].keepPeriod,0);
+			}
 		}
+
+		
+		
+		
+		
 		// Скрипт после ротации
 		executeScript(items[i].postRotate);
 		/*
@@ -127,6 +152,7 @@ void LogRotator::rotate()
 		*/
 	}
 }
+//------------------------------------------------------------------------
 //! Выполнить скрипт до/после ротации
 void LogRotator::executeScript(const std::string &script)
 {
@@ -148,8 +174,28 @@ void LogRotator::executeScript(const std::string &script)
 			
 		}
 }
+//------------------------------------------------------------------------
+//! Определят нужна ли ротация при режиме shift для записи indx
+bool LogRotator::isNeedRotate(int indx)
+{
+if (!items[indx].shift) return false;
+Timestamp nowDate;
+Timestamp lastRotateDate=rstatus.getDate(items[indx].confName,items[indx].name);
+Timespan diffTime(0,23,0,0,0);  //Сколько нужно отнять
+switch(items[indx].periodMode)
+{
+case Rotate::Daily:
+	diffTime.assign(0,23,0,0,0);  //Сколько нужно отнять
+	break;
+case Rotate::Weekly:
+	diffTime.assign(6,23,0,0,0);  //Сколько нужно отнять
+	break;
+case Rotate::Monthly:
+	diffTime.assign(29,23,0,0,0);  //Сколько нужно отнять
+	break;
+}
 
-	
+}
 
 //------------------------------------------------------------------------
 //! Ротировать файлы/удалить архивы
@@ -340,12 +386,15 @@ if (!pFile.exists()) return false; // Файла нет
 	if (!pFile.isFile()) return false; // Это не файл
 	if (!pFile.canRead()) return false; // Файл не может быть прочитан
 
-	int iPeriod(Period);
-	Poco::Int64 iSize(lSize);
-	if (Period==0 && lSize==0) // Параметры не заданы, берем из текущей настройки ротации
+	
+	if (Period==0 && lSize==0) // Параметры не заданы, нужно ротировать
 	{
 		return true;
 	}
+	
+	int iPeriod(Period);
+	Poco::Int64 iSize(lSize);
+
 	if (_force && items[currIndex].shift) return true;
 	//if (iPeriod==0 && iSize==0) return false; // Все равно не заданы
 	if (iPeriod>0) //задан период обрабтки

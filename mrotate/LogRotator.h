@@ -109,6 +109,9 @@ private:
 	//! Выполнить скрипт до/после ротации
 	void executeScript(const std::string &script);
 	
+	//! Определят нужна ли ротация при режиме shift для записи indx
+	bool isNeedRotate(int indx);
+
 	//! Преобразование строки в int64
 	//unsigned long int convertSize(std::string &strSize);
 	//! Преобразовать target к полному пути
