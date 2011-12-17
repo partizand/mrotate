@@ -99,7 +99,7 @@ void LogRotator::rotate()
 			if (items[i].periodMode!=Rotate::None) // Ротация по расписанию
 			{
 				// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
-				if (isNeedRotate(i))
+				if (_force || isNeedRotate(i))
 				{
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
 				if (!_debugMode)

@@ -1,5 +1,5 @@
-mRotate 
-=======
+mRotate 0.2
+===========
 
 //Log rotation for Windows
 
