@@ -99,7 +99,11 @@ void LogRotator::rotate()
 			if (items[i].periodMode!=Rotate::None) // Ротация по расписанию
 			{
 				// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
+				if (isNeedRotate(i))
+				{
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
+				rstatus.setDate(items[i].confName,items[i].name); // Сохраняем дату ротации
+				}
 			}
 			else if (items[i].limitSize>0) // Ротация по размеру
 			{
@@ -179,22 +183,49 @@ void LogRotator::executeScript(const std::string &script)
 bool LogRotator::isNeedRotate(int indx)
 {
 if (!items[indx].shift) return false;
-Timestamp nowDate;
-Timestamp lastRotateDate=rstatus.getDate(items[indx].confName,items[indx].name);
-Timespan diffTime(0,23,0,0,0);  //Сколько нужно отнять
+bool ret=false;
+Timestamp nowStamp;
+DateTime nowDate(nowStamp);
+Timestamp lastStamp=rstatus.getDate(items[indx].confName,items[indx].name);
+DateTime lastDate(lastStamp);
+
+int nowYear,lastYear,nowMonth,lastMonth,nowDay,lastDay,nowWeek,lastWeek;
+	nowYear=nowDate.year();
+	nowMonth=nowDate.month();
+	lastYear=lastDate.year();
+	lastMonth=lastDate.month();
+	nowDay=nowDate.day();
+	lastDay=lastDate.day();
+
 switch(items[indx].periodMode)
 {
 case Rotate::Daily:
-	diffTime.assign(0,23,0,0,0);  //Сколько нужно отнять
+	if ((nowYear!=lastYear) || (nowMonth!=lastMonth) || (nowDay!=lastDay))
+	{
+		ret=true;
+	}
 	break;
 case Rotate::Weekly:
-	diffTime.assign(6,23,0,0,0);  //Сколько нужно отнять
+	nowWeek=nowDate.week();
+	lastWeek=lastDate.week();
+	if (nowWeek==0) // Нужно смотреть на предыдущую неделю в предыдущем году
+	{
+		nowWeek=53;
+		--nowYear;
+	}
+	if ((nowYear!=lastYear) || (nowWeek!=lastWeek))
+	{
+		ret=true;
+	}
 	break;
 case Rotate::Monthly:
-	diffTime.assign(29,23,0,0,0);  //Сколько нужно отнять
+	if ((nowYear!=lastYear) || (nowMonth!=lastMonth))
+	{
+		ret=true;
+	}
 	break;
 }
-
+return ret;
 }
 
 //------------------------------------------------------------------------
@@ -589,6 +620,26 @@ int i;
 				ret=false;
 				entryOk=false;
 				poco_error_f1(*log,"Postrotate script %s not found",items[i].postRotate);
+			}
+
+		}
+		// Указано хоть что-то для ротации
+		if (items[i].shift)
+		{
+			if (items[i].limitSize==0 && items[i].periodMode==Rotate::None)
+			{
+				ret=false;
+				entryOk=false;
+				log->error("Nothing TODO. Size and Period are zero");
+			}
+		}
+		else
+		{
+			if (items[i].limitSize==0 && items[i].period==0 && items[i].keepPeriod==0)
+			{
+				ret=false;
+				entryOk=false;
+				log->error("Nothing TODO. Size, Period and Keep are zero");
 			}
 
 		}

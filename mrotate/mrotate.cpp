@@ -132,6 +132,12 @@ protected:
 				.repeatable(true)
 				.argument("file")
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadEntries)));
+		options.addOption(
+			Option("status", "s", "Set status filename")
+				.required(false)
+				.repeatable(false)
+				.argument("file")
+				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleStatusFile)));
 	}
 	
 	void handleHelp(const std::string& name, const std::string& value)
@@ -176,6 +182,10 @@ protected:
 	void handleLoadArh(const std::string& name, const std::string& value)
 	{
 		rotator.archiver.load(value); // Грузим файл архиватора
+	}
+	void handleStatusFile(const std::string& name, const std::string& value)
+	{
+		rotator.setStatusFileName(value); // Установка файла статуса
 	}
 	void handleLoadEntries(const std::string& name, const std::string& value)
 	{
