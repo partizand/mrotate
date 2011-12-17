@@ -28,20 +28,27 @@
 
 namespace Rotate
 {
-	//enum RotateType{Single,Multiple};
 	//! Режим обработки даты файла
 	enum DateMode {Created,Modified,Last,Now};
-	//! Режим замены даты в параметрах %dd
-	//enum DateReplaceMode{Now,Create,Modify};
-
+	//! Режим ротации при shift	
+	enum PeriodMode {None,Daily,Weekly,Monthly};
+	//! Получение режима обработки даты из строки
 	Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode);
+	//! Получение периода ротации из строки
+	Rotate::PeriodMode periodModeFromString(const std::string &str);
 }
 
 //! Одна запись настроек ротации
 class RotateEntry
 {
 public:
-	RotateEntry(void);
+	//RotateEntry(void);
+	//! Создание записи ротации по минимуму, остальное по умолчанию
+	RotateEntry(const std::string &ConfName,
+				const std::string &Name, 
+				const std::string &Source,
+				const std::string &ArchiverName);
+	//! Создание записи ротации со всеми параметрами
 	RotateEntry(const std::string &Name, const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		bool Shift,
@@ -52,6 +59,9 @@ public:
 		const std::string &PostRotate
 		);
 	~RotateEntry(void);
+	//! Установить период ротации для Shift
+	void setPeriodMode(const std::string &pMode);
+	
 	//! Имя записи
 	std::string name;
 	//! Источник
@@ -89,6 +99,10 @@ public:
 	std::string  preRotate;
 	//! Скрипт выполнение после ротации
 	std::string postRotate;
+	//! Режим ротации при shift
+	Rotate::PeriodMode periodMode;
+	//! Имя файла с настройкой, без расширения
+	std::string confName;
 	
 };
 

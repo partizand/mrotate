@@ -32,8 +32,54 @@ using namespace Poco;
 
 RotateEntry::RotateEntry(void)
 {
+	recurse=false;
+	period=0;
+	limitSize=0;
+	keepPeriod=0;
+	shift=false;
+	preRotate="";
+	postRotate="";
+	targetMask="%FileName";
+	dateMode=Rotate::Last;
+	dateReplaceMode=Rotate::Now;
 }
-
+//! Создание записи ротации по минимуму, остальное по умолчанию
+RotateEntry::RotateEntry(const std::string &ConfName,
+				const std::string &Name, 
+				const std::string &Source,
+				const std::string &ArchiverName):
+	confName(ConfName),
+	name(Name),
+	source(Source),
+	archiverName(ArchiverName)
+	
+{
+	// Вычисляемые значения. Маска файлов источника
+	Path sPath(source);
+	sPath.makeFile();
+	sourceMask=sPath.getFileName();
+	// Вычисляемые значения. Каталог источника
+	sPath.setFileName("");
+	sourceDir=sPath.toString();
+	
+	// Значения по умолчанию
+	recurse=false;
+	period=0;
+	limitSize=0;
+	keepPeriod=0;
+	shift=false;
+	preRotate="";
+	postRotate="";
+	targetMask="%FileName";
+	dateMode=Rotate::Last;
+	dateReplaceMode=Rotate::Now;
+}
+//! Установить период ротации для Shift
+void RotateEntry::setPeriodMode(const std::string &pMode)
+{
+	periodMode=Rotate::periodModeFromString(pMode);
+}
+	
 RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		bool Shift,
@@ -125,4 +171,28 @@ Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defa
 	return ret;
 	
 }
+
+//! Получение периода ротации из строки
+Rotate::PeriodMode periodModeFromString(const std::string &str)
+{
+	Rotate::PeriodMode ret=Rotate::None;
+	if (!str.empty())
+	{
+		if (icompare(str,0,1,"D")==0)
+			{
+				ret=Rotate::Daily;
+			}
+		else if (icompare(str,0,1,"W")==0)
+			{
+				ret=Rotate::Weekly;
+			}
+		else if (icompare(str,0,1,"M")==0)
+			{
+				ret=Rotate::Monthly;
+			}
+		
+	}
+	return ret;
+}
+
 }

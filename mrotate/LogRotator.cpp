@@ -659,6 +659,7 @@ if (!RootKeys.empty())
 
 				//items.push_back(tmpItem);
 				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,Shift,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
+				
 				//cout<< *it<<endl;
 			 
 			}
