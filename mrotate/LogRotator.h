@@ -35,6 +35,7 @@
 
 #include "RotateEntry.h"
 #include "Archiver.h"
+#include "RStatus.h"
 
 //! Осущствляет ротацию логов
 class LogRotator
@@ -54,6 +55,9 @@ public:
 	void setDebugMode();
 	//! Установить режим force
 	void setForceMode();
+	//! Устанавливает имя файла статусов ротаций
+	void setStatusFileName(const std::string &fileName);
+
 	//! Возвращает версию
 	std::string getVersion();
 	//! Архиватор
@@ -102,11 +106,16 @@ private:
 	//! Возвращает дату в зависимости от режима dateMode
 	Poco::DateTime getDate(const Poco::File &pFile,Rotate::DateMode dateMode);
 	
+	//! Выполнить скрипт до/после ротации
+	void executeScript(const std::string &script);
 	
 	//! Преобразование строки в int64
 	//unsigned long int convertSize(std::string &strSize);
 	//! Преобразовать target к полному пути
 	//std::string getFullTarget(const std::string &targetPath,const std::string &Source);
+
+	//! Сохранение дат ротаций
+	RStatus rstatus;
 
 	Poco::Logger *log;
 };

@@ -43,29 +43,36 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-const string ver="0.1"; // Версия ротатора
+const string ver="0.2"; // Версия ротатора
 
 LogRotator::LogRotator(Poco::Logger &logger):
 	archiver(logger),
 	_debugMode(false),
-	_force(false)
+	_force(false),
+	rstatus(logger)
 {
 	log=&logger;
 }
 
-
+//------------------------------------------------------------------------
 LogRotator::~LogRotator(void)
 {
+}
+//! Устанавливает имя файла статусов ротаций
+void LogRotator::setStatusFileName(const std::string &fileName)
+{
+	rstatus.setStatusFileName(fileName);
 }
 //------------------------------------------------------------------------
 //! Ротировать файлы (основная функция)
 void LogRotator::rotate()
 {
-	int i,ret;
+	int i;
 	bool suc;
 	string fileMask;
 	//string oldArhMask;
-	vector<string> vectArgs;
+	//vector<string> vectArgs;
+	rstatus.load();
 	// Перебираем все записи
 	for (i=0;i<items.size();++i)
 	{
@@ -83,19 +90,8 @@ void LogRotator::rotate()
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
 		// Скрипт перед ротацией
-		if (!items[i].preRotate.empty())
-		{
-			if (!_debugMode)
-			{
-			//poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
-			ret=Executer::execute(items[i].preRotate,vectArgs,*log);
-			poco_information_f2(*log,"Executed %s. Exit code %i",items[i].preRotate,ret);
-			}
-			else
-			{
-			poco_information_f1(*log,"[Debug] Launch process %s.",items[i].preRotate);
-			}
-		}
+		executeScript(items[i].preRotate);
+		
 		if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 		{
 		
@@ -111,6 +107,8 @@ void LogRotator::rotate()
 			rotateFiles(fileMask,destDir,destDir,items[i].recurse,false,items[i].keepPeriod,0);
 		}
 		// Скрипт после ротации
+		executeScript(items[i].postRotate);
+		/*
 		if (!items[i].postRotate.empty())
 		{
 			if (!_debugMode)
@@ -126,8 +124,33 @@ void LogRotator::rotate()
 			
 			
 		}
+		*/
 	}
 }
+//! Выполнить скрипт до/после ротации
+void LogRotator::executeScript(const std::string &script)
+{
+
+		if (!script.empty())
+		{
+			if (!_debugMode)
+			{
+			vector<string> vectArgs;
+			//poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
+			int ret=Executer::execute(script,vectArgs,*log);
+			poco_information_f2(*log,"Executed %s. Exit code %i",script,ret);
+			}
+			else
+			{
+			poco_information_f1(*log,"[Debug] Launch process %s.",script);
+			}
+			
+			
+		}
+}
+
+	
+
 //------------------------------------------------------------------------
 //! Ротировать файлы/удалить архивы
 void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period,Poco::Int64 lSize)
