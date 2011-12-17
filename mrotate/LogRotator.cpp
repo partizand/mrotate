@@ -103,10 +103,10 @@ void LogRotator::rotate()
 				{
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
 				if (!_debugMode)
-				{
-				rstatus.setDate(items[i].confName,items[i].name); // Сохраняем дату ротации
-				rstatus.save();
-				}
+					{
+					rstatus.setDate(items[i].confName,items[i].name); // Сохраняем дату ротации
+					//rstatus.save();
+					}
 				}
 			}
 			else if (items[i].limitSize>0) // Ротация по размеру

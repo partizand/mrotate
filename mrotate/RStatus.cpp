@@ -10,6 +10,7 @@
 //#include <Poco\DirectoryIterator.h>
 #include <Poco\NumberParser.h>
 #include <Poco\NumberFormatter.h>
+#include <Poco\DateTimeFormatter.h>
 //#include <Poco\Glob.h>
 #include <Poco\Timestamp.h>
 
@@ -29,7 +30,7 @@ statusFileName("mrotate.status")
 
 RStatus::~RStatus(void)
 {
-	save();
+	//save();
 	pConf->release();
 }
 //======================================================
@@ -74,8 +75,7 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 
 	if (!NumberParser::tryParse64(sDate,iDate)) return rDate;
 
-	Timestamp tsDate;
-	tsDate.epochTime(); //fromUtcTime(iDate);// fromEpochTime(iDate);
+	Timestamp tsDate=Timestamp::fromEpochTime(iDate); //fromUtcTime(iDate);// fromEpochTime(iDate);
 	
 	DateTime retDate(tsDate);
 	//rDate=iDate;
@@ -96,11 +96,13 @@ void RStatus::setDate(const std::string &confName,const std::string &entryName)
 	Timestamp nowDate;
 	Int64 iDate=nowDate.epochTime();// utcTime();// epochTime();// epochMicroseconds();
 	string strDate=NumberFormatter::format(iDate);
+	string strmanDate=DateTimeFormatter::format(nowDate,"%Y-%m-%d %H:%M"); 
 
 	string KeyName=confName+"."+entryName;
 
 	pConf->setString(KeyName,strDate);
-	
+	pConf->setString(KeyName+".Date",strmanDate);
+	save();
 }
 //------------------------------------------------------------------------
 //! Загрузка параметров из файла
