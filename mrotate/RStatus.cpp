@@ -75,7 +75,7 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 	if (!NumberParser::tryParse64(sDate,iDate)) return rDate;
 
 	Timestamp tsDate;
-	tsDate.fromUtcTime(iDate);// fromEpochTime(iDate);
+	tsDate.epochTime(); //fromUtcTime(iDate);// fromEpochTime(iDate);
 	
 	DateTime retDate(tsDate);
 	//rDate=iDate;
@@ -94,7 +94,7 @@ void RStatus::setDate(const std::string &confName,const std::string &entryName)
 	//if (pConf.isNull()) return;
 	if (pConf==0) return;
 	Timestamp nowDate;
-	Int64 iDate=nowDate.utcTime();// epochTime();// epochMicroseconds();
+	Int64 iDate=nowDate.epochTime();// utcTime();// epochTime();// epochMicroseconds();
 	string strDate=NumberFormatter::format(iDate);
 
 	string KeyName=confName+"."+entryName;
