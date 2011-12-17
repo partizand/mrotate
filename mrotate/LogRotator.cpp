@@ -103,6 +103,7 @@ void LogRotator::rotate()
 				{
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
 				rstatus.setDate(items[i].confName,items[i].name); // Сохраняем дату ротации
+				rstatus.save();
 				}
 			}
 			else if (items[i].limitSize>0) // Ротация по размеру
@@ -186,8 +187,8 @@ if (!items[indx].shift) return false;
 bool ret=false;
 Timestamp nowStamp;
 DateTime nowDate(nowStamp);
-Timestamp lastStamp=rstatus.getDate(items[indx].confName,items[indx].name);
-DateTime lastDate(lastStamp);
+//Timestamp lastStamp=rstatus.getDate(items[indx].confName,items[indx].name);
+DateTime lastDate=rstatus.getDate(items[indx].confName,items[indx].name);
 
 int nowYear,lastYear,nowMonth,lastMonth,nowDay,lastDay,nowWeek,lastWeek;
 	nowYear=nowDate.year();
@@ -666,10 +667,13 @@ void LogRotator::load(const std::string &fileName)
 {
 // Определение типа файла по расширению
 	Poco::Path pPath(fileName);
+	pPath.makeFile();
 	Poco::File pFile(pPath);
 
 	if (!pFile.exists()) return; // Файла нет
 	if (!pFile.canRead()) return; // Файл не может быть прочитан
+
+	string confName=pPath.getBaseName();
 
 	string Ext=pPath.getExtension();
 	toLowerInPlace(Ext); // Расширение маленькими буквами
@@ -687,7 +691,7 @@ void LogRotator::load(const std::string &fileName)
 	}
 	if (pConf.isNull()) return; // Нет нужного расширения
 	poco_information_f1(*log,"Loading config file %s.",fileName);
-	load(pConf);
+	load(pConf,confName);
 }
 //------------------------------------------------------------------------
 //! Загрузка настроек ротации

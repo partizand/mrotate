@@ -56,8 +56,7 @@ public:
 		_checkRequested(false),_debugReq(false),
 		rotator(logger())
 	{
-		std::string statusFile=config().getString("application.dir","")+"mrotate.status";
-		rotator.setStatusFileName(statusFile);
+		
 		//bak=new Backup(logger());
 		poco_information_f1(logger(),"mrotate v.%s. Rotate text logs for Windows.",rotator.getVersion());
 		//logger().information("mrotate v.0.1. Rotate logs utility for Windows");
@@ -207,8 +206,13 @@ protected:
 	{
 		if (!_helpRequested)
 		{
+			std::string statusFile=config().getString("application.dir","")+"mrotate.status";
+			rotator.setStatusFileName(statusFile);
+			
 			std::string arhFile=config().getString("application.dir","")+"archivers.ini";
 			rotator.archiver.load(arhFile); // Грузим пользовательские архиваторы
+
+
 			if (!_loadRequested) 
 			{
 				logger().information("Loading standart config file.");

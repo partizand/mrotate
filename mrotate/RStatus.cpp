@@ -2,7 +2,7 @@
 #include "RStatus.h"
 
 //#include <Poco\Util\IniFileConfiguration.h>
-#include <Poco\Util\PropertyFileConfiguration.h>
+
 #include <Poco\AutoPtr.h>
 #include <Poco\String.h>
 #include <Poco\File.h>
@@ -29,6 +29,8 @@ statusFileName("mrotate.status")
 
 RStatus::~RStatus(void)
 {
+	save();
+	pConf->release();
 }
 //======================================================
 //! Устанавливает каталог сохранения файлов конфигураций
@@ -36,31 +38,52 @@ void RStatus::setStatusFileName(const std::string &fName)
 {
 	statusFileName=fName;
 }
-
+//------------------------------------------------------------------------
+//! Сохранить статусы
+void RStatus::save()
+{
+try
+	{
+	pConf->save(statusFileName);
+	}
+	catch (exception e)
+	{
+	poco_error_f1(*log,"Exception then saving status. %s",statusFileName);
+	}
+}
 //------------------------------------------------------------------------
 //! Возвращает дату последней ротации
-Poco::Timestamp RStatus::getDate(const std::string &confName,const std::string &entryName)
+Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &entryName)
 {
-	Timestamp rDate;
-	if (pConf.isNull()) return rDate;
+	//Timestamp stampDate;
+	DateTime rDate; // Текущая дата
 	
+	//if (pConf.isNull()) return rDate;
+	if (pConf==0) return rDate;
+	rDate.assign(2001,1,1); // Начало 2001 года
 	string sDate;
 	Int64 iDate;
 
 	string KeyName=confName+"."+entryName;
 
 	sDate=pConf->getString(KeyName,"");
+	
 	if (sDate.empty()) return rDate;
+
+	
 
 	if (!NumberParser::tryParse64(sDate,iDate)) return rDate;
 
-	rDate.fromEpochTime(iDate);
+	Timestamp tsDate;
+	tsDate.fromUtcTime(iDate);// fromEpochTime(iDate);
+	
+	DateTime retDate(tsDate);
 	//rDate=iDate;
 	//Timestamp tsDate(iDate);
 	
 	//Timestamp rDate(iDate);
 
-	return rDate;
+	return retDate;
 
 
 }
@@ -68,9 +91,10 @@ Poco::Timestamp RStatus::getDate(const std::string &confName,const std::string &
 //! Сохраняет дату последней ротации. Дата становится текущей
 void RStatus::setDate(const std::string &confName,const std::string &entryName)
 {
-	if (pConf.isNull()) return;
+	//if (pConf.isNull()) return;
+	if (pConf==0) return;
 	Timestamp nowDate;
-	Int64 iDate=nowDate.epochTime();// epochMicroseconds();
+	Int64 iDate=nowDate.utcTime();// epochTime();// epochMicroseconds();
 	string strDate=NumberFormatter::format(iDate);
 
 	string KeyName=confName+"."+entryName;
@@ -85,12 +109,22 @@ void RStatus::load()
 // Определение типа файла по расширению
 	//Poco::Path pPath(fileName);
 	Poco::File pFile(statusFileName);
-
-	if (!pFile.exists()) return; // Файла нет
-	if (!pFile.canWrite()) return; // Файл не может быть прочитан/записан
+	
+	if (!pFile.exists()) // Файла нет, создаем пустую конфигурацию
+	{
+		pConf=new PropertyFileConfiguration();
+		return;
+	}
+	
+	if (!pFile.canWrite()) 
+	{
+		poco_error_f1(*log,"Can't write into status file. %s",statusFileName);
+		return; // Файл не может быть прочитан/записан
+	}
 
 	//AutoPtr<AbstractConfiguration> pConf;
-
+	
+	// Создаем конфигурацию из файла
 	pConf=new PropertyFileConfiguration(statusFileName);
 	
 	/*
