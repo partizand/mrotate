@@ -26,10 +26,11 @@
 
 #include <Poco\Path.h>
 #include <Poco\String.h>
+#include <Poco\NumberParser.h>
 
 using namespace std;
 using namespace Poco;
-
+/*
 RotateEntry::RotateEntry(void)
 {
 	recurse=false;
@@ -43,6 +44,7 @@ RotateEntry::RotateEntry(void)
 	dateMode=Rotate::Last;
 	dateReplaceMode=Rotate::Now;
 }
+*/
 //! Создание записи ротации по минимуму, остальное по умолчанию
 RotateEntry::RotateEntry(const std::string &ConfName,
 				const std::string &Name, 
@@ -70,16 +72,70 @@ RotateEntry::RotateEntry(const std::string &ConfName,
 	shift=false;
 	preRotate="";
 	postRotate="";
-	targetMask="%FileName";
+	setTarget("","");
+	//targetMask="%FileName";
 	dateMode=Rotate::Last;
 	dateReplaceMode=Rotate::Now;
 }
-//! Установить период ротации для Shift
-void RotateEntry::setPeriodMode(const std::string &pMode)
+//! Установить период ротации 
+void RotateEntry::setPeriod(const std::string &Period)
 {
-	periodMode=Rotate::periodModeFromString(pMode);
+	if (shift)
+	{
+		periodMode=Rotate::periodModeFromString(Period);
+		period=0;
+	}
+	else
+	{
+		int iPeriod=0;
+		NumberParser::tryParse(Period,iPeriod);
+		period=iPeriod;
+	}
 }
+//! Установить размер
+void RotateEntry::setSize(std::string &lSize)
+{
+	limitSize=Rotate::convertSize(lSize);
+}
+//! Установить приемник
+void RotateEntry::setTarget(const std::string &TargetDir,const std::string &TargetMask)
+{
+	targetDir=TargetDir;
+	targetMask=TargetMask;
+	// Заполнение target если оно пусто
+	if (targetMask.empty())
+	{
+		if (shift)
+		{
+		targetMask="%FileName.%Index";
+		}
+		else
+		{
+		targetMask="%FileName";
+		}
+
+	}
 	
+	if (targetDir.empty())
+	{
+		targetDir=sourceDir;
+	}
+	Path tPath(targetDir);
+	tPath.makeDirectory();
+	tPath.setFileName(targetMask);
+	targetPath=tPath.toString();
+}
+//! Установить режим даты
+void RotateEntry::setDateMode(const std::string &DateMode)
+{
+dateMode=Rotate::dateModeFromString(DateMode,Rotate::Last); // Дата создания по умолчанию
+}
+	//! Установить режим замены даты
+void RotateEntry::setDateReplaceMode(const std::string &DateReplaceMode)
+{
+dateReplaceMode=Rotate::dateModeFromString(DateReplaceMode,Rotate::Now); // Текущая дата по умолчанию
+}
+/*
 RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		bool Shift,
@@ -139,6 +195,7 @@ RotateEntry::RotateEntry(const std::string &Name,const std::string &Source,bool 
 	dateReplaceMode=Rotate::dateModeFromString(DateReplaceMode,Rotate::Now); // Текущая дата по умолчанию
 	
 }
+	*/
 RotateEntry::~RotateEntry(void)
 {
 }
@@ -193,6 +250,37 @@ Rotate::PeriodMode periodModeFromString(const std::string &str)
 		
 	}
 	return ret;
+}
+//------------------------------------------------------------------------
+//! Преобразование размера в int64 (Т.е. строка может содержать K и M)
+Poco::Int64 convertSize(std::string &strSize)
+{
+	if (strSize.empty()) return 0;
+	Int64 iSize;
+	Int64 multipl=1;
+	// Преобразуем строку в число
+	toUpperInPlace(strSize);
+	string::size_type iK=strSize.find("K");
+	string::size_type iM=strSize.find("M");
+	if (iK!=string::npos) // Найден K
+	{
+		multipl=1024;
+		strSize.erase(iK,1);
+	}
+	if (iM!=string::npos) // Найден M
+	{
+		multipl=1024*1024;
+		strSize.erase(iM,1);
+	}
+	if (NumberParser::tryParse64(strSize,iSize))
+	{
+		return iSize*multipl;
+	}
+	else
+	{
+		//log->error("Error parsing size in entry");
+		return 0;
+	}
 }
 
 }

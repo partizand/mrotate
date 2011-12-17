@@ -42,6 +42,9 @@
     <ClInclude Include="Executer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Executer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RStatus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

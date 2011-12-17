@@ -130,7 +130,7 @@ void LogRotator::rotate()
 }
 //------------------------------------------------------------------------
 //! Ротировать файлы/удалить архивы
-void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period,unsigned long int lSize)
+void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period,Poco::Int64 lSize)
 {
 		// Обрабатываем файлы в каталоге
 	//string fileMask=pSourceMask.getFileName();
@@ -311,14 +311,14 @@ int LogRotator::getIndexOfFile(const std::string &baseFileName,const std::string
 }
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
-bool LogRotator::isRotateFile(Poco::File &pFile,int Period,unsigned long int lSize)
+bool LogRotator::isRotateFile(Poco::File &pFile,int Period,Poco::Int64 lSize)
 {
 if (!pFile.exists()) return false; // Файла нет
 	if (!pFile.isFile()) return false; // Это не файл
 	if (!pFile.canRead()) return false; // Файл не может быть прочитан
 
 	int iPeriod(Period);
-	unsigned long int iSize(lSize);
+	Poco::Int64 iSize(lSize);
 	if (Period==0 && lSize==0) // Параметры не заданы, берем из текущей настройки ротации
 	{
 		return true;
@@ -445,7 +445,7 @@ removeFile(pFile);
 
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
-bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,unsigned long int lSize/*=0*/)
+bool LogRotator::isRotateFile(const std::string &fileName,int Period/*=0*/,Poco::Int64 lSize/*=0*/)
 {
 Poco::File pFile(fileName);
 return isRotateFile(pFile,Period,lSize);
@@ -568,13 +568,15 @@ void LogRotator::load(const std::string &fileName)
 }
 //------------------------------------------------------------------------
 //! Загрузка настроек ротации
-void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf)
+void LogRotator::load(const Poco::Util::AbstractConfiguration *pConf,const std::string &confName)
 {
-//RotateEntry tmpItem;
-string Source,ArchiverName,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate;
-int Period,KeepPeriod;
-bool Recurse,Shift;
-unsigned long int LimitSize;
+//RotateEntry *re;
+//string Period;
+//string Source,ArchiverName,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate;
+string Source,ArchiverName,TargetDir,TargetMask;
+//int KeepPeriod;
+//bool Recurse,Shift;
+//unsigned long int LimitSize;
 
 AbstractConfiguration::Keys RootKeys;
 pConf-> keys("",RootKeys); // Список корневых ключей
@@ -584,42 +586,21 @@ if (!RootKeys.empty())
 	//RotateEntry re;
 	int i;
 	for (i=0;i<RootKeys.size();++i)
-	
-	 //for (AbstractConfiguration::Keys::const_iterator it = RootKeys.begin(); it != RootKeys.end(); ++it)
-			{
-				// Базовые ключи
-				//KeyName=RootKeys.at(i);
-				if (icompare(RootKeys.at(i),"application")==0) continue;
-				if (icompare(RootKeys.at(i),"system")==0) continue;
-				if (icompare(RootKeys.at(i),"logging")==0) continue;
+	{
 				
-				poco_debug_f1(*log,"Loading entry %s.",RootKeys.at(i));
+		if (icompare(RootKeys.at(i),"application")==0) continue;
+		if (icompare(RootKeys.at(i),"system")==0) continue;
+		if (icompare(RootKeys.at(i),"logging")==0) continue;
+		// Базовые ключи
+		poco_debug_f1(*log,"Loading entry %s.",RootKeys.at(i));
 
-				//KeyName=*it+".source";
+				
 				// Источник
 				KeyName=RootKeys.at(i)+".Source";
 				Source=pConf->getString(KeyName,"");
 				if (Source.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Source missing",RootKeys.at(i));
-					continue;
-				}
-				//Период
-				KeyName=RootKeys.at(i)+".Period";
-				Period=pConf->getInt(KeyName,0);
-				
-				// Размер
-				KeyName=RootKeys.at(i)+".Size";
-				KeyValue=pConf->getString(KeyName,"");
-				LimitSize=convertSize(KeyValue);
-				
-				// Keep Период
-				KeyName=RootKeys.at(i)+".Keep";
-				KeepPeriod=pConf->getInt(KeyName,0);
-				
-				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
-				{
-					poco_error_f1(*log,"Skip entry %s. Period, KeepPeriod and size is null",RootKeys.at(i));
 					continue;
 				}
 				// Архиватор
@@ -631,35 +612,70 @@ if (!RootKeys.empty())
 					poco_error_f1(*log,"Skip entry %s. Archiver is empty",RootKeys.at(i));
 					continue;
 				}
+				// Создаем объект
+				RotateEntry re(confName,RootKeys.at(i),Source,ArchiverName);
+				//re=new RotateEntry(confName,RootKeys.at(i),Source,ArchiverName);
+				
+				// Режим сдвига. Доложен идти первым!
+				KeyName=RootKeys.at(i)+".Shift";
+				re.shift=pConf->getBool(KeyName,false);
+
+				//Период
+				KeyName=RootKeys.at(i)+".Period";
+				KeyValue=pConf->getString(KeyName,"0");
+				re.setPeriod(KeyValue);
+
+				// Размер
+				KeyName=RootKeys.at(i)+".Size";
+				KeyValue=pConf->getString(KeyName,"");
+				re.setSize(KeyValue);
+				
+				// Keep Период
+				KeyName=RootKeys.at(i)+".Keep";
+				re.keepPeriod=pConf->getInt(KeyName,0);
+				
+				/*
+				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
+				{
+					poco_error_f1(*log,"Skip entry %s. Period, KeepPeriod and size is null",RootKeys.at(i));
+					continue;
+				}
+				*/
+
 				// Target Dir
 				KeyName=RootKeys.at(i)+".TargetDir";
 				TargetDir=pConf->getString(KeyName,"");
 				// Target Mask
 				KeyName=RootKeys.at(i)+".TargetMask";
 				TargetMask=pConf->getString(KeyName,"");
+				
+				re.setTarget(TargetDir,TargetMask);
+
 				// Date mode
 				KeyName=RootKeys.at(i)+".DateMode";
-				FDateMode=pConf->getString(KeyName,"");
+				KeyValue=pConf->getString(KeyName,"");
+				re.setDateMode(KeyValue);
+
 				// Date Replace Mode
 				KeyName=RootKeys.at(i)+".DateReplace";
-				DateReplaceMode=pConf->getString(KeyName,"");
+				KeyValue=pConf->getString(KeyName,"");
+				re.setDateReplaceMode(KeyValue);
+
 				// Рекурсивность
 				KeyName=RootKeys.at(i)+".Recurse";
-				Recurse=pConf->getBool(KeyName,false);
-				//RotateEntry tmpItem(Source,Period,LimitSize,ArchiverName,KeepPeriod,TargetDir,TargetMask);
+				re.recurse=pConf->getBool(KeyName,false);
+				
 				// Скрипт перед ротацией
 				KeyName=RootKeys.at(i)+".PreRotate";
-				PreRotate=pConf->getString(KeyName,"");
+				re.preRotate=pConf->getString(KeyName,"");
 				// Скрипт после ротации
 				KeyName=RootKeys.at(i)+".PostRotate";
-				PostRotate=pConf->getString(KeyName,"");
-				// Режим сдвига
-				KeyName=RootKeys.at(i)+".Shift";
-				Shift=pConf->getBool(KeyName,false);
-
-				//items.push_back(tmpItem);
-				items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,Shift,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
+				re.postRotate=pConf->getString(KeyName,"");
 				
+				items.push_back(re);
+				//items.push_back(tmpItem);
+				//items.push_back(RotateEntry(RootKeys.at(i),Source,Recurse,Period,LimitSize,ArchiverName,KeepPeriod,Shift,TargetDir,TargetMask,FDateMode,DateReplaceMode,PreRotate,PostRotate));
+				//delete(re);
 				//cout<< *it<<endl;
 			 
 			}
@@ -668,6 +684,7 @@ if (!RootKeys.empty())
 
 //------------------------------------------------------------------------
 //! Преобразование размера в int64 (Т.е. строка может содержать K и M)
+/*
 unsigned long int LogRotator::convertSize(std::string &strSize)
 {
 	if (strSize.empty()) return 0;
@@ -697,6 +714,7 @@ unsigned long int LogRotator::convertSize(std::string &strSize)
 		return 0;
 	}
 }
+*/
 //! Возвращает версию
 std::string LogRotator::getVersion()
 {

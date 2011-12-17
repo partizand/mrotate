@@ -45,7 +45,7 @@ public:
 	//! Загрузка настроек ротации из файла
 	void load(const std::string &fileName);
 	//! Загрузка настроек ротации
-	void load(const Poco::Util::AbstractConfiguration *pConf);
+	void load(const Poco::Util::AbstractConfiguration *pConf,const std::string &confName="mrotate");
 	//! Ротировать файлы (основная функция)
 	void rotate();
 	//! Проверка загруженных записей ротации на ошибки
@@ -75,11 +75,11 @@ private:
 	//void getFileList(std::vector<std::string> &fileList, const std::string &pathMask, int Period=0,unsigned long int lSize=0);
 	//void getFileList(std::vector<std::string> &fileList,const Poco::Path &pathMask,bool recurse, int Period=0,unsigned long int lSize=0);
 	
-	void rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period=0,unsigned long int lSize=0);
+	void rotateFiles(const std::string &fileMask,const Poco::Path &pSourceDir,const Poco::Path pDestDir,bool recurse,bool rotate,int Period=0,Poco::Int64 lSize=0);
 	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
-	bool isRotateFile(const std::string &fileName,int Period=0,unsigned long int lSize=0);
+	bool isRotateFile(const std::string &fileName,int Period=0,Poco::Int64 lSize=0);
 	//! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
-	bool isRotateFile(Poco::File &pFileName,int Period=0,unsigned long int lSize=0);
+	bool isRotateFile(Poco::File &pFileName,int Period=0,Poco::Int64 lSize=0);
 	//! Ротировать заданный файл
 	void rotateFile(const Poco::File &pFile,const Poco::Path &destDir);
 	
@@ -104,7 +104,7 @@ private:
 	
 	
 	//! Преобразование строки в int64
-	unsigned long int convertSize(std::string &strSize);
+	//unsigned long int convertSize(std::string &strSize);
 	//! Преобразовать target к полному пути
 	//std::string getFullTarget(const std::string &targetPath,const std::string &Source);
 

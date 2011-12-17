@@ -25,6 +25,8 @@
 
 #include "stdafx.h"
 
+#include <Poco\Poco.h>
+
 
 namespace Rotate
 {
@@ -36,6 +38,8 @@ namespace Rotate
 	Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode);
 	//! Получение периода ротации из строки
 	Rotate::PeriodMode periodModeFromString(const std::string &str);
+	//! Преобразование размера в int64 (Т.е. строка может содержать K и M)
+	Poco::Int64 convertSize(std::string &strSize);
 }
 
 //! Одна запись настроек ротации
@@ -49,6 +53,7 @@ public:
 				const std::string &Source,
 				const std::string &ArchiverName);
 	//! Создание записи ротации со всеми параметрами
+	/*
 	RotateEntry(const std::string &Name, const std::string &Source,bool Recurse,int Period,unsigned long int LimitSize,
 		const std::string &ArchiverName,int KeepPeriod,
 		bool Shift,
@@ -58,10 +63,18 @@ public:
 		const std::string &PreRotate,
 		const std::string &PostRotate
 		);
+	*/
 	~RotateEntry(void);
-	//! Установить период ротации для Shift
-	void setPeriodMode(const std::string &pMode);
-	
+	//! Установить период (в зависимости от Shift)
+	void setPeriod(const std::string &Period);
+	//! Установить размер
+	void setSize(std::string &lSize);
+	//! Установить приемник
+	void setTarget(const std::string &TargetDir,const std::string &TargetMask);
+	//! Установить режим даты
+	void setDateMode(const std::string &DateMode);
+	//! Установить режим замены даты
+	void setDateReplaceMode(const std::string &DateReplaceMode);
 	//! Имя записи
 	std::string name;
 	//! Источник
@@ -76,7 +89,7 @@ public:
 	//! Период обработки
 	int period;
 	//! Ограничение размера
-	unsigned long int limitSize;
+	Poco::Int64 limitSize;
 	//! Имя архиватора, или none
 	std::string archiverName;
 	//! Тип ротации (много ежедневных файлов, или один)
