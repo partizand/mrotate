@@ -30,14 +30,17 @@
 
 namespace Rotate
 {
+	const int Daily=1;
+	const int Weekly=7;
+	const int Monthly=30;
 	//! Режим обработки даты файла
 	enum DateMode {Created,Modified,Last,First,Now};
 	//! Режим ротации при shift	
-	enum PeriodMode {None,Daily,Weekly,Monthly};
+	//enum PeriodMode {None,Daily,Weekly,Monthly};
 	//! Получение режима обработки даты из строки
 	Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode);
 	//! Получение периода ротации из строки
-	Rotate::PeriodMode periodModeFromString(const std::string &str);
+	//int periodModeFromString(const std::string &str);
 	//! Преобразование размера в int64 (Т.е. строка может содержать K и M)
 	Poco::Int64 convertSize(std::string &strSize);
 }
@@ -113,7 +116,7 @@ public:
 	//! Скрипт выполнение после ротации
 	std::string postRotate;
 	//! Режим ротации при shift
-	Rotate::PeriodMode periodMode;
+	//Rotate::PeriodMode periodMode;
 	//! Имя файла с настройкой, без расширения
 	std::string confName;
 	

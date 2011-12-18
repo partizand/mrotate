@@ -35,6 +35,7 @@
 #include <Poco\Glob.h>
 #include <Poco\Timestamp.h>
 #include <Poco\DateTime.h>
+#include <Poco\LocalDateTime.h>
 
 #include "ReplVar.h"
 #include "Executer.h"
@@ -95,24 +96,28 @@ void LogRotator::rotate()
 
 		if (items[i].shift) // Ротация в режиме сдвига
 		{
-			// Возможна ротация либо по расписанию либо по размеру
-			if (items[i].periodMode!=Rotate::None) // Ротация по расписанию
+			if (_force) 
 			{
-				// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
-				if (_force || isNeedRotate(i))
-				{
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
-				if (!_debugMode)
+			}
+			else
+			{
+			
+				// Возможна ротация либо по расписанию либо по размеру
+				if (items[i].period>0) // Ротация по расписанию
+				{
+					// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
+					if (isNeedRotate())
 					{
-					rstatus.setDate(items[i].confName,items[i].name); // Сохраняем дату ротации
-					//rstatus.save();
+					rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
+				
 					}
 				}
-			}
-			else if (items[i].limitSize>0) // Ротация по размеру
-			{
-				// Ротируем файлы
-			rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,items[i].limitSize);
+				else if (items[i].limitSize>0) // Ротация по размеру
+				{
+					// Ротируем файлы
+					rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,items[i].limitSize);
+				}
 			}
 
 
@@ -184,14 +189,14 @@ void LogRotator::executeScript(const std::string &script)
 }
 //------------------------------------------------------------------------
 //! Определят нужна ли ротация при режиме shift для записи indx
-bool LogRotator::isNeedRotate(int indx)
+bool LogRotator::isNeedRotate()
 {
-if (!items[indx].shift) return false;
+	if (!items[currIndex].shift) return false;
 bool ret=false;
-Timestamp nowStamp;
-DateTime nowDate(nowStamp);
+//Timestamp nowStamp;
+DateTime nowDate;//(nowStamp);
 //Timestamp lastStamp=rstatus.getDate(items[indx].confName,items[indx].name);
-DateTime lastDate=rstatus.getDate(items[indx].confName,items[indx].name);
+DateTime lastDate=rstatus.getDate(items[currIndex].confName,items[currIndex].name);
 
 int nowYear,lastYear,nowMonth,lastMonth,nowDay,lastDay,nowWeek,lastWeek;
 	nowYear=nowDate.year();
@@ -201,7 +206,7 @@ int nowYear,lastYear,nowMonth,lastMonth,nowDay,lastDay,nowWeek,lastWeek;
 	nowDay=nowDate.day();
 	lastDay=lastDate.day();
 
-switch(items[indx].periodMode)
+switch(items[currIndex].period)
 {
 case Rotate::Daily:
 	if ((nowYear!=lastYear) || (nowMonth!=lastMonth) || (nowDay!=lastDay))
@@ -212,7 +217,7 @@ case Rotate::Daily:
 case Rotate::Weekly:
 	nowWeek=nowDate.week();
 	lastWeek=lastDate.week();
-	if (nowWeek==0) // Нужно смотреть на предыдущую неделю в предыдущем году
+	if (nowWeek==0) // Нужно смотреть на последнюю неделю в предыдущем году
 	{
 		nowWeek=53;
 		--nowYear;
@@ -228,6 +233,14 @@ case Rotate::Monthly:
 		ret=true;
 	}
 	break;
+default:
+		Timespan diffTime(items[currIndex].period-1,23,0,0,0);  //Сколько нужно отнять
+		nowDate-=diffTime; // Дата с которой сверяют
+		if (lastDate<nowDate)
+		{
+			ret=true;
+		}
+		break;
 }
 return ret;
 }
@@ -273,6 +286,11 @@ void LogRotator::rotateFiles(const std::string &fileMask,const Poco::Path &pSour
 			}
 			
 			++it;
+		}
+		// Сохранение даты ротации, если shift
+		if (items[currIndex].shift && !_debugMode && items[currIndex].period>0)
+		{
+			rstatus.setDate(items[currIndex].confName,items[currIndex].name); // Сохраняем дату ротации
 		}
 
 	
@@ -639,7 +657,7 @@ int i;
 		// Указано хоть что-то для ротации
 		if (items[i].shift)
 		{
-			if (items[i].limitSize==0 && items[i].periodMode==Rotate::None)
+			if (items[i].limitSize==0 && items[i].period==0)
 			{
 				ret=false;
 				entryOk=false;
@@ -755,19 +773,19 @@ if (!RootKeys.empty())
 				RotateEntry re(confName,RootKeys.at(i),Source,ArchiverName);
 				//re=new RotateEntry(confName,RootKeys.at(i),Source,ArchiverName);
 				
-				// Режим сдвига. Доложен идти первым!
-				KeyName=RootKeys.at(i)+".Shift";
-				re.shift=pConf->getBool(KeyName,false);
+				// Размер (возможно выставление shift)
+				KeyName=RootKeys.at(i)+".Size";
+				KeyValue=pConf->getString(KeyName,"");
+				re.setSize(KeyValue);
 
-				//Период
+				//Период (задает shift)
 				KeyName=RootKeys.at(i)+".Period";
 				KeyValue=pConf->getString(KeyName,"0");
 				re.setPeriod(KeyValue);
 
-				// Размер
-				KeyName=RootKeys.at(i)+".Size";
-				KeyValue=pConf->getString(KeyName,"");
-				re.setSize(KeyValue);
+				// Режим сдвига. Доложен идти после автоопределяемых полей
+				KeyName=RootKeys.at(i)+".Shift";
+				re.shift=pConf->getBool(KeyName,re.shift);
 				
 				// Keep Период
 				KeyName=RootKeys.at(i)+".Keep";
@@ -781,7 +799,7 @@ if (!RootKeys.empty())
 				}
 				*/
 
-				// Target Dir
+				// Target Dir. Должен идти после однозначного определения shift
 				KeyName=RootKeys.at(i)+".TargetDir";
 				TargetDir=pConf->getString(KeyName,"");
 				// Target Mask

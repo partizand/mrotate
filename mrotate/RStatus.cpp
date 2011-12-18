@@ -33,7 +33,7 @@
 //#include <Poco\DirectoryIterator.h>
 #include <Poco\NumberParser.h>
 #include <Poco\NumberFormatter.h>
-//#include <Poco\DateTimeFormatter.h>
+#include <Poco\DateTimeFormatter.h>
 //#include <Poco\Glob.h>
 #include <Poco\Timestamp.h>
 
@@ -101,6 +101,7 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 	Timestamp tsDate=Timestamp::fromEpochTime(iDate); //fromUtcTime(iDate);// fromEpochTime(iDate);
 	
 	DateTime retDate(tsDate);
+	
 	//rDate=iDate;
 	//Timestamp tsDate(iDate);
 	
@@ -119,12 +120,12 @@ void RStatus::setDate(const std::string &confName,const std::string &entryName)
 	Timestamp nowDate;
 	Int64 iDate=nowDate.epochTime();// utcTime();// epochTime();// epochMicroseconds();
 	string strDate=NumberFormatter::format(iDate);
-	//string strmanDate=DateTimeFormatter::format(nowDate,"%Y-%m-%d %H:%M"); 
+	string strmanDate=DateTimeFormatter::format(nowDate,"%Y-%m-%d %H:%M"); 
 
 	string KeyName=confName+"."+entryName;
 
 	pConf->setString(KeyName,strDate);
-	//pConf->setString(KeyName+".Date",strmanDate);
+	pConf->setString(KeyName+".Date",strmanDate);
 	save();
 }
 //------------------------------------------------------------------------

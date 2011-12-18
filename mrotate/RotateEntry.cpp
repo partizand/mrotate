@@ -77,26 +77,46 @@ RotateEntry::RotateEntry(const std::string &ConfName,
 	dateMode=Rotate::Last;
 	dateReplaceMode=Rotate::Now;
 }
+//------------------------------------------------------
 //! Установить период ротации 
 void RotateEntry::setPeriod(const std::string &Period)
 {
-	if (shift)
+	int iPeriod=0;
+	if (!Period.empty())
 	{
-		periodMode=Rotate::periodModeFromString(Period);
-		period=0;
+		if (icompare(Period,0,1,"D")==0)
+			{
+				iPeriod=Rotate::Daily;
+				shift=true;
+			}
+		else if (icompare(Period,0,1,"W")==0)
+			{
+				iPeriod=Rotate::Weekly;
+				shift=true;
+			}
+		else if (icompare(Period,0,1,"M")==0)
+			{
+				iPeriod=Rotate::Monthly;
+				shift=true;
+			}
+		else
+		{
+			NumberParser::tryParse(Period,iPeriod);
+			shift=false;
+		}
+		
 	}
-	else
-	{
-		int iPeriod=0;
-		NumberParser::tryParse(Period,iPeriod);
-		period=iPeriod;
-	}
+	period=iPeriod;
+	
 }
+//------------------------------------------------------
 //! Установить размер
 void RotateEntry::setSize(std::string &lSize)
 {
 	limitSize=Rotate::convertSize(lSize);
+	if (limitSize>0) shift=true;
 }
+//------------------------------------------------------
 //! Установить приемник
 void RotateEntry::setTarget(const std::string &TargetDir,const std::string &TargetMask)
 {
@@ -234,9 +254,10 @@ Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defa
 }
 
 //! Получение периода ротации из строки
-Rotate::PeriodMode periodModeFromString(const std::string &str)
+/*
+int periodModeFromString(const std::string &str)
 {
-	Rotate::PeriodMode ret=Rotate::None;
+	int ret=0;
 	if (!str.empty())
 	{
 		if (icompare(str,0,1,"D")==0)
@@ -255,6 +276,7 @@ Rotate::PeriodMode periodModeFromString(const std::string &str)
 	}
 	return ret;
 }
+*/
 //------------------------------------------------------------------------
 //! Преобразование размера в int64 (Т.е. строка может содержать K и M)
 Poco::Int64 convertSize(std::string &strSize)
