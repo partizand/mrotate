@@ -56,6 +56,7 @@ RotateEntry::RotateEntry(const std::string &ConfName,
 	archiverName(ArchiverName)
 	
 {
+	
 	// Вычисляемые значения. Маска файлов источника
 	Path sPath(source);
 	sPath.makeFile();
@@ -86,17 +87,17 @@ void RotateEntry::setPeriod(const std::string &Period)
 	{
 		if (icompare(Period,0,1,"D")==0)
 			{
-				iPeriod=Rotate::Daily;
+				iPeriod=Rotate::DAILY;
 				shift=true;
 			}
 		else if (icompare(Period,0,1,"W")==0)
 			{
-				iPeriod=Rotate::Weekly;
+				iPeriod=Rotate::WEEKLY;
 				shift=true;
 			}
 		else if (icompare(Period,0,1,"M")==0)
 			{
-				iPeriod=Rotate::Monthly;
+				iPeriod=Rotate::MONTHLY;
 				shift=true;
 			}
 		else

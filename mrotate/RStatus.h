@@ -46,12 +46,13 @@ public:
 	//! Сохранить статусы
 	void save();
 private:
-	//! Имя файла со статусами ротацийs
+	//! Имя файла со статусами ротаций
 	std::string statusFileName;
 	//! Открытый файл конфигурации
-	//Poco::Util::PropertyFileConfiguration *pConf;
 	Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> pConf;
-	//Poco::Util::AbstractConfiguration *pConf;
+	//! Имя ключа из имени файла и имени записи в файле
+	std::string getKeyName(const std::string &confName,const std::string &entryName);
+
 
 	//! Даты ротаций
 	std::map<std::string,Poco::Timestamp> rDates;

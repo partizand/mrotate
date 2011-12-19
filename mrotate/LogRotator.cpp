@@ -208,13 +208,13 @@ int nowYear,lastYear,nowMonth,lastMonth,nowDay,lastDay,nowWeek,lastWeek;
 
 switch(items[currIndex].period)
 {
-case Rotate::Daily:
+case Rotate::DAILY:
 	if ((nowYear!=lastYear) || (nowMonth!=lastMonth) || (nowDay!=lastDay))
 	{
 		ret=true;
 	}
 	break;
-case Rotate::Weekly:
+case Rotate::WEEKLY:
 	nowWeek=nowDate.week();
 	lastWeek=lastDate.week();
 	if (nowWeek==0) // Нужно смотреть на последнюю неделю в предыдущем году
@@ -222,12 +222,17 @@ case Rotate::Weekly:
 		nowWeek=53;
 		--nowYear;
 	}
+	if (lastWeek==0) // Нужно смотреть на последнюю неделю в предыдущем году
+	{
+		lastWeek=53;
+		--lastYear;
+	}
 	if ((nowYear!=lastYear) || (nowWeek!=lastWeek))
 	{
 		ret=true;
 	}
 	break;
-case Rotate::Monthly:
+case Rotate::MONTHLY:
 	if ((nowYear!=lastYear) || (nowMonth!=lastMonth))
 	{
 		ret=true;

@@ -120,19 +120,19 @@ protected:
 				.repeatable(false)
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleForce)));
 		options.addOption(
-			Option("conf", "c", "load rotate entries from a file")
+			Option("conf", "c", "load rotate entries from a file. Default is mrotate.ini")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadEntries)));
 		options.addOption(
-			Option("arh", "a", "load archivers settings from a file")
+			Option("arh", "a", "load archivers settings from a file. Default is archivers.ini")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
 				.callback(OptionCallback<RotateApp>(this, &RotateApp::handleLoadEntries)));
 		options.addOption(
-			Option("status", "s", "Set status filename")
+			Option("status", "s", "Set status filename. Default is mrotate.status")
 				.required(false)
 				.repeatable(false)
 				.argument("file")

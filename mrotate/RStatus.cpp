@@ -88,7 +88,7 @@ Poco::DateTime RStatus::getDate(const std::string &confName,const std::string &e
 	string sDate;
 	Int64 iDate;
 
-	string KeyName=confName+"."+entryName;
+	string KeyName=getKeyName(confName,entryName);
 
 	sDate=pConf->getString(KeyName,"");
 	
@@ -122,11 +122,18 @@ void RStatus::setDate(const std::string &confName,const std::string &entryName)
 	string strDate=NumberFormatter::format(iDate);
 	string strmanDate=DateTimeFormatter::format(nowDate,"%Y-%m-%d %H:%M"); 
 
-	string KeyName=confName+"."+entryName;
+	string KeyName=getKeyName(confName,entryName);
 
 	pConf->setString(KeyName,strDate);
-	pConf->setString(KeyName+".Date",strmanDate);
+	pConf->setString(KeyName+".date",strmanDate);
 	save();
+}
+//------------------------------------------------------------------------
+//! Имя ключа из имени файла и имени записи в файле
+std::string RStatus::getKeyName(const std::string &confName,const std::string &entryName)
+{
+	string KeyName=toLower(confName)+"."+toLower(entryName);
+	return KeyName;
 }
 //------------------------------------------------------------------------
 //! Загрузка параметров из файла

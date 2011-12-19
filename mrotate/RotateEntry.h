@@ -30,9 +30,9 @@
 
 namespace Rotate
 {
-	const int Daily=1;
-	const int Weekly=7;
-	const int Monthly=30;
+	const int DAILY=1;
+	const int WEEKLY=7;
+	const int MONTHLY=30;
 	//! Режим обработки даты файла
 	enum DateMode {Created,Modified,Last,First,Now};
 	//! Режим ротации при shift	
