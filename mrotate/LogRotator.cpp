@@ -44,7 +44,7 @@ using namespace std;
 using namespace Poco;
 using namespace Util;
 
-const string ver="0.2"; // Версия ротатора
+const string ver="0.2 beta"; // Версия ротатора
 
 LogRotator::LogRotator(Poco::Logger &logger):
 	archiver(logger),
