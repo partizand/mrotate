@@ -383,14 +383,20 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 	map<int,string>::reverse_iterator rit;
 	for (rit=fileList.rbegin();rit!=fileList.rend();++rit)
 	{
+		
 		// Удаляем лишнее
 		if (items[currIndex].keepPeriod>0)
 		{
-		if (rit->first >= items[currIndex].keepPeriod) // Индекс файла больше
+			if (rit->first >= items[currIndex].keepPeriod) // Индекс файла больше
+			{
+			removeFile(rit->second);
+			continue;
+			}
+		}
+		else if (rit->first>=MAXINDEX) // Индекс превышает возможный
 		{
 			removeFile(rit->second);
 			continue;
-		}
 		}
 		// Сдвигаем остальное
 		
