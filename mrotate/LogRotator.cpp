@@ -89,7 +89,7 @@ void LogRotator::rotate()
 		
 		suc=archiver.isValid(items[i].archiverName);
 		if (!suc) continue; // Ошибка в архиваторе
-		poco_information_f1(*log,"Start rotate entry %s.",items[i].source);
+		poco_information_f2(*log,"Start rotate entry %s (%s).",items[i].name,items[i].source);
 		// Скрипт перед ротацией
 		executeScript(items[i].preRotate);
 		
