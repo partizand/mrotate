@@ -216,7 +216,7 @@ protected:
 			rotator.archiver.load(arhFile); // Грузим пользовательские архиваторы
 
 
-			if (!_loadRequested) 
+			if (!_loadRequested && (_debugReq || _runRequested || _checkRequested)) 
 			{
 				logger().information("Loading standart config file.");
 				rotator.load(&config());
