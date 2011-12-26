@@ -79,6 +79,8 @@ public:
 	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTim,int index=0);
 	//! Заменить имя файла и дату в векторе
 	static void replaceFileAndDate(std::vector<std::string> &strVect,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTime,int index=0);
+	//! Возращает позицию начала индекса в файле
+	static std::string::size_type getIndexPos(const std::string &baseFileName,const std::string &fileName);
 private:
 	//! Заменить дату/время в строке на *
 	static std::string replaceDateMask(const std::string &str);

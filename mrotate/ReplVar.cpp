@@ -132,6 +132,40 @@ else
 }
 return tmpStr;
 }
+
+//------------------------------------------------------------------------
+//! Возращает позицию начала индекса в файле
+std::string::size_type ReplVar::getIndexPos(const std::string &baseFileName,const std::string &fileName)
+{
+	string fName(fileName);
+	int ind=-1;
+	// Убрать расширение архиватора
+	string ext=archiver.getExtension(items[currIndex].archiverName);
+	if (!ext.empty())
+	{
+		string to="";
+		replaceInPlace(fName,ext,to); // Тупой вариант, нужно переделать на более надежный
+	}
+	// fName теперь - имя файла без расширения архиватора
+	string strFind=ReplVar::replaceFile(items[currIndex].targetMask,baseFileName,"",-2);
+	// strFind- имя файла, где вместо индекса, написано %Index
+	string::size_type i=strFind.find("%Index"); // Позиция начала
+	if (i==string::npos || i+zeroPad>fName.length()) return ind; // Идекс не нашли
+	string strNum=string(fName,i,zeroPad); // Читаем индекс
+
+	NumberParser::tryParse(strNum,ind); // Пытаемся декодировать
+
+	//Path pFileName(fName);
+	//pFileName.makeFile();
+	//ext=pFileName.getExtension(); // Расширение без точки, типа 2
+	
+	//NumberParser::tryParse(ext,ind);
+	
+	return ind;
+
+
+}
+
 //------------------------------------------------------------------------
 //! Заменить дату/время в строке на *
 /*
