@@ -30,6 +30,7 @@
 #include <Poco\String.h>
 #include <Poco\Path.h>
 #include <Poco\NumberFormatter.h>
+#include <Poco\NumberParser.h>
 
 using namespace std;
 using namespace Poco;
@@ -135,37 +136,27 @@ return tmpStr;
 
 //------------------------------------------------------------------------
 //! Возращает позицию начала индекса в файле
-std::string::size_type ReplVar::getIndexPos(const std::string &baseFileName,const std::string &fileName)
+std::string::size_type ReplVar::getIndexPos(const std::string &baseFileName,const std::string &targetMask)
 {
-	string fName(fileName);
-	int ind=-1;
-	// Убрать расширение архиватора
-	string ext=archiver.getExtension(items[currIndex].archiverName);
-	if (!ext.empty())
-	{
-		string to="";
-		replaceInPlace(fName,ext,to); // Тупой вариант, нужно переделать на более надежный
-	}
+	
 	// fName теперь - имя файла без расширения архиватора
-	string strFind=ReplVar::replaceFile(items[currIndex].targetMask,baseFileName,"",-2);
+	DateTime dtNow;
+	string strFind=ReplVar::replaceFileAndDate(targetMask,baseFileName,"",dtNow,-2);
 	// strFind- имя файла, где вместо индекса, написано %Index
 	string::size_type i=strFind.find("%Index"); // Позиция начала
-	if (i==string::npos || i+zeroPad>fName.length()) return ind; // Идекс не нашли
-	string strNum=string(fName,i,zeroPad); // Читаем индекс
-
-	NumberParser::tryParse(strNum,ind); // Пытаемся декодировать
-
-	//Path pFileName(fName);
-	//pFileName.makeFile();
-	//ext=pFileName.getExtension(); // Расширение без точки, типа 2
-	
-	//NumberParser::tryParse(ext,ind);
-	
-	return ind;
+	return i;
 
 
 }
-
+//! Возвращает индекс файла, про его короткуму имени и позиции начала индекса
+int ReplVar::getIndex(const std::string &fileName,std::string::size_type posIndex)
+{
+	int ind=-1;
+	if (posIndex==string::npos || posIndex+zeroPad>fileName.length()) return ind;
+	string strNum=string(fileName,posIndex,zeroPad); // Читаем индекс
+	NumberParser::tryParse(strNum,ind); // Пытаемся декодировать
+	return ind;
+}
 //------------------------------------------------------------------------
 //! Заменить дату/время в строке на *
 /*
