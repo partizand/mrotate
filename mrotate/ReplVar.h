@@ -83,6 +83,8 @@ public:
 	static std::string::size_type getIndexPos(const std::string &baseFileName,const std::string &targetMask);
 	//! Возвращает индекс файла, про его короткуму имени и позиции начала индекса
 	static int getIndex(const std::string &fileName,std::string::size_type posIndex);
+	//! Возвращает имя файла с новым индексом index
+	static std::string setIndex(const std::string &fileName, int index,std::string::size_type posIndex);
 private:
 	//! Заменить дату/время в строке на *
 	static std::string replaceDateMask(const std::string &str);

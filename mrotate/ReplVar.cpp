@@ -59,6 +59,10 @@ std::string ReplVar::replaceFileAndDate(const std::string &str,const std::string
 {
 string ret(str);
 ret=replaceFile(ret,FileName,ArhFileName,index);
+//Замена %Index - > %%Index
+string From="%Index"; // Только имя файла
+string To="%%Index";
+ret=replace (ret,From,To);
 ret=replaceDate(ret,dateTime);
 return ret;
 }
@@ -157,6 +161,19 @@ int ReplVar::getIndex(const std::string &fileName,std::string::size_type posInde
 	NumberParser::tryParse(strNum,ind); // Пытаемся декодировать
 	return ind;
 }
+//! Возвращает имя файла с новым индексом index
+std::string ReplVar::setIndex(const std::string &fileName, int index,std::string::size_type posIndex)
+{
+	string newFileName="";
+	if (posIndex==string::npos || posIndex+zeroPad>fileName.length()) return newFileName;
+	string strIndex=NumberFormatter::format0(index,zeroPad);
+	Path sPath(fileName); // Получаем короткое имя файла
+	sPath.makeFile();
+	newFileName=sPath.getFileName();
+	newFileName=newFileName.replace(posIndex,zeroPad,strIndex);
+	return newFileName;
+}
+
 //------------------------------------------------------------------------
 //! Заменить дату/время в строке на *
 /*

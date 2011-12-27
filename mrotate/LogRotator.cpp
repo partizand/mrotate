@@ -70,6 +70,7 @@ void LogRotator::rotate()
 {
 	int i;
 	bool suc;
+	bool needPostScript; // Нужно выполнить скрипт после ротации
 	string fileMask;
 	//string oldArhMask;
 	//vector<string> vectArgs;
@@ -90,9 +91,8 @@ void LogRotator::rotate()
 		suc=archiver.isValid(items[i].archiverName);
 		if (!suc) continue; // Ошибка в архиваторе
 		poco_information_f2(*log,"Start rotate entry %s (%s).",items[i].name,items[i].source);
-		// Скрипт перед ротацией
-		executeScript(items[i].preRotate);
-		bool needPostScript=false; // Нужно выполнить скрипт после ротации
+		
+		needPostScript=false; // Нужно выполнить скрипт после ротации
 
 		if (items[i].shift) // Ротация в режиме сдвига
 		{
@@ -380,7 +380,8 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 	// Проходим по списку в обратном направлении (по убыванию индексов)
 	Path pDest(destDir);
 	pDest.makeDirectory();
-
+	
+	string newFileName;
 	map<int,string>::reverse_iterator rit;
 	for (rit=fileList.rbegin();rit!=fileList.rend();++rit)
 	{
@@ -401,8 +402,9 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 		}
 		// Сдвигаем остальное
 		
-		string newFileName=ReplVar::replaceFile(items[currIndex].targetMask,srcFile,"",rit->first+1);
-		newFileName+=archiver.getExtension(items[currIndex].archiverName);
+		newFileName=ReplVar::setIndex(rit->second,rit->first+1,posIndex); //ReplVar::replaceFile(items[currIndex].targetMask,srcFile,"",rit->first+1);
+		if (newFileName.empty()) continue;
+		//newFileName+=archiver.getExtension(items[currIndex].archiverName);
 		pDest.setFileName(newFileName); // Новое имя файла с новым индексом
 		Executer::moveFile(rit->second,pDest.toString(),_debugMode,*log);
 
