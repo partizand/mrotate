@@ -96,7 +96,7 @@ private:
 	//! Сдвинуть старые файлы заданного файла
 	void shiftFile(const std::string &srcFile,const std::string &destDir);
 	//! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2)
-	int getIndexOfFile(const std::string &baseFileName,const std::string &fileName);
+	//int getIndexOfFile(const std::string &baseFileName,const std::string &fileName);
 
 	//! Возвращает маску для удаляемых файлов для текущего задания
 	std::string getRemoveMask();

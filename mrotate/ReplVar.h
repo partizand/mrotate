@@ -74,7 +74,7 @@ public:
 	static std::string replaceDate(const std::string &str,Poco::DateTime dateTime);
 	
 	//! Заменить имя файла в строке
-	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName="",int index);
+	static std::string replaceFile(const std::string &str,const std::string &FileName,const std::string &ArhFileName,int index);
 	//! Заменить имя файла и дату в строке
 	static std::string replaceFileAndDate(const std::string &str,const std::string &FileName,const std::string &ArhFileName,Poco::DateTime dateTim,int index);
 	//! Заменить имя файла и дату в векторе

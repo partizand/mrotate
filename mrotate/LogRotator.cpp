@@ -92,12 +92,15 @@ void LogRotator::rotate()
 		poco_information_f2(*log,"Start rotate entry %s (%s).",items[i].name,items[i].source);
 		// Скрипт перед ротацией
 		executeScript(items[i].preRotate);
-		
+		bool needPostScript=false; // Нужно выполнить скрипт после ротации
 
 		if (items[i].shift) // Ротация в режиме сдвига
 		{
 			if (_force) 
 			{
+				// Скрипт перед ротацией
+				executeScript(items[i].preRotate);
+				needPostScript=true;
 				rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
 			}
 			else
@@ -109,12 +112,18 @@ void LogRotator::rotate()
 					// Здесь нужно опеределиться нужна ли ротация, если нужна, то для всех файлов
 					if (isNeedRotate())
 					{
+					// Скрипт перед ротацией
+					executeScript(items[i].preRotate);
 					rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,0);
+					needPostScript=true;
 				
 					}
 				}
 				else if (items[i].limitSize>0) // Ротация по размеру
 				{
+					// Скрипт перед ротацией
+					executeScript(items[i].preRotate);
+					needPostScript=true;
 					// Ротируем файлы
 					rotateFiles(fileMask,sourceDir,destDir,items[i].recurse,true,0,items[i].limitSize);
 				}
@@ -124,6 +133,9 @@ void LogRotator::rotate()
 		}
 		else // Ротация в режиме Win
 		{
+			// Скрипт перед ротацией
+			executeScript(items[i].preRotate);
+			needPostScript=true;
 			if (items.at(i).period>0 || items.at(i).limitSize>0) // Ротация файлов
 			{
 		
@@ -145,24 +157,8 @@ void LogRotator::rotate()
 		
 		
 		// Скрипт после ротации
-		executeScript(items[i].postRotate);
-		/*
-		if (!items[i].postRotate.empty())
-		{
-			if (!_debugMode)
-			{
-			//poco_information_f1(*log,"Launch process %s.",items[i].preRotate);
-			ret=Executer::execute(items[i].postRotate,vectArgs,*log);
-			poco_information_f2(*log,"Executed %s. Exit code %i",items[i].preRotate,ret);
-			}
-			else
-			{
-			poco_information_f1(*log,"[Debug] Launch process %s.",items[i].postRotate);
-			}
-			
-			
-		}
-		*/
+		if (needPostScript) executeScript(items[i].postRotate);
+		
 	}
 }
 //------------------------------------------------------------------------
@@ -350,6 +346,11 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 	fileMask+=archiver.getExtension(items[currIndex].archiverName);
 	// Строим список файлов
 	
+	string::size_type posIndex=string::npos; // Позиция индекса для данного файла
+	posIndex=ReplVar::getIndexPos(srcFile,items[currIndex].targetMask);
+
+	if (posIndex==string::npos) return; // Нет индекса
+
 	Glob glob(fileMask,Glob::GLOB_CASELESS); // Регистр не важен в маске
 		map<int,string> fileList; // Список файлов с индексами
 		int ind;
@@ -362,7 +363,7 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 				if (glob.match(it.name())) // Проходит по маске
 				{
 					// Добавляем в список
-					ind=getIndexOfFile(srcFile,it.name());
+					ind=ReplVar::getIndex(it.name(),posIndex);
 					if (ind>=0)
 					{
 						fileList[ind]=it->path();
@@ -412,6 +413,7 @@ void LogRotator::shiftFile(const std::string &srcFile,const std::string &destDir
 //------------------------------------------------------------------------
 //! Возращает индекс файла (из конструкции test.log.2.7z -> вернет 2, если targetMask=%FileName.%Index)
 // Если ничего не получилось вернет -1
+/*
 int LogRotator::getIndexOfFile(const std::string &baseFileName,const std::string &fileName)
 {
 	string fName(fileName);
@@ -439,9 +441,8 @@ int LogRotator::getIndexOfFile(const std::string &baseFileName,const std::string
 	//NumberParser::tryParse(ext,ind);
 	
 	return ind;
-
-
 }
+*/
 //------------------------------------------------------------------------
 //! Проверить нужно ли ротировать данный файл, если period и lSize не заданы, файл нужно ротировать
 bool LogRotator::isRotateFile(Poco::File &pFile,int Period,Poco::Int64 lSize)
@@ -503,7 +504,7 @@ if (!pFile.exists()) return false; // Файла нет
 std::string LogRotator::getRemoveMask()
 {
 string retMask;
-retMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,items[currIndex].sourceMask,"",0);
+retMask=ReplVar::replaceFileAndDate(items[currIndex].targetMask,items[currIndex].sourceMask,"",0,0);
 retMask+=archiver.getExtension(items[currIndex].archiverName);
 return retMask;
 }
