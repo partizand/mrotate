@@ -83,26 +83,27 @@ RotateEntry::RotateEntry(const std::string &ConfName,
 void RotateEntry::setPeriod(const std::string &Period)
 {
 	int iPeriod=0;
-	if (!Period.empty())
+	string period=trim(Period);
+	if (!period.empty())
 	{
-		if (icompare(Period,0,1,"D")==0)
+		if (icompare(period,0,1,"D")==0)
 			{
 				iPeriod=Rotate::DAILY;
 				shift=true;
 			}
-		else if (icompare(Period,0,1,"W")==0)
+		else if (icompare(period,0,1,"W")==0)
 			{
 				iPeriod=Rotate::WEEKLY;
 				shift=true;
 			}
-		else if (icompare(Period,0,1,"M")==0)
+		else if (icompare(period,0,1,"M")==0)
 			{
 				iPeriod=Rotate::MONTHLY;
 				shift=true;
 			}
 		else
 		{
-			NumberParser::tryParse(Period,iPeriod);
+			NumberParser::tryParse(period,iPeriod);
 			shift=false;
 		}
 		
@@ -227,25 +228,26 @@ namespace Rotate
 Rotate::DateMode dateModeFromString(const std::string &str,Rotate::DateMode defaultMode)
 {
 	Rotate::DateMode ret=defaultMode;
-	if (!str.empty())
+	string tstr=trim(str);
+	if (!tstr.empty())
 	{
-		if (icompare(str,0,1,"M")==0)
+		if (icompare(tstr,0,1,"M")==0)
 			{
 				ret=Rotate::Modified;
 			}
-		else if (icompare(str,0,1,"C")==0)
+		else if (icompare(tstr,0,1,"C")==0)
 			{
 				ret=Rotate::Created;
 			}
-		else if (icompare(str,0,1,"N")==0)
+		else if (icompare(tstr,0,1,"N")==0)
 			{
 				ret=Rotate::Now;
 			}
-		else if (icompare(str,0,1,"L")==0)
+		else if (icompare(tstr,0,1,"L")==0)
 			{
 				ret=Rotate::Last;
 			}
-		else if (icompare(str,0,1,"F")==0)
+		else if (icompare(tstr,0,1,"F")==0)
 			{
 				ret=Rotate::First;
 			}

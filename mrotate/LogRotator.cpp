@@ -769,6 +769,7 @@ if (!RootKeys.empty())
 				// Источник
 				KeyName=RootKeys.at(i)+".Source";
 				Source=pConf->getString(KeyName,"");
+				trimInPlace(Source);
 				if (Source.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Source missing",RootKeys.at(i));
@@ -778,6 +779,7 @@ if (!RootKeys.empty())
 				KeyName=RootKeys.at(i)+".Compress";
 				ArchiverName=pConf->getString(KeyName,"");
 				toLowerInPlace(ArchiverName);
+				trimInPlace(ArchiverName);
 				if (ArchiverName.empty()) 
 				{
 					poco_error_f1(*log,"Skip entry %s. Archiver is empty",RootKeys.at(i));
@@ -805,20 +807,12 @@ if (!RootKeys.empty())
 				KeyName=RootKeys.at(i)+".Keep";
 				re.keepPeriod=pConf->getInt(KeyName,0);
 				
-				/*
-				if (LimitSize==0 && Period==0 && KeepPeriod==0) 
-				{
-					poco_error_f1(*log,"Skip entry %s. Period, KeepPeriod and size is null",RootKeys.at(i));
-					continue;
-				}
-				*/
-
 				// Target Dir. Должен идти после однозначного определения shift
 				KeyName=RootKeys.at(i)+".TargetDir";
-				TargetDir=pConf->getString(KeyName,"");
+				TargetDir=trim(pConf->getString(KeyName,""));
 				// Target Mask
 				KeyName=RootKeys.at(i)+".TargetMask";
-				TargetMask=pConf->getString(KeyName,"");
+				TargetMask=trim(pConf->getString(KeyName,""));
 				
 				re.setTarget(TargetDir,TargetMask);
 
@@ -838,10 +832,10 @@ if (!RootKeys.empty())
 				
 				// Скрипт перед ротацией
 				KeyName=RootKeys.at(i)+".PreRotate";
-				re.preRotate=pConf->getString(KeyName,"");
+				re.preRotate=trim(pConf->getString(KeyName,""));
 				// Скрипт после ротации
 				KeyName=RootKeys.at(i)+".PostRotate";
-				re.postRotate=pConf->getString(KeyName,"");
+				re.postRotate=trim(pConf->getString(KeyName,""));
 				
 				items.push_back(re);
 				//items.push_back(tmpItem);
