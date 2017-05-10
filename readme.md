@@ -87,3 +87,29 @@ If you change the name of the entry, you may lose information about the date of 
  To compress files specified by << arh, the archiving rule >> or not to compress ("no") - there will be a simple renaming
 * `TargetDir`  
  The directory for placing old files, if not specified, the archive files are created near to the originals
+* `TargetMask`  
+ Mask the name of the archives, the archiver's extension is always added to it.
+   * For rotation mode 1  
+    The default is% FileName. It can also contain date-time parameters that will be replaced by the date / time specified by the DateReplace parameter. If the name is not unique, then in the archive there will be several files.
+   * For rotation mode 2 (shift)  
+	The default is %FileName%%Index%. Must contain the %Index% parameter. It can contain date/time parameters, but for any date they must have the same length. Ie it is permissible, for example, to specify %FileBaseName% Y% m% d-% H% M.% Index and not valid% FileBaseName.% Y-% B-% d-% H% M.% Index % B (full month name) can have different lengths. Date / time settings are always replaced with the date / time specified by the DateReplace parameter.
+* `Keep`  
+ How many days to store old files, the analogue of the `Period`, if not specified, then forever. With shift mode, this is the number of stored rotations
+* `DateMode`  
+ What date to take from files, by default Last.
+ Used only when shift mode is off. Pay attention to file dates, they may not be as you expect!  
+ Possible (only the first letter is verified):
+  * Modify  
+   File modification date
+  * Created  
+   Date of file creation
+  * Last  
+   The latest of the creation and modification dates. Date closest to current
+  * First  
+   The earliest of the creation and modification dates.
+* `DateReplace`  
+ The replacement date in the date parameters (like %d%), the default Now is the current one, Modify, Created, Last, First are also possible (see the DateMode parameter, only the first letter is checked).
+* `Prerotate`  
+ The script before rotation is executed once for the entire record
+* `Postrotate`  
+ The script after rotation is executed once for the entire record
