@@ -113,3 +113,37 @@ If you change the name of the entry, you may lose information about the date of 
  The script before rotation is executed once for the entire record
 * `Postrotate`  
  The script after rotation is executed once for the entire record
+ 
+## Archiving
+
+Archiving is performed by an external archiver, it must be in %Path% paths or in the current directory.
+The name of the archiving rule is specified in the `compress` parameter. (This parameter is required)
+
+The following archiving rules are protected in the program:
+
+
+Title   | Description | Start command
+--- | --- | ---
+No | Just renaming files | no
+7z | Archiving into a 7z container using the PPMD ??algorithm (for text files) | 7z.exe a% ArhFileName% FullFileName -m0 = PPMd
+7zLzma | 7z archiving according to the LZMA algorithm | 7z.exe a% ArhFileName% FullFileName
+Rar | Archiving rar | rar.exe a% ArhFileName% FullFileName
+WinRar | Backup WinRar | winrar.exe a% ArhFileName% FullFileName
+
+
+Add your own archiving rules by creating an archivers.ini file, about this:
+```ini
+; The name of the partition is the name of the archiver
+; The name must be unique. If you specify a name sewn into the program, it will be redefined.
+[7zlzma2]
+; The name of the executable file, without specifying the path
+; (Although it is possible to specify the full path, but there will not be a search in Path)
+ExeName = 7z.exe
+; Archive File Extension
+Extension = .7z
+; Arguments of the archiver, are divided by spaces, quotes will not work!
+; Instead of the file name, substitute% FullFileName, instead of the name of the archive% ArhFileName
+Args = a% ArhFileName% FullFileName -m0 = LZMA2
+```
+
+After that, you can use 7zLzma2 in the `compress` parameter, the files will be compressed using the Lzma2
