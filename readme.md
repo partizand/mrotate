@@ -32,12 +32,12 @@ In the case of this mode, file dates are not analyzed. Information about the dat
 
 The modes are determined automatically, depending on the settings of `Period` and `Size`. If Period is specified by a number, the first mode is used. In other cases, the second one is used (when Period is equal to Daily, Weekly or Monthly, or when the file size is specified). However, you can always set the mode you need manually by specifying `shift=no` for the first mode and `shift=yes` for the second.
 
-Rotation settings are specified via ini configuration text files. (You can also use the format in java-style).
+Rotation settings are specified via ini configuration text files. (You can also use the format in [java-style](#format-in-java-style)).
 The default configuration file is mrotate.ini.
 
 The general scheme of use is as follows: specify the settings for the rotations in the mrotate.ini file and add the daily launch of `mrotate.exe /r` to the scheduler
 
-## Startup Options
+## Command-line options
 
 * `/help, /h` - Display the list of available keys
 * `/rotate, /r` - Run the rotation process for all loaded rotation settings
@@ -48,22 +48,23 @@ The general scheme of use is as follows: specify the settings for the rotations 
 * `/arh=file, /a=file` - Load the settings of archiving rules from the specified file, the parameter can be specified several times. In addition to the above, the archivers.ini file is always processed
 * `/status=file, /s=file` - Use the specified rotation status file instead of the default
 
-## Configuration File Format
+## Configuration file format
 
 The configuration file contains the rotation settings (the usual ini format). UTF-8 encoding
 
 Common file format:
 
 ```ini
-[Recording_Name1]
+[Rule_Name1]
 Options
-[Recording_name2]
+
+[Rule_name2]
 Options
 ```
 
 If you change the name of the entry, you may lose information about the date of the last rotation and an extraordinary rotation will occur. The same when changing the name of the settings file. (Only with shift mode)
 
-### Description of parameters
+### Ini options
 
 * `Source`  
  Directory and mask of rotated files
@@ -91,7 +92,7 @@ If you change the name of the entry, you may lose information about the date of 
    * For rotation mode 1  
     The default is% FileName. It can also contain date-time parameters that will be replaced by the date / time specified by the DateReplace parameter. If the name is not unique, then in the archive there will be several files.
    * For rotation mode 2 (shift)  
-	The default is %FileName%%Index%. Must contain the %Index% parameter. It can contain date/time parameters, but for any date they must have the same length. Ie it is permissible, for example, to specify %FileBaseName% Y% m% d-% H% M.% Index and not valid% FileBaseName.% Y-% B-% d-% H% M.% Index % B (full month name) can have different lengths. Date / time settings are always replaced with the date / time specified by the DateReplace parameter.
+	The default is %FileName%%Index%. Must contain the %Index% parameter. It can contain date/time parameters, but for any date they must have the same length. Ie it is permissible, for example, to specify %FileBaseName.%y%m%d-%H%M.%Index and not valid %FileBaseName.%y-%B-%d-%H%M.%Index because %B (full month name) can have different lengths. Date/time settings are always replaced with the date/time specified by the DateReplace parameter.
 * `Keep`  
  How many days to store old files, the analogue of the `Period`, if not specified, then forever. With shift mode, this is the number of stored rotations
 * `DateMode`  
@@ -107,7 +108,7 @@ If you change the name of the entry, you may lose information about the date of 
   * First  
    The earliest of the creation and modification dates.
 * `DateReplace`  
- The replacement date in the date parameters (like %d%), the default Now is the current one, Modify, Created, Last, First are also possible (see the DateMode parameter, only the first letter is checked).
+ The replacement date in the date parameters (like `%d`), the default Now is the current one, Modify, Created, Last, First are also possible (see the DateMode parameter, only the first letter is checked).
 * `Prerotate`  
  The script before rotation is executed once for the entire record
 * `Postrotate`  
@@ -121,7 +122,7 @@ The name of the archiving rule is specified in the `compress` parameter. (This p
 The following archiving rules are protected in the program:
 
 
-Title   | Description | Start command
+Title | Description | Start command
 --- | --- | ---
 No | Just renaming files | no
 7z | Archiving into a 7z container using the PPMD algorithm (for text files) | 7z.exe a %ArhFileName% %FullFileName% -m0=PPMd
@@ -137,12 +138,12 @@ Add your own archiving rules by creating an archivers.ini file, about this:
 [7zlzma2]
 ; The name of the executable file, without specifying the path
 ; (Although it is possible to specify the full path, but there will not be a search in Path)
-ExeName = 7z.exe
+ExeName=7z.exe
 ; Archive File Extension
-Extension = .7z
+Extension =.7z
 ; Arguments of the archiver, are divided by spaces, quotes will not work!
 ; Instead of the file name, substitute %FullFileName%, instead of the name of the archive %ArhFileName%
-Args = a %ArhFileName% %FullFileName% -m0 = LZMA2
+Args=a %ArhFileName% %FullFileName% -m0=LZMA2
 ```
 
 After that, you can use 7zLzma2 in the `compress` parameter, the files will be compressed using the Lzma2
@@ -234,7 +235,8 @@ Keep=10
 ## Output messages to a file
 
 By default, all messages are output to the console. Redirecting output to a file (> log.txt) does not work (standard output stream is not used). If you need to write messages to a file, create a logging section in the mrotate.ini file
-----------------------------------------------
+
+```
 [Logging]
 ; The log is maintained on the console and in a file
 Formatters.f1.class = PatternFormatter
@@ -262,7 +264,7 @@ Channels.croot.channels = c1,c2
 
 Loggers.root.channel = croot
 Loggers.root.level = information
-----------------------------------------------
+```
 
 You can use any of the logging settings from [Poco](http://pocoproject.org/docs/Poco.FileChannel.html)
 
@@ -295,11 +297,9 @@ The 7-zip archiver can be downloaded for free at http://7-zip.org/
 
 ## Contacts
 
-
 https://github.com/partizand/mrotate
 
 ## Annex
-
 
 Valid parameters in targetMask
 
