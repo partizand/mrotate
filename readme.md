@@ -3,6 +3,8 @@ mrotate 0.2
 
 Log rotation for Windows
 
+[Russian help](readme.rus)
+
 Console utility for rotating files.
 
 Works on Windows. Installation is not required, there are no dependencies.
@@ -140,7 +142,7 @@ Add your own archiving rules by creating an archivers.ini file, about this:
 ; (Although it is possible to specify the full path, but there will not be a search in Path)
 ExeName=7z.exe
 ; Archive File Extension
-Extension =.7z
+Extension=.7z
 ; Arguments of the archiver, are divided by spaces, quotes will not work!
 ; Instead of the file name, substitute %FullFileName%, instead of the name of the archive %ArhFileName%
 Args=a %ArhFileName% %FullFileName% -m0=LZMA2
@@ -167,7 +169,7 @@ Keep=10
 Source=d:\temp\rotate\*.log
 recurse=yes
 Period=35
-Ñompress=7z
+Compress=7z
 TargetDir=d:\temp\rotateold
 TargetMask=%Y%m
 Keep=180
