@@ -3,7 +3,7 @@ mrotate 0.2
 
 Log rotation for Windows
 
-[Russian help](readme.rus)
+[Russian help](readme-rus.asciidoc)
 
 Console utility for rotating files.
 
